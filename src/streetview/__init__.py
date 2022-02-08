@@ -187,7 +187,7 @@ def _download_tiles(tile_list, session=None):
                 print("Connection error. Trying again in 2 seconds.")
                 time.sleep(2)
 
-        tile_data[(x,y)] = response.content
+        tile_data[(x, y)] = response.content
         del response
 
     return tile_data
@@ -206,7 +206,7 @@ def _stitch_tiles(pano, tile_list, tile_data, zoom):
     panorama = Image.new('RGB', (img_size[1], img_size[0]))
 
     for x, y, url in tile_list:
-        tile = Image.open(BytesIO(tile_data[(x,y)]))
+        tile = Image.open(BytesIO(tile_data[(x, y)]))
         panorama.paste(im=tile, box=(x*tile_width, y*tile_height))
         del tile
 
@@ -215,7 +215,7 @@ def _stitch_tiles(pano, tile_list, tile_data, zoom):
 
 def get_coverage_tile(tile_x, tile_y, session=None):
     """
-    Gets all panoramas on a Google Maps tile (at zoom level 17 specifially, for some reason).
+    Gets all panoramas on a Google Maps tile (at zoom level 17 specifically, for some reason).
     Returns panoid, lat, lon only.
     This function uses the API call which is triggered when zooming into a tile in globe view on Google Maps,
     so it can be used to find hidden coverage.
@@ -248,7 +248,7 @@ def get_coverage_tile(tile_x, tile_y, session=None):
 
 def get_coverage_tile_by_latlon(lat, lon, session=None):
     """
-    Gets all panoramas on a Google Maps tile (at zoom level 17 specifially, for some reason).
+    Gets all panoramas on a Google Maps tile (at zoom level 17 specifically, for some reason).
     Returns panoid, lat, lon only.
     This function uses the API call which is triggered when zooming into a tile in globe view on Google Maps,
     so it can be used to find hidden coverage.
