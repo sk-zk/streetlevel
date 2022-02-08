@@ -1,4 +1,4 @@
-﻿class StreetViewPanorama:
+class StreetViewPanorama:
     def __init__(self, id, lat, lon):
         self.id = id
         self.lat = lat
