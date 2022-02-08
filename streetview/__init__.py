@@ -16,14 +16,14 @@ def is_third_party_panoid(panoid):
     return len(panoid) == 44
 
 
-def get_panos_at_position(lat, lon, radius=50, session=None):
+def find_panoramas(lat, lon, radius=50, session=None):
     """
     Searches for panoramas around a point.
     """
     url = "https://maps.googleapis.com/maps/api/js/GeoPhotoService.SingleImageSearch?pb=!1m5!1sapiv3!5sUS!11m2!1m1!1b0!2m4!1m2!3d{0:}!4d{1:}!2d{2}!3m10!2m2!1sen!2sGB!9m1!1e2!11m4!1m3!1e2!2b1!3e2!4m10!1e1!1e2!1e3!1e4!1e8!1e6!5m1!1e0!6m1!1e2&callback=_xdc_._v2mub5"
     url = url.format(lat, lon, radius)
 
-    if session == None:
+    if session is None:
         resp = requests.get(url).text
     else:
         resp = session.get(url).text
@@ -88,7 +88,7 @@ def lookup_panoid(panoid, session=None, download_depth=False):
     depth_toggle = 2 if download_depth else 0
     url = "https://www.google.com/maps/photometa/v1?authuser=0&hl=de&gl=de&pb=!1m4!1smaps_sv.tactile!11m2!2m1!1b1!2m2!1sde!2sde!3m3!1m2!1e{0}!2s{1}!4m57!1e1!1e2!1e3!1e4!1e5!1e6!1e8!1e12!2m1!1e1!4m1!1i48!5m1!1e1!5m1!1e{2}!6m1!1e1!6m1!1e2!9m36!1m3!1e2!2b1!3e2!1m3!1e2!2b0!3e3!1m3!1e3!2b1!3e2!1m3!1e3!2b0!3e3!1m3!1e8!2b0!3e3!1m3!1e1!2b0!3e3!1m3!1e4!2b0!3e3!1m3!1e10!2b1!3e2!1m3!1e10!2b0!3e3"
     url = url.format(pano_type, panoid, depth_toggle)
-    if session == None:
+    if session is None:
         response = requests.get(url).text
     else:
         response = session.get(url).text
