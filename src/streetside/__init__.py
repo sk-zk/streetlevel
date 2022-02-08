@@ -5,7 +5,7 @@ import math
 import numpy as np
 from PIL import Image
 import requests
-from streetside.panorama import StreetsidePanorama
+from .panorama import StreetsidePanorama
 
 
 TILE_SIZE = 256

@@ -5,8 +5,8 @@ import os
 from PIL import Image
 import requests
 import time
-from streetview.maps import *
-from streetview.panorama import StreetViewPanorama
+from .maps import *
+from .panorama import StreetViewPanorama
 
 
 def is_third_party_panoid(panoid):
