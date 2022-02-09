@@ -52,6 +52,6 @@ Returns whether or not a pano ID refers to third-party coverage rather than offi
 
 Fetches metadata of a specific panorama.
 
-**panoid**: The pano ID.
-**session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
+**panoid**: The pano ID.  
+**session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).  
 **download_depth**: Whether or not to download the depth map. The library does not yet parse this data, so for now, this should always be false.
