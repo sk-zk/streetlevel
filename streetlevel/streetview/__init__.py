@@ -182,14 +182,7 @@ def _download_tiles(tile_list, session=None):
 
     tile_data = {}
     for i, (x, y, url) in enumerate(tile_list):
-        while True:
-            try:
-                response = session.get(url, stream=True)
-                break
-            except requests.ConnectionError:
-                print("Connection error. Trying again in 2 seconds.")
-                time.sleep(2)
-
+        response = session.get(url, stream=True)
         tile_data[(x, y)] = response.content
         del response
 
