@@ -146,6 +146,7 @@ def get_panorama(pano, zoom=5):
     """
     Downloads a panorama as PIL image.
     """
+    zoom = min(zoom, len(pano.image_sizes) - 1)
     tile_list = _generate_tile_list(pano, zoom)
     tiles = _download_tiles(tile_list)
     stitched = _stitch_tiles(pano, tile_list, tiles, zoom)
@@ -161,7 +162,7 @@ def _generate_tile_list(pano, zoom):
     tile_width = pano.tile_size[0]
     tile_height = pano.tile_size[1]
     cols = math.ceil(img_size[1] / tile_width)
-    rows = math.ceil(img_size[0] / tile_height)
+    rows = math.ceil(img_size[0] / tile_height)    
 
     image_url = "http://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
     third_party_image_url = "https://lh3.ggpht.com/p/{0:}=x{1:}-y{2:}-z{3:}"
