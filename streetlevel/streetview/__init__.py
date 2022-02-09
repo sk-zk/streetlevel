@@ -114,7 +114,10 @@ def lookup_panoid(panoid, session=None, download_depth=False):
     except IndexError:
         street_name = None
 
-    neighbors = pano_data[1][0][5][0][3][0]
+    try:
+        neighbors = pano_data[1][0][5][0][3][0]
+    except IndexError:
+        neighbors = None
 
     # TODO: Properly parse historical panos & neighbors
 
