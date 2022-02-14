@@ -23,7 +23,7 @@ Retrieves panoramas within a rectangle.
 
 **north**, **west**: lat1/lon1.  
 **south**, **east**: lat2/lon2.  
-**limit**: Maximum number of results to return. 
+**limit**: Maximum number of results to return.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
 
 
