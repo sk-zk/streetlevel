@@ -44,7 +44,7 @@ def find_panoramas(north, west, south, east, limit=50):
         if "ne" in pano:
             pano_obj.next = pano["ne"]
         if "pr" in pano:
-            pano_obj.next = pano["pr"]
+            pano_obj.previous = pano["pr"]
         if "al" in pano:
             pano_obj.altitude = pano["al"]
         panos.append(pano_obj)
