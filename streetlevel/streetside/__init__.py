@@ -19,11 +19,11 @@ def from_base4(n):
     return int(n, 4)
 
 
-def find_panoramas(north, west, south, east, count=50):
+def find_panoramas(north, west, south, east, limit=50):
     """
     Returns panoramas within a bounding box (I think).
     """
-    url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?count={count}&north={north}&south={south}&east={east}&west={west}"
+    url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?count={limit}&north={north}&south={south}&east={east}&west={west}"
     response = requests.get(url)
     response_panos = response.json()
 
