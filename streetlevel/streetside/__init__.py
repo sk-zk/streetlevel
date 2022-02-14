@@ -4,6 +4,7 @@ from io import BytesIO
 import math
 import numpy as np
 from PIL import Image
+import pyproj
 import requests
 from .panorama import StreetsidePanorama
 
@@ -19,12 +20,16 @@ def from_base4(n):
     return int(n, 4)
 
 
-def find_panoramas(north, west, south, east, limit=50):
+def find_panoramas_in_rectangle(north, west, south, east, limit=50, session=None):
     """
-    Returns panoramas within a bounding box (I think).
+    Retrieves panoramas within a rectangle.
     """
     url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?count={limit}&north={north}&south={south}&east={east}&west={west}"
-    response = requests.get(url)
+    
+    if session is None:
+        response = requests.get(url)
+    else:
+        response = session.get(url) 
     response_panos = response.json()
 
     panos = []
@@ -32,7 +37,7 @@ def find_panoramas(north, west, south, east, limit=50):
         # todo: parse ro, pi, he, bl, ml, nbn, pbn, ad fields
         pano_obj = StreetsidePanorama(pano["id"], pano["la"], pano["lo"])
         if "cd" in pano:
-            # as it turns out, months/years without leading zeros
+            # as it turns out, months/days without leading zeros
             # don't have a cross-platform format code in strptime.
             # wanna guess what kind of dates bing returns?
             datestr = pano["cd"]
@@ -51,6 +56,18 @@ def find_panoramas(north, west, south, east, limit=50):
     return panos
 
 
+def find_panoramas(lat, lon, radius=25, limit=50, session=None):
+    """
+    Retrieves panoramas within a square around a point.
+    """
+    geod = pyproj.Geod(ellps="WGS84")
+    dist_to_corner = math.sqrt(2 * pow(2*radius, 2)) / 2
+    top_left = geod.fwd(lon, lat, 315, dist_to_corner)
+    bottom_right = geod.fwd(lon, lat, 135, dist_to_corner)
+    return find_panoramas_in_rectangle(top_left[1], top_left[0], 
+        bottom_right[1], bottom_right[0], limit=limit, session=session)
+    
+    
 def download_panorama(panoid, directory, zoom=3):
     """
     Downloads a panorama to the given directory.
