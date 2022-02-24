@@ -133,13 +133,12 @@ def lookup_panoid(panoid, session=None, download_depth=False):
     return pano
 
 
-def download_panorama(pano, directory, zoom=5):
+def download_panorama(pano, filename, zoom=5):
     """
-    Downloads a panorama to the given directory.
+    Downloads a panorama.
     """
     stitched = get_panorama(pano, zoom=zoom)
-    stitched.save(os.path.join(directory, f"{pano.id}.jpg"))
-    del stitched
+    stitched.save(filename)
 
 
 def get_panorama(pano, zoom=5):

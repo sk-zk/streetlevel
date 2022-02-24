@@ -9,10 +9,10 @@ Downloading the closest StreetView panorama to specific location:
 ```
 from streetlevel import streetview
 
-panos = streetview.find_panoramas(66.6804141, 34.3093958)
-streetview.download_panorama(panos[0], ".")
+panos = streetview.find_panoramas(46.8839586, 12.169002)
+streetview.download_panorama(panos[0], f"{panos[0].id}.jpg")
 ```
 
 ## Documentation
 
-Documentation of all available functionality is available in the `doc` folder.
+Documentation of all available functionality can be found in the `doc` folder.

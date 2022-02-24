@@ -1,11 +1,11 @@
-#### <code>download_panorama(<em>pano, directory, zoom=5</em>)</code>
+#### <code>download_panorama(<em>pano, filename, zoom=5</em>)</code>
 
-Downloads a panorama and saves it in the given directory. The pano ID will be used as filename.
+Downloads a panorama to a file.
 
 Supports all camera generations as well as third-party coverage.
 
 **pano**: A `StreetViewPanorama` object.  
-**directory**: The output directory.  
+**filename**: Output filename.  
 **zoom**: Image size; 0 is lowest, 5 is highest. The actual dimensions of the panorama depend on the camera generation used.
 If the requested zoom level does not exist, the highest available level will be used.
 

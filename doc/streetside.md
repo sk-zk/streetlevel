@@ -1,9 +1,9 @@
-#### <code>download_panorama(<em>panoid, directory, zoom=3</em>)</code>
+#### <code>download_panorama(<em>panoid, filename, zoom=3</em>)</code>
 
-Downloads a panorama and saves it in the given directory. The pano ID will be used as filename.
+Downloads a panorama to a file.
 
 **panoid**: The pano ID.  
-**directory**: The output directory.  
+**filename**: Output filename.  
 **zoom**: Image size; 0 is lowest, 3 is highest.
 
 
