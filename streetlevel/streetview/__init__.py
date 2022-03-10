@@ -17,7 +17,7 @@ def is_third_party_panoid(panoid):
     return len(panoid) == 44
 
 
-def _find_panoramas_raw(lat, lon, radius=50, download_depth=False, session=None):
+def _find_panorama_raw(lat, lon, radius=50, download_depth=False, session=None):
     radius = float(radius)
     toggles = []
     search_third_party = False
@@ -84,11 +84,11 @@ def _find_panoramas_raw(lat, lon, radius=50, download_depth=False, session=None)
     return pano_data
 
 
-def find_panoramas(lat, lon, radius=50, download_depth=False, session=None):
+def find_panorama(lat, lon, radius=50, download_depth=False, session=None):
     """
-    Searches for panoramas around a point.
+    Searches for a panorama within a radius around a point.
     """
-    pano_data = _find_panoramas_raw(lat, lon, radius=radius, download_depth=download_depth, session=session)
+    pano_data = _find_panorama_raw(lat, lon, radius=radius, download_depth=download_depth, session=session)
 
     try:
         img_sizes = pano_data[0][1][2][3][0]
@@ -104,36 +104,35 @@ def find_panoramas(lat, lon, radius=50, download_depth=False, session=None):
     except (IndexError, TypeError):
         other_dates = {}
 
-    panos = []
-
+    pano_obj = None
     for idx, pano in enumerate(response_panos):
         panoid = pano[0][1]
         lat = float(pano[2][0][2])
         lon = float(pano[2][0][3])
 
-        pano_obj = StreetViewPanorama(panoid, lat, lon)
+        new_pano = StreetViewPanorama(panoid, lat, lon)
 
         if idx == 0:
+            pano_obj = new_pano
             pano_obj.year = most_recent_date[0]
             pano_obj.month = most_recent_date[1]
-            panos.append(pano_obj)
         elif idx in other_dates:
-            pano_obj.year = other_dates[idx][0]
-            pano_obj.month = other_dates[idx][1]
-            panos[0].historical.append(pano_obj)
+            new_pano.year = other_dates[idx][0]
+            new_pano.month = other_dates[idx][1]
+            pano_obj.historical.append(new_pano)
         else:
-            panos.append(pano_obj)
+            pano_obj.neighbors.append(new_pano)
 
         try:
-            pano_obj.street_name = pano[3][2][0]
+            new_pano.street_name = pano[3][2][0]
         except IndexError:
             pass
 
-        pano_obj.tile_size = tile_size
-        pano_obj.image_sizes = img_sizes
+    pano_obj.tile_size = tile_size
+    pano_obj.image_sizes = img_sizes
 
-    panos[0].historical = sorted(panos[0].historical, key=lambda x: (x.year, x.month), reverse=True)
-    return panos
+    pano_obj.historical = sorted(pano_obj.historical, key=lambda x: (x.year, x.month), reverse=True)
+    return pano_obj
 
 
 def _lookup_panoid_raw(panoid, session=None, download_depth=False):
