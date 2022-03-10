@@ -17,11 +17,14 @@ def is_third_party_panoid(panoid):
     return len(panoid) > 22
 
 
-def _split_ietf(locale):
-    locale = locale.split("-")
-    ietf_lang = locale[0]
-    ietf_country = locale[1] if len(locale) > 1 else locale[0]
-    return ietf_lang, ietf_country
+def _split_ietf(tag):
+    """
+    Splits a IETF language tag into its language part and country part.
+    """
+    tag = tag.split("-")
+    lang = tag[0]
+    country = tag[1] if len(tag) > 1 else tag[0]
+    return lang, country
 
 
 def _try_get(accessor):
@@ -31,7 +34,7 @@ def _try_get(accessor):
         return None
 
 
-def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en-US", session=None):
+def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", session=None):
     radius = float(radius)
     toggles = []
     search_third_party = False
@@ -99,7 +102,7 @@ def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en-US"
     return pano_data
 
 
-def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", session=None):
+def find_panorama(lat, lon, radius=50, download_depth=False, locale="en", session=None):
     """
     Searches for a panorama within a radius around a point.
     """
@@ -117,7 +120,7 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
     return pano
 
 
-def _lookup_panoid_raw(panoid, download_depth=False, locale="en-US", session=None):
+def _lookup_panoid_raw(panoid, download_depth=False, locale="en", session=None):
     pano_type = 10 if is_third_party_panoid(panoid) else 2
     toggles = []
     include_resolution_info = True
@@ -189,7 +192,7 @@ def _lookup_panoid_raw(panoid, download_depth=False, locale="en-US", session=Non
     return pano_data
 
 
-def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
+def lookup_panoid(panoid, download_depth=False, locale="en", session=None):
     """
     Fetches metadata for a specific panorama.
     """
