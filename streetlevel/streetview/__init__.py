@@ -14,7 +14,7 @@ def is_third_party_panoid(panoid):
     """
     Returns whether or not a panoid refers to a third-party panorama.
     """
-    return len(panoid) == 44
+    return len(panoid) > 22
 
 
 def _find_panorama_raw(lat, lon, radius=50, download_depth=False, session=None):
