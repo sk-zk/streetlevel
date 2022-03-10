@@ -226,6 +226,12 @@ def lookup_panoid(panoid, session=None, download_depth=False):
     date = pano_data[1][0][6][7]
 
     try:
+        other_dates = pano_data[1][0][5][0][8]
+        other_dates = dict([(x[0], x[1]) for x in other_dates])
+    except (IndexError, TypeError):
+        other_dates = {}
+
+    try:
         country_code = pano_data[1][0][5][0][1][4]
     except IndexError:
         country_code = None
@@ -235,21 +241,31 @@ def lookup_panoid(panoid, session=None, download_depth=False):
         street_name = None
 
     try:
-        neighbors = pano_data[1][0][5][0][3][0]
+        others = pano_data[1][0][5][0][3][0]
     except IndexError:
-        neighbors = None
-
-    # TODO: Properly parse historical panos & neighbors
+        others = None
 
     pano = StreetViewPanorama(panoid, lat, lon)
     pano.month = date[1]
     pano.year = date[0]
-    pano.neighbors = neighbors
-    #pano.historical =
     pano.tile_size = tile_size
     pano.image_sizes = img_sizes
     pano.country_code = country_code
     pano.street_name = street_name
+
+    for idx, other in enumerate(others):
+        panoid = other[0][1]
+        lat = float(other[2][0][2])
+        lon = float(other[2][0][3])
+        new_pano = StreetViewPanorama(panoid, lat, lon)
+
+        if idx in other_dates:
+            new_pano.year = other_dates[idx][0]
+            new_pano.month = other_dates[idx][1]
+            pano.historical.append(new_pano)
+        else:
+            pano.neighbors.append(new_pano)
+
     return pano
 
 
