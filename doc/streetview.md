@@ -10,12 +10,14 @@ Supports all camera generations as well as third-party coverage.
 If the requested zoom level does not exist, the highest available level will be used.
 
 
-#### <code>find_panoramas(<em>lat, lon, radius=50, session=None</em>)</code>
+#### <code>find_panorama(<em>lat, lon, radius=50, download_depth=False, locale="en", session=None</em>)</code>
 
-Retrieves panoramas around a point. 
+Searches for a panorama within a radius around a point.
 
 **lat**, **lon**: Latitude and longitude.  
 **radius**: Search radius in meters.  
+**download_depth**: Whether or not to download the depth map. The library does not yet parse this data, so for now, this should always be false.  
+**locale**: Desired language of the location's address as IETF code.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
 
 
@@ -48,10 +50,11 @@ Returns whether or not a pano ID refers to third-party coverage rather than offi
 **panoid**: The pano ID.
 
 
-#### <code>lookup_panoid(<em>panoid, session=None, download_depth=False</em>)</code>
+#### <code>lookup_panoid(<em>panoid, download_depth=False, locale="en", session=None</em>)</code>
 
 Fetches metadata of a specific panorama.
 
 **panoid**: The pano ID.  
+**download_depth**: Whether or not to download the depth map. The library does not yet parse this data, so for now, this should always be false.  
+**locale**: Desired language of the location's address as IETF code.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).  
-**download_depth**: Whether or not to download the depth map. The library does not yet parse this data, so for now, this should always be false.
