@@ -106,10 +106,14 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
     pano_data = _find_panorama_raw(lat, lon, radius=radius, download_depth=download_depth,
                                    locale=locale, session=session)
 
-    try:
-        img_sizes = pano_data[0][1][2][3][0]
-    except IndexError:  # search returned no images
-        return []
+    response_code = pano_data[0][0][0]
+    # 0: OK
+    # 5: search returned no images
+    # don't know if there are others
+    if response_code != 0:
+        return None
+
+    img_sizes = pano_data[0][1][2][3][0]
     img_sizes = list(map(lambda x: x[0], img_sizes))
     panoid = pano_data[0][1][1][1]
     lat = pano_data[0][1][5][0][1][0][2]
@@ -236,10 +240,14 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     pano_data = _lookup_panoid_raw(panoid, download_depth=download_depth,
                                    locale=locale, session=session)
 
-    try:
-        img_sizes = pano_data[1][0][2][3][0]
-    except TypeError:  # lookup returned nothing
+    response_code = pano_data[1][0][0][0]
+    # 1: OK
+    # 2: Not found
+    # don't know if there are others
+    if response_code != 1:
         return None
+
+    img_sizes = pano_data[1][0][2][3][0]
     img_sizes = list(map(lambda x: x[0], img_sizes))
     lat = pano_data[1][0][5][0][1][0][2]
     lon = pano_data[1][0][5][0][1][0][3]
