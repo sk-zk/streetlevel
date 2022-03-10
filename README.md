@@ -4,7 +4,7 @@ Since it relies on internal / inofficial API calls, it may break unexpectedly.
 
 ## Example
 
-Downloading the closest StreetView panorama to specific location:
+Downloading the closest StreetView panorama to a specific location:
 
 ```
 from streetlevel import streetview
