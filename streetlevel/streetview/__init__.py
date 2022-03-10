@@ -7,6 +7,7 @@ import requests
 import time
 from .maps import *
 from .panorama import StreetViewPanorama
+from .protobuf import *
 
 
 def is_third_party_panoid(panoid):
@@ -16,23 +17,78 @@ def is_third_party_panoid(panoid):
     return len(panoid) == 44
 
 
-def find_panoramas(lat, lon, radius=50, session=None):
+def _find_panoramas_raw(lat, lon, radius=50, download_depth=False, session=None):
+    radius = float(radius)
+    toggles = []
+    search_third_party = False
+    include_resolution_info = True
+    include_street_name_and_date = True
+    include_copyright_information = True
+    include_neighbors_and_historical = True
+    # language of the second row of text on StreetView, e.g. "Chojnice, Pomeranian Voivodeship"
+    ietf_lang = "en"
+    ietf_country = "GB"
+
+    if search_third_party:
+        image_type = 10
+    else:
+        image_type = 2
+
+    if download_depth:
+        depth1 = {1: ProtobufEnum(0)}
+        depth2 = {1: ProtobufEnum(2)}
+    else:
+        depth1 = {}
+        depth2 = {}
+
+    if include_resolution_info:
+        toggles.append(ProtobufEnum(1))
+    if include_street_name_and_date:
+        toggles.append(ProtobufEnum(2))
+    if include_copyright_information:
+        toggles.append(ProtobufEnum(3))
+    toggles.append(ProtobufEnum(4))
+    if include_neighbors_and_historical:
+        toggles.append(ProtobufEnum(6))
+    toggles.append(ProtobufEnum(8))
+
+    search_message = {
+        1: {
+            1: 'apiv3',
+            5: 'US',
+            11: {1: {1: False}}
+        },
+        2: {1: {3: lat, 4: lon}, 2: radius},
+        3: {
+            2: {1: ietf_lang, 2: ietf_country},
+            9: {1: ProtobufEnum(2)},
+            11: {
+                1: {1: ProtobufEnum(image_type), 2: True, 3: ProtobufEnum(2)}
+            },
+        },
+        4: {
+            1: toggles,
+            5: depth1,
+            6: depth2,
+        }
+    }
+
+    url = "https://maps.googleapis.com/maps/api/js/GeoPhotoService.SingleImageSearch?pb=" \
+          + to_protobuf_url(search_message) + "&callback=_xdc_._v2mub5"
+
+    response = requests.get(url).text
+    first_paren = response.index("(")
+    last_paren = response.rindex(")")
+    pano_data_json = "[" + response[first_paren + 1:last_paren] + "]"
+    pano_data = json.loads(pano_data_json)
+    return pano_data
+
+
+def find_panoramas(lat, lon, radius=50, download_depth=False, session=None):
     """
     Searches for panoramas around a point.
     """
-    url = "https://maps.googleapis.com/maps/api/js/GeoPhotoService.SingleImageSearch?pb=!1m5!1sapiv3!5sUS!11m2!1m1!1b0!2m4!1m2!3d{0:}!4d{1:}!2d{2}!3m10!2m2!1sen!2sGB!9m1!1e2!11m4!1m3!1e2!2b1!3e2!4m10!1e1!1e2!1e3!1e4!1e8!1e6!5m1!1e0!6m1!1e2&callback=_xdc_._v2mub5"
-    url = url.format(lat, lon, radius)
-
-    if session is None:
-        resp = requests.get(url).text
-    else:
-        resp = session.get(url).text
-
-    # remove all that junk surrounding the json data
-    first_paren = resp.index("(")
-    last_paren = resp.rindex(")")
-    pano_data_json = "[" + resp[first_paren + 1:last_paren] + "]"
-    pano_data = json.loads(pano_data_json)
+    pano_data = _find_panoramas_raw(lat, lon, radius=radius, download_depth=download_depth, session=session)
 
     try:
         img_sizes = pano_data[0][1][2][3][0]
@@ -80,20 +136,85 @@ def find_panoramas(lat, lon, radius=50, session=None):
     return panos
 
 
-def lookup_panoid(panoid, session=None, download_depth=False):
-    """
-    Fetches metadata for a specific panorama.
-    """
+def _lookup_panoid_raw(panoid, session=None, download_depth=False):
     pano_type = 10 if is_third_party_panoid(panoid) else 2
-    depth_toggle = 2 if download_depth else 0
-    url = "https://www.google.com/maps/photometa/v1?authuser=0&hl=de&gl=de&pb=!1m4!1smaps_sv.tactile!11m2!2m1!1b1!2m2!1sde!2sde!3m3!1m2!1e{0}!2s{1}!4m57!1e1!1e2!1e3!1e4!1e5!1e6!1e8!1e12!2m1!1e1!4m1!1i48!5m1!1e1!5m1!1e{2}!6m1!1e1!6m1!1e2!9m36!1m3!1e2!2b1!3e2!1m3!1e2!2b0!3e3!1m3!1e3!2b1!3e2!1m3!1e3!2b0!3e3!1m3!1e8!2b0!3e3!1m3!1e1!2b0!3e3!1m3!1e4!2b0!3e3!1m3!1e10!2b1!3e2!1m3!1e10!2b0!3e3"
-    url = url.format(pano_type, panoid, depth_toggle)
+    toggles = []
+    include_resolution_info = True
+    include_street_name_and_date = True
+    include_copyright_information = True
+    include_neighbors_and_historical = True
+
+    if include_resolution_info:
+        toggles.append(ProtobufEnum(1))
+    if include_street_name_and_date:
+        toggles.append(ProtobufEnum(2))
+    if include_copyright_information:
+        toggles.append(ProtobufEnum(3))
+    toggles.append(ProtobufEnum(4))  # does nothing?
+    toggles.append(ProtobufEnum(5))  # does nothing?
+    if include_neighbors_and_historical:
+        toggles.append(ProtobufEnum(6))
+
+    # these seem to have no effect:
+    toggles.append(ProtobufEnum(4))  # does nothing?
+    toggles.append(ProtobufEnum(5))  # does nothing?
+
+    # these change stuff, but idk what exactly:
+    toggles.append(ProtobufEnum(8))
+    # toggles.append(ProtobufEnum(11))
+    toggles.append(ProtobufEnum(12))
+    # toggles.append(ProtobufEnum(13))
+
+    if download_depth:
+        depth1 = [{1: ProtobufEnum(1)}, {1: ProtobufEnum(2)}]
+        depth2 = [{1: ProtobufEnum(1)}, {1: ProtobufEnum(2)}]
+    else:
+        depth1 = [{}]
+        depth2 = [{}]
+
+    # this is the protobuf message in the request URL written out as a dict
+    pano_request_message = {
+        1: {1: 'maps_sv.tactile', 11: {2: {1: True}}},
+        2: {1: 'de', 2: 'de'},
+        3: {1: {1: ProtobufEnum(pano_type), 2: panoid}},
+        4: {
+            1: toggles,
+            2: {1: ProtobufEnum(1)},  # changing this to any other value causes huge changes;
+                                      # haven't looked into it any further though
+            4: {1: 48},  # all this does is change the size param in an icon URL
+            5: depth1,
+            6: depth2,
+            9: {  # none of these seem to do anything
+                1: [
+                    {1: ProtobufEnum(2), 2: True, 3: ProtobufEnum(2)},
+                    {1: ProtobufEnum(2), 2: False, 3: ProtobufEnum(3)},
+                    {1: ProtobufEnum(3), 2: True, 3: ProtobufEnum(2)},
+                    {1: ProtobufEnum(3), 2: False, 3: ProtobufEnum(3)},
+                    {1: ProtobufEnum(8), 2: False, 3: ProtobufEnum(3)},
+                    {1: ProtobufEnum(1), 2: False, 3: ProtobufEnum(3)},
+                    {1: ProtobufEnum(4), 2: False, 3: ProtobufEnum(3)},
+                    {1: ProtobufEnum(10), 2: True, 3: ProtobufEnum(2)},
+                    {1: ProtobufEnum(10), 2: False, 3: ProtobufEnum(3)}
+                ]
+            }
+        }
+    }
+    url = "https://www.google.com/maps/photometa/v1?authuser=0&hl=de&gl=de&pb=" + to_protobuf_url(pano_request_message)
+
     if session is None:
         response = requests.get(url).text
     else:
         response = session.get(url).text
     pano_data_json = response[4:]  # skip that junk at the start
     pano_data = json.loads(pano_data_json)
+    return pano_data
+
+
+def lookup_panoid(panoid, session=None, download_depth=False):
+    """
+    Fetches metadata for a specific panorama.
+    """
+    pano_data = _lookup_panoid_raw(panoid, session=session, download_depth=download_depth)
 
     try:
         img_sizes = pano_data[1][0][2][3][0]
