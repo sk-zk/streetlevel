@@ -24,6 +24,13 @@ def _split_ietf(locale):
     return ietf_lang, ietf_country
 
 
+def _try_get(accessor):
+    try:
+        return accessor()
+    except IndexError:
+        return None
+
+
 def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en-US", session=None):
     radius = float(radius)
     toggles = []
@@ -104,43 +111,30 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
     except IndexError:  # search returned no images
         return []
     img_sizes = list(map(lambda x: x[0], img_sizes))
-    tile_size = pano_data[0][1][2][3][1]
-    try:
-        others = pano_data[0][1][5][0][3][0]
-    except IndexError:
-        others = None
-    most_recent_date = pano_data[0][1][6][7]
+    panoid = pano_data[0][1][1][1]
+    lat = pano_data[0][1][5][0][1][0][2]
+    lon = pano_data[0][1][5][0][1][0][3]
+    others = _try_get(lambda: pano_data[0][1][5][0][3][0])
+    date = pano_data[0][1][6][7]
     try:
         other_dates = pano_data[0][1][5][0][8]
         other_dates = dict([(x[0], x[1]) for x in other_dates])
     except (IndexError, TypeError):
         other_dates = {}
 
-    try:
-        country_code = pano_data[0][1][5][0][1][4]
-    except IndexError:
-        country_code = None
-    try:
-        street_name = pano_data[0][1][5][0][12][0][0][0][2]
-    except IndexError:
-        street_name = None
-
-    try:
-        address = pano_data[0][1][3][2]
-    except IndexError:
-        address = None
-
-    panoid = pano_data[0][1][1][1]
-    lat = pano_data[0][1][5][0][1][0][2]
-    lon = pano_data[0][1][5][0][1][0][3]
     pano_obj = StreetViewPanorama(panoid, lat, lon)
-    pano_obj.year = most_recent_date[0]
-    pano_obj.month = most_recent_date[1]
-    if len(most_recent_date) > 2:
-        pano_obj.day = most_recent_date[2]
-    pano_obj.country_code = country_code
-    pano_obj.street_name = street_name
-    pano_obj.address = address
+    pano_obj.year = date[0]
+    pano_obj.month = date[1]
+    if len(date) > 2:
+        pano_obj.day = date[2]
+    pano_obj.tile_size = pano_data[0][1][2][3][1]
+    pano_obj.image_sizes = img_sizes
+    pano_obj.country_code = _try_get(lambda: pano_data[0][1][5][0][1][4])
+    pano_obj.street_name = _try_get(lambda: pano_data[0][1][5][0][12][0][0][0][2])
+    pano_obj.address = _try_get(lambda: pano_data[0][1][3][2])
+    pano_obj.copyright_message = _try_get(lambda: pano_data[0][1][4][0][0][0])
+    pano_obj.uploader = _try_get(lambda: pano_data[0][1][4][1][0][0][0])
+    pano_obj.uploader_icon_url = _try_get(lambda: pano_data[0][1][4][1][0][2])
 
     if others is not None and len(others) > 1:
         for idx, pano in enumerate(others[1:]):
@@ -157,19 +151,7 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
             else:
                 pano_obj.neighbors.append(new_pano)
 
-            try:
-                new_pano.street_name = pano[3][2][0]
-            except IndexError:
-                pass
-
-    pano_obj.tile_size = tile_size
-    pano_obj.image_sizes = img_sizes
-    pano_obj.copyright_message = pano_data[0][1][4][0][0][0]
-    try:
-        pano_obj.uploader = pano_data[0][1][4][1][0][0][0]
-        pano_obj.uploader_icon_url = pano_data[0][1][4][1][0][2]
-    except IndexError:
-        pass
+            new_pano.street_name = _try_get(lambda: pano[3][2][0])
 
     pano_obj.historical = sorted(pano_obj.historical, key=lambda x: (x.year, x.month), reverse=True)
     return pano_obj
@@ -259,45 +241,26 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     except TypeError:  # lookup returned nothing
         return None
     img_sizes = list(map(lambda x: x[0], img_sizes))
-    tile_size = pano_data[1][0][2][3][1]
     lat = pano_data[1][0][5][0][1][0][2]
     lon = pano_data[1][0][5][0][1][0][3]
+    others = _try_get(lambda: pano_data[1][0][5][0][3][0])
     date = pano_data[1][0][6][7]
-
     try:
         other_dates = pano_data[1][0][5][0][8]
         other_dates = dict([(x[0], x[1]) for x in other_dates])
     except (IndexError, TypeError):
         other_dates = {}
 
-    try:
-        country_code = pano_data[1][0][5][0][1][4]
-    except IndexError:
-        country_code = None
-    try:
-        street_name = pano_data[1][0][5][0][12][0][0][0][2]
-    except IndexError:
-        street_name = None
-    try:
-        address = pano_data[1][0][3][2]
-    except IndexError:
-        address = None
-
-    try:
-        others = pano_data[1][0][5][0][3][0]
-    except IndexError:
-        others = None
-
     pano = StreetViewPanorama(panoid, lat, lon)
-    pano.month = date[1]
     pano.year = date[0]
+    pano.month = date[1]
     if len(date) > 2:
         pano.day = date[2]
-    pano.tile_size = tile_size
+    pano.tile_size = pano_data[1][0][2][3][1]
     pano.image_sizes = img_sizes
-    pano.country_code = country_code
-    pano.street_name = street_name
-    pano.address = address
+    pano.country_code = _try_get(lambda: pano_data[1][0][5][0][1][4])
+    pano.street_name = _try_get(lambda: pano_data[1][0][5][0][12][0][0][0][2])
+    pano.address = _try_get(lambda: pano_data[1][0][3][2])
     pano.copyright_message = pano_data[1][0][4][0][0][0]
     pano.uploader = pano_data[1][0][4][1][0][0][0]
     pano.uploader_icon_url = pano_data[1][0][4][1][0][2]
@@ -314,6 +277,8 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
             pano.historical.append(new_pano)
         else:
             pano.neighbors.append(new_pano)
+
+        new_pano.street_name = _try_get(lambda: other[3][2][0])
 
     return pano
 
