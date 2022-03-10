@@ -104,7 +104,7 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
     Searches for a panorama within a radius around a point.
     """
     resp = _find_panorama_raw(lat, lon, radius=radius, download_depth=download_depth,
-                                   locale=locale, session=session)
+                              locale=locale, session=session)
 
     response_code = resp[0][0][0]
     # 0: OK
@@ -113,53 +113,7 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
     if response_code != 0:
         return None
 
-    resp = resp[0][1]
-
-    img_sizes = resp[2][3][0]
-    img_sizes = list(map(lambda x: x[0], img_sizes))
-    panoid = resp[1][1]
-    lat = resp[5][0][1][0][2]
-    lon = resp[5][0][1][0][3]
-    others = _try_get(lambda: resp[5][0][3][0])
-    date = resp[6][7]
-    try:
-        other_dates = resp[5][0][8]
-        other_dates = dict([(x[0], x[1]) for x in other_dates])
-    except (IndexError, TypeError):
-        other_dates = {}
-
-    pano = StreetViewPanorama(panoid, lat, lon)
-    pano.year = date[0]
-    pano.month = date[1]
-    if len(date) > 2:
-        pano.day = date[2]
-    pano.tile_size = resp[2][3][1]
-    pano.image_sizes = img_sizes
-    pano.country_code = _try_get(lambda: resp[5][0][1][4])
-    pano.street_name = _try_get(lambda: resp[5][0][12][0][0][0][2])
-    pano.address = _try_get(lambda: resp[3][2])
-    pano.copyright_message = _try_get(lambda: resp[4][0][0][0])
-    pano.uploader = _try_get(lambda: resp[4][1][0][0][0])
-    pano.uploader_icon_url = _try_get(lambda: resp[4][1][0][2])
-
-    if others is not None and len(others) > 1:
-        for idx, other in enumerate(others[1:], start=1):
-            panoid = other[0][1]
-            lat = float(other[2][0][2])
-            lon = float(other[2][0][3])
-
-            new_pano = StreetViewPanorama(panoid, lat, lon)
-
-            if idx in other_dates:
-                new_pano.year = other_dates[idx][0]
-                new_pano.month = other_dates[idx][1]
-                pano.historical.append(new_pano)
-            else:
-                pano.neighbors.append(new_pano)
-
-            new_pano.street_name = _try_get(lambda: other[3][2][0])
-
-    pano.historical = sorted(pano.historical, key=lambda x: (x.year, x.month), reverse=True)
+    pano = _parse_pano_message(resp[0][1])
     return pano
 
 
@@ -204,7 +158,7 @@ def _lookup_panoid_raw(panoid, download_depth=False, locale="en-US", session=Non
         4: {
             1: toggles,
             2: {1: ProtobufEnum(1)},  # changing this to any other value causes huge changes;
-                                      # haven't looked into it any further though
+            # haven't looked into it any further though
             4: {1: 48},  # all this does is change the size param in an icon URL
             5: depth1,
             6: depth2,
@@ -240,7 +194,7 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     Fetches metadata for a specific panorama.
     """
     resp = _lookup_panoid_raw(panoid, download_depth=download_depth,
-                                   locale=locale, session=session)
+                              locale=locale, session=session)
 
     response_code = resp[1][0][0][0]
     # 1: OK
@@ -249,16 +203,20 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     if response_code != 1:
         return None
 
-    resp = resp[1][0]
+    pano = _parse_pano_message(resp[1][0])
+    return pano
 
-    img_sizes = resp[2][3][0]
+
+def _parse_pano_message(msg):
+    img_sizes = msg[2][3][0]
     img_sizes = list(map(lambda x: x[0], img_sizes))
-    lat = resp[5][0][1][0][2]
-    lon = resp[5][0][1][0][3]
-    others = _try_get(lambda: resp[5][0][3][0])
-    date = resp[6][7]
+    panoid = msg[1][1]
+    lat = msg[5][0][1][0][2]
+    lon = msg[5][0][1][0][3]
+    others = _try_get(lambda: msg[5][0][3][0])
+    date = msg[6][7]
     try:
-        other_dates = resp[5][0][8]
+        other_dates = msg[5][0][8]
         other_dates = dict([(x[0], x[1]) for x in other_dates])
     except (IndexError, TypeError):
         other_dates = {}
@@ -268,29 +226,32 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     pano.month = date[1]
     if len(date) > 2:
         pano.day = date[2]
-    pano.tile_size = resp[2][3][1]
+    pano.tile_size = msg[2][3][1]
     pano.image_sizes = img_sizes
-    pano.country_code = _try_get(lambda: resp[5][0][1][4])
-    pano.street_name = _try_get(lambda: resp[5][0][12][0][0][0][2])
-    pano.address = _try_get(lambda: resp[3][2])
-    pano.copyright_message = resp[4][0][0][0]
-    pano.uploader = resp[4][1][0][0][0]
-    pano.uploader_icon_url = resp[4][1][0][2]
+    pano.country_code = _try_get(lambda: msg[5][0][1][4])
+    pano.street_name = _try_get(lambda: msg[5][0][12][0][0][0][2])
+    pano.address = _try_get(lambda: msg[3][2])
+    pano.copyright_message = _try_get(lambda: msg[4][0][0][0])
+    pano.uploader = _try_get(lambda: msg[4][1][0][0][0])
+    pano.uploader_icon_url = _try_get(lambda: msg[4][1][0][2])
 
-    for idx, other in enumerate(others[1:], start=1):
-        panoid = other[0][1]
-        lat = float(other[2][0][2])
-        lon = float(other[2][0][3])
-        new_pano = StreetViewPanorama(panoid, lat, lon)
+    if others is not None and len(others) > 1:
+        for idx, other in enumerate(others[1:], start=1):
+            panoid = other[0][1]
+            lat = float(other[2][0][2])
+            lon = float(other[2][0][3])
 
-        if idx in other_dates:
-            new_pano.year = other_dates[idx][0]
-            new_pano.month = other_dates[idx][1]
-            pano.historical.append(new_pano)
-        else:
-            pano.neighbors.append(new_pano)
+            new_pano = StreetViewPanorama(panoid, lat, lon)
 
-        new_pano.street_name = _try_get(lambda: other[3][2][0])
+            if idx in other_dates:
+                new_pano.year = other_dates[idx][0]
+                new_pano.month = other_dates[idx][1]
+                pano.historical.append(new_pano)
+            else:
+                pano.neighbors.append(new_pano)
+
+            new_pano.street_name = _try_get(lambda: other[3][2][0])
+    pano.historical = sorted(pano.historical, key=lambda x: (x.year, x.month), reverse=True)
 
     return pano
 
@@ -323,7 +284,7 @@ def _generate_tile_list(pano, zoom):
     tile_width = pano.tile_size[0]
     tile_height = pano.tile_size[1]
     cols = math.ceil(img_size[1] / tile_width)
-    rows = math.ceil(img_size[0] / tile_height)    
+    rows = math.ceil(img_size[0] / tile_height)
 
     image_url = "http://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
     third_party_image_url = "https://lh3.ggpht.com/p/{0:}=x{1:}-y{2:}-z{3:}"
@@ -365,7 +326,7 @@ def _stitch_tiles(pano, tile_list, tile_data, zoom):
 
     for x, y, url in tile_list:
         tile = Image.open(BytesIO(tile_data[(x, y)]))
-        panorama.paste(im=tile, box=(x*tile_width, y*tile_height))
+        panorama.paste(im=tile, box=(x * tile_width, y * tile_height))
         del tile
 
     return panorama
