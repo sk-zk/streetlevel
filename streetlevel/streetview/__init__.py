@@ -96,7 +96,10 @@ def find_panorama(lat, lon, radius=50, download_depth=False, session=None):
         return []
     img_sizes = list(map(lambda x: x[0], img_sizes))
     tile_size = pano_data[0][1][2][3][1]
-    response_panos = pano_data[0][1][5][0][3][0]
+    try:
+        others = pano_data[0][1][5][0][3][0]
+    except IndexError:
+        others = None
     most_recent_date = pano_data[0][1][6][7]
     try:
         other_dates = pano_data[0][1][5][0][8]
@@ -104,32 +107,43 @@ def find_panorama(lat, lon, radius=50, download_depth=False, session=None):
     except (IndexError, TypeError):
         other_dates = {}
 
-    pano_obj = None
-    for idx, pano in enumerate(response_panos):
-        panoid = pano[0][1]
-        lat = float(pano[2][0][2])
-        lon = float(pano[2][0][3])
+    panoid = pano_data[0][1][1][1]
+    lat = pano_data[0][1][5][0][1][0][2]
+    lon = pano_data[0][1][5][0][1][0][3]
+    pano_obj = StreetViewPanorama(panoid, lat, lon)
+    pano_obj.year = most_recent_date[0]
+    pano_obj.month = most_recent_date[1]
+    if len(most_recent_date) > 2:
+        pano_obj.day = most_recent_date[2]
 
-        new_pano = StreetViewPanorama(panoid, lat, lon)
+    if others is not None and len(others) > 1:
+        for idx, pano in enumerate(others[1:]):
+            panoid = pano[0][1]
+            lat = float(pano[2][0][2])
+            lon = float(pano[2][0][3])
 
-        if idx == 0:
-            pano_obj = new_pano
-            pano_obj.year = most_recent_date[0]
-            pano_obj.month = most_recent_date[1]
-        elif idx in other_dates:
-            new_pano.year = other_dates[idx][0]
-            new_pano.month = other_dates[idx][1]
-            pano_obj.historical.append(new_pano)
-        else:
-            pano_obj.neighbors.append(new_pano)
+            new_pano = StreetViewPanorama(panoid, lat, lon)
 
-        try:
-            new_pano.street_name = pano[3][2][0]
-        except IndexError:
-            pass
+            if idx in other_dates:
+                new_pano.year = other_dates[idx][0]
+                new_pano.month = other_dates[idx][1]
+                pano_obj.historical.append(new_pano)
+            else:
+                pano_obj.neighbors.append(new_pano)
+
+            try:
+                new_pano.street_name = pano[3][2][0]
+            except IndexError:
+                pass
 
     pano_obj.tile_size = tile_size
     pano_obj.image_sizes = img_sizes
+    pano_obj.copyright_message = pano_data[0][1][4][0][0][0]
+    try:
+        pano_obj.uploader = pano_data[0][1][4][1][0][0][0]
+        pano_obj.uploader_icon_url = pano_data[0][1][4][1][0][2]
+    except IndexError:
+        pass
 
     pano_obj.historical = sorted(pano_obj.historical, key=lambda x: (x.year, x.month), reverse=True)
     return pano_obj
@@ -248,10 +262,15 @@ def lookup_panoid(panoid, session=None, download_depth=False):
     pano = StreetViewPanorama(panoid, lat, lon)
     pano.month = date[1]
     pano.year = date[0]
+    if len(date) > 2:
+        pano.day = date[2]
     pano.tile_size = tile_size
     pano.image_sizes = img_sizes
     pano.country_code = country_code
     pano.street_name = street_name
+    pano.copyright_message = pano_data[1][0][4][0][0][0]
+    pano.uploader = pano_data[1][0][4][1][0][0][0]
+    pano.uploader_icon_url = pano_data[1][0][4][1][0][2]
 
     for idx, other in enumerate(others):
         panoid = other[0][1]
