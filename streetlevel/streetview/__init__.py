@@ -76,7 +76,10 @@ def _find_panorama_raw(lat, lon, radius=50, download_depth=False, session=None):
     url = "https://maps.googleapis.com/maps/api/js/GeoPhotoService.SingleImageSearch?pb=" \
           + to_protobuf_url(search_message) + "&callback=_xdc_._v2mub5"
 
-    response = requests.get(url).text
+    if session is None:
+        response = requests.get(url).text
+    else:
+        response = session.get(url).text
     first_paren = response.index("(")
     last_paren = response.rindex(")")
     pano_data_json = "[" + response[first_paren + 1:last_paren] + "]"
