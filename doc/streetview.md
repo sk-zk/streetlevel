@@ -27,7 +27,7 @@ Fetches StreetView coverage on a specific [map tile](https://developers.google.c
 
 When viewing Google Maps with satellite imagery in globe view and zooming into a spot, it calls the API method
 which is called here. This is useful because there are various hidden/removed locations which cannot be found by
-any other method (unless you access it by pano ID directly).
+any other method (unless you access them by pano ID directly).
 
 **tile_x**, **tile_y**: X and Y coordinate of the tile in Google Maps.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
