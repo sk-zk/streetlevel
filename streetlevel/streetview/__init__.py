@@ -17,7 +17,14 @@ def is_third_party_panoid(panoid):
     return len(panoid) > 22
 
 
-def _find_panorama_raw(lat, lon, radius=50, download_depth=False, session=None):
+def _split_ietf(locale):
+    locale = locale.split("-")
+    ietf_lang = locale[0]
+    ietf_country = locale[1] if len(locale) > 1 else locale[0]
+    return ietf_lang, ietf_country
+
+
+def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en-US", session=None):
     radius = float(radius)
     toggles = []
     search_third_party = False
@@ -25,9 +32,7 @@ def _find_panorama_raw(lat, lon, radius=50, download_depth=False, session=None):
     include_street_name_and_date = True
     include_copyright_information = True
     include_neighbors_and_historical = True
-    # language of the second row of text on StreetView, e.g. "Chojnice, Pomeranian Voivodeship"
-    ietf_lang = "en"
-    ietf_country = "GB"
+    ietf_lang, ietf_country = _split_ietf(locale)
 
     if search_third_party:
         image_type = 10
@@ -87,11 +92,12 @@ def _find_panorama_raw(lat, lon, radius=50, download_depth=False, session=None):
     return pano_data
 
 
-def find_panorama(lat, lon, radius=50, download_depth=False, session=None):
+def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", session=None):
     """
     Searches for a panorama within a radius around a point.
     """
-    pano_data = _find_panorama_raw(lat, lon, radius=radius, download_depth=download_depth, session=session)
+    pano_data = _find_panorama_raw(lat, lon, radius=radius, download_depth=download_depth,
+                                   locale=locale, session=session)
 
     try:
         img_sizes = pano_data[0][1][2][3][0]
@@ -110,6 +116,20 @@ def find_panorama(lat, lon, radius=50, download_depth=False, session=None):
     except (IndexError, TypeError):
         other_dates = {}
 
+    try:
+        country_code = pano_data[0][1][5][0][1][4]
+    except IndexError:
+        country_code = None
+    try:
+        street_name = pano_data[0][1][5][0][12][0][0][0][2]
+    except IndexError:
+        street_name = None
+
+    try:
+        address = pano_data[0][1][3][2]
+    except IndexError:
+        address = None
+
     panoid = pano_data[0][1][1][1]
     lat = pano_data[0][1][5][0][1][0][2]
     lon = pano_data[0][1][5][0][1][0][3]
@@ -118,6 +138,9 @@ def find_panorama(lat, lon, radius=50, download_depth=False, session=None):
     pano_obj.month = most_recent_date[1]
     if len(most_recent_date) > 2:
         pano_obj.day = most_recent_date[2]
+    pano_obj.country_code = country_code
+    pano_obj.street_name = street_name
+    pano_obj.address = address
 
     if others is not None and len(others) > 1:
         for idx, pano in enumerate(others[1:]):
@@ -152,13 +175,14 @@ def find_panorama(lat, lon, radius=50, download_depth=False, session=None):
     return pano_obj
 
 
-def _lookup_panoid_raw(panoid, session=None, download_depth=False):
+def _lookup_panoid_raw(panoid, download_depth=False, locale="en-US", session=None):
     pano_type = 10 if is_third_party_panoid(panoid) else 2
     toggles = []
     include_resolution_info = True
     include_street_name_and_date = True
     include_copyright_information = True
     include_neighbors_and_historical = True
+    ietf_lang, ietf_country = _split_ietf(locale)
 
     if include_resolution_info:
         toggles.append(ProtobufEnum(1))
@@ -187,7 +211,7 @@ def _lookup_panoid_raw(panoid, session=None, download_depth=False):
     # this is the protobuf message in the request URL written out as a dict
     pano_request_message = {
         1: {1: 'maps_sv.tactile', 11: {2: {1: True}}},
-        2: {1: 'de', 2: 'de'},
+        2: {1: ietf_lang, 2: ietf_country},
         3: {1: {1: ProtobufEnum(pano_type), 2: panoid}},
         4: {
             1: toggles,
@@ -211,7 +235,8 @@ def _lookup_panoid_raw(panoid, session=None, download_depth=False):
             }
         }
     }
-    url = "https://www.google.com/maps/photometa/v1?authuser=0&hl=de&gl=de&pb=" + to_protobuf_url(pano_request_message)
+    url = f"https://www.google.com/maps/photometa/v1?authuser=0&hl={ietf_lang}&gl={ietf_country}&pb=" \
+          + to_protobuf_url(pano_request_message)
 
     if session is None:
         response = requests.get(url).text
@@ -222,11 +247,12 @@ def _lookup_panoid_raw(panoid, session=None, download_depth=False):
     return pano_data
 
 
-def lookup_panoid(panoid, session=None, download_depth=False):
+def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     """
     Fetches metadata for a specific panorama.
     """
-    pano_data = _lookup_panoid_raw(panoid, session=session, download_depth=download_depth)
+    pano_data = _lookup_panoid_raw(panoid, download_depth=download_depth,
+                                   locale=locale, session=session)
 
     try:
         img_sizes = pano_data[1][0][2][3][0]
@@ -252,6 +278,10 @@ def lookup_panoid(panoid, session=None, download_depth=False):
         street_name = pano_data[1][0][5][0][12][0][0][0][2]
     except IndexError:
         street_name = None
+    try:
+        address = pano_data[1][0][3][2]
+    except IndexError:
+        address = None
 
     try:
         others = pano_data[1][0][5][0][3][0]
@@ -267,6 +297,7 @@ def lookup_panoid(panoid, session=None, download_depth=False):
     pano.image_sizes = img_sizes
     pano.country_code = country_code
     pano.street_name = street_name
+    pano.address = address
     pano.copyright_message = pano_data[1][0][4][0][0][0]
     pano.uploader = pano_data[1][0][4][1][0][0][0]
     pano.uploader_icon_url = pano_data[1][0][4][1][0][2]
