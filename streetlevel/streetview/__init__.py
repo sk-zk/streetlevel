@@ -113,15 +113,17 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
     if response_code != 0:
         return None
 
-    img_sizes = resp[0][1][2][3][0]
+    resp = resp[0][1]
+
+    img_sizes = resp[2][3][0]
     img_sizes = list(map(lambda x: x[0], img_sizes))
-    panoid = resp[0][1][1][1]
-    lat = resp[0][1][5][0][1][0][2]
-    lon = resp[0][1][5][0][1][0][3]
-    others = _try_get(lambda: resp[0][1][5][0][3][0])
-    date = resp[0][1][6][7]
+    panoid = resp[1][1]
+    lat = resp[5][0][1][0][2]
+    lon = resp[5][0][1][0][3]
+    others = _try_get(lambda: resp[5][0][3][0])
+    date = resp[6][7]
     try:
-        other_dates = resp[0][1][5][0][8]
+        other_dates = resp[5][0][8]
         other_dates = dict([(x[0], x[1]) for x in other_dates])
     except (IndexError, TypeError):
         other_dates = {}
@@ -131,14 +133,14 @@ def find_panorama(lat, lon, radius=50, download_depth=False, locale="en-US", ses
     pano.month = date[1]
     if len(date) > 2:
         pano.day = date[2]
-    pano.tile_size = resp[0][1][2][3][1]
+    pano.tile_size = resp[2][3][1]
     pano.image_sizes = img_sizes
-    pano.country_code = _try_get(lambda: resp[0][1][5][0][1][4])
-    pano.street_name = _try_get(lambda: resp[0][1][5][0][12][0][0][0][2])
-    pano.address = _try_get(lambda: resp[0][1][3][2])
-    pano.copyright_message = _try_get(lambda: resp[0][1][4][0][0][0])
-    pano.uploader = _try_get(lambda: resp[0][1][4][1][0][0][0])
-    pano.uploader_icon_url = _try_get(lambda: resp[0][1][4][1][0][2])
+    pano.country_code = _try_get(lambda: resp[5][0][1][4])
+    pano.street_name = _try_get(lambda: resp[5][0][12][0][0][0][2])
+    pano.address = _try_get(lambda: resp[3][2])
+    pano.copyright_message = _try_get(lambda: resp[4][0][0][0])
+    pano.uploader = _try_get(lambda: resp[4][1][0][0][0])
+    pano.uploader_icon_url = _try_get(lambda: resp[4][1][0][2])
 
     if others is not None and len(others) > 1:
         for idx, other in enumerate(others[1:], start=1):
@@ -247,14 +249,16 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     if response_code != 1:
         return None
 
-    img_sizes = resp[1][0][2][3][0]
+    resp = resp[1][0]
+
+    img_sizes = resp[2][3][0]
     img_sizes = list(map(lambda x: x[0], img_sizes))
-    lat = resp[1][0][5][0][1][0][2]
-    lon = resp[1][0][5][0][1][0][3]
-    others = _try_get(lambda: resp[1][0][5][0][3][0])
-    date = resp[1][0][6][7]
+    lat = resp[5][0][1][0][2]
+    lon = resp[5][0][1][0][3]
+    others = _try_get(lambda: resp[5][0][3][0])
+    date = resp[6][7]
     try:
-        other_dates = resp[1][0][5][0][8]
+        other_dates = resp[5][0][8]
         other_dates = dict([(x[0], x[1]) for x in other_dates])
     except (IndexError, TypeError):
         other_dates = {}
@@ -264,14 +268,14 @@ def lookup_panoid(panoid, download_depth=False, locale="en-US", session=None):
     pano.month = date[1]
     if len(date) > 2:
         pano.day = date[2]
-    pano.tile_size = resp[1][0][2][3][1]
+    pano.tile_size = resp[2][3][1]
     pano.image_sizes = img_sizes
-    pano.country_code = _try_get(lambda: resp[1][0][5][0][1][4])
-    pano.street_name = _try_get(lambda: resp[1][0][5][0][12][0][0][0][2])
-    pano.address = _try_get(lambda: resp[1][0][3][2])
-    pano.copyright_message = resp[1][0][4][0][0][0]
-    pano.uploader = resp[1][0][4][1][0][0][0]
-    pano.uploader_icon_url = resp[1][0][4][1][0][2]
+    pano.country_code = _try_get(lambda: resp[5][0][1][4])
+    pano.street_name = _try_get(lambda: resp[5][0][12][0][0][0][2])
+    pano.address = _try_get(lambda: resp[3][2])
+    pano.copyright_message = resp[4][0][0][0]
+    pano.uploader = resp[4][1][0][0][0]
+    pano.uploader_icon_url = resp[4][1][0][2]
 
     for idx, other in enumerate(others[1:], start=1):
         panoid = other[0][1]
