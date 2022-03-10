@@ -168,10 +168,6 @@ def _lookup_panoid_raw(panoid, session=None, download_depth=False):
     if include_neighbors_and_historical:
         toggles.append(ProtobufEnum(6))
 
-    # these seem to have no effect:
-    toggles.append(ProtobufEnum(4))  # does nothing?
-    toggles.append(ProtobufEnum(5))  # does nothing?
-
     # these change stuff, but idk what exactly:
     toggles.append(ProtobufEnum(8))
     # toggles.append(ProtobufEnum(11))
