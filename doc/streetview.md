@@ -29,7 +29,7 @@ When viewing Google Maps with satellite imagery in globe view and zooming into a
 which is called here. This is useful because there are various hidden/removed locations which cannot be found by
 any other method (unless you access them by pano ID directly).
 
-**tile_x**, **tile_y**: X and Y coordinate of the tile in Google Maps.  
+**tile_x**, **tile_y**: X and Y coordinate of the tile in Google Maps at zoom level 17.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
 
 
