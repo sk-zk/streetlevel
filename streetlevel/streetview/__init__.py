@@ -289,7 +289,7 @@ def _generate_tile_list(pano, zoom):
     cols = math.ceil(img_size[1] / tile_width)
     rows = math.ceil(img_size[0] / tile_height)
 
-    image_url = "http://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
+    image_url = "https://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
     third_party_image_url = "https://lh3.ggpht.com/p/{0:}=x{1:}-y{2:}-z{3:}"
 
     url_to_use = third_party_image_url if is_third_party_panoid(pano.id) else image_url
