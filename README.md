@@ -1,10 +1,10 @@
-**streetlevel** is a module for downloading panoramas and metadata from Google StreetView and Bing Streetside.
+**streetlevel** is a module for downloading panoramas and metadata from Google Street View and Bing Streetside.
 
 Since it relies on internal / inofficial API calls, it may break unexpectedly.
 
 ## Example
 
-Downloading the closest StreetView panorama to a specific location:
+Downloading the closest Street View panorama to a specific location:
 
 ```
 from streetlevel import streetview
