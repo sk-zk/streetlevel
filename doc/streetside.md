@@ -6,7 +6,7 @@ Downloads a panorama to a file.
 **filename**: Output filename.  
 **zoom**: Image size; 0 is lowest, 3 is highest.
 
-
+&nbsp;
 #### <code>find_panoramas(<em>lat, lon, radius=25, limit=50, session=None</em>)</code>
 
 Retrieves panoramas within a square around a point.
@@ -16,7 +16,7 @@ Retrieves panoramas within a square around a point.
 **limit**: Maximum number of results to return.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
 
-
+&nbsp;
 #### <code>find_panoramas_in_rectangle(<em>north, west, south, east, limit=50, session=None</em>)</code>
 
 Retrieves panoramas within a rectangle.
@@ -26,17 +26,17 @@ Retrieves panoramas within a rectangle.
 **limit**: Maximum number of results to return.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
 
-
+&nbsp;
 #### <code>from_base4(<em>n</em>)</code>
 
 Converts a string containing a base 4 number to integer.
 
-
+&nbsp;
 #### <code>get_panorama(<em>panoid, zoom=3</em>)</code>
 
 Like `download_panorama()`, but the panorama is returned as a PIL image.
 
-
+&nbsp;
 #### <code>to_base4(<em>n</em>)</code>
 
 Converts an int to a base 4 string.
