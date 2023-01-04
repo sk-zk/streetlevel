@@ -23,7 +23,7 @@ Searches for a panorama within a radius around a point.
 
 #### <code>get_coverage_tile(<em>tile_x, tile_y, session=None</em>)</code>
 
-Fetches StreetView coverage on a specific [map tile](https://developers.google.com/maps/documentation/javascript/coordinates).
+Fetches Street View coverage on a specific [map tile](https://developers.google.com/maps/documentation/javascript/coordinates).
 
 When viewing Google Maps with satellite imagery in globe view and zooming into a spot, it calls the API method
 which is called here. This is useful because there are various hidden/removed locations which cannot be found by
