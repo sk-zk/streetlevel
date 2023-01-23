@@ -234,7 +234,7 @@ def _parse_pano_message(msg):
     pano.country_code = _try_get(lambda: msg[5][0][1][4])
     pano.street_name = _try_get(lambda: msg[5][0][12][0][0][0][2])
     pano.address = _try_get(lambda: msg[3][2])
-    pano.copyright_message = _try_get(lambda: msg[4][0][0][0])
+    pano.copyright_message = _try_get(lambda: msg[4][0][0][0][0])
     pano.uploader = _try_get(lambda: msg[4][1][0][0][0])
     pano.uploader_icon_url = _try_get(lambda: msg[4][1][0][2])
 
