@@ -12,14 +12,14 @@ from .protobuf import *
 
 def is_third_party_panoid(panoid):
     """
-    Returns whether or not a panoid refers to a third-party panorama.
+    Returns whether a panoid refers to a third-party panorama.
     """
     return len(panoid) > 22
 
 
 def _split_ietf(tag):
     """
-    Splits a IETF language tag into its language part and country part.
+    Splits an IETF language tag into its language part and country part.
     """
     tag = tag.split("-")
     lang = tag[0]
