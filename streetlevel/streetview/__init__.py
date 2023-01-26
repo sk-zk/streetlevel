@@ -343,21 +343,14 @@ def get_coverage_tile(tile_x, tile_y, session=None):
     so it can be used to find hidden coverage.
     Unlike get_panos_at_position(), the list only contains the most recent panorama of a location.
     """
-    url = "https://www.google.com/maps/photometa/ac/v1?pb=!1m1!1smaps_sv.tactile!6m3!1i{0}!2i{1}!3i17!8b1"
-    url = url.format(tile_x, tile_y)
-    if session is None:
-        response = requests.get(url).text
-    else:
-        response = session.get(url).text
-    data_json = response[4:]
-    data = json.loads(data_json)
+    resp = _get_coverage_tile_raw(tile_x, tile_y, session)
 
-    if data is None:
+    if resp is None:
         return []
 
     panos = []
-    if data[1] is not None and len(data[1]) > 0:
-        for pano in data[1][1]:
+    if resp[1] is not None and len(resp[1]) > 0:
+        for pano in resp[1][1]:
             if pano[0][0] == 1:
                 continue
             panoid = pano[0][0][1]
@@ -366,6 +359,18 @@ def get_coverage_tile(tile_x, tile_y, session=None):
             panos.append(StreetViewPanorama(panoid, lat, lon))
 
     return panos
+
+
+def _get_coverage_tile_raw(tile_x, tile_y, session=None):
+    url = "https://www.google.com/maps/photometa/ac/v1?pb=!1m1!1smaps_sv.tactile!6m3!1i{0}!2i{1}!3i17!8b1"
+    url = url.format(tile_x, tile_y)
+    if session is None:
+        response = requests.get(url).text
+    else:
+        response = session.get(url).text
+    data_json = response[4:]
+    data = json.loads(data_json)
+    return data
 
 
 def get_coverage_tile_by_latlon(lat, lon, session=None):
