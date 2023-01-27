@@ -17,9 +17,9 @@ def from_base4(n):
     return int(n, 4)
 
 
-def find_panoramas_in_rectangle(north, west, south, east, limit=50, session=None):
+def find_panoramas_in_bbox(north, west, south, east, limit=50, session=None):
     """
-    Retrieves panoramas within a rectangle.
+    Retrieves panoramas within a bounding box.
     """
     response = _find_panoramas_raw(north, west, south, east, limit, session)
 
@@ -69,7 +69,7 @@ def find_panoramas(lat, lon, radius=25, limit=50, session=None):
     Retrieves panoramas within a square around a point.
     """
     top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
-    return find_panoramas_in_rectangle(
+    return find_panoramas_in_bbox(
         top_left[1], top_left[0],
         bottom_right[1], bottom_right[0],
         limit=limit, session=session)

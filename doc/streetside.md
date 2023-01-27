@@ -8,7 +8,7 @@ Retrieves panoramas within a square around a point.
 **limit**: Maximum number of results to return.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
 
-#### <code>find_panoramas_in_rectangle(<em>north, west, south, east, limit=50, session=None</em>)</code>
+#### <code>find_panoramas_in_bbox(<em>north, west, south, east, limit=50, session=None</em>)</code>
 Retrieves panoramas within a bounding box.
 
 **north**, **west**: lat1/lon1.  
