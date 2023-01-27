@@ -13,6 +13,8 @@ The address of the location and the languages of the names, e.g. `[['39 Obertale
 This can be localized using the `locale` parameter on the find/lookup functions (if a localization is available). For instance,
 requesting Danish locale (`da`) would yield `[['39 Obertaler Str.', 'de'], ['Trentino-Sydtyrol', 'da']]`.
 
+Typically only set for official road coverage.
+
 **copyright_message**:  
 The copyright message of the panorama as displayed on Google Maps. For official coverage, this will say "© (year) Google".
 
@@ -39,6 +41,8 @@ For third party coverage, this returns the app the panorama was uploaded with.
 
 **street_name**:  
 The name of the street the panorama is located on, and the language of that name, e.g. `['Obertaler Str.', 'de']`.
+
+Typically only set for official road coverage.
 
 **tile_size**:  
 Street View panoramas are broken up into multiple tiles. This returns the size of one tile.
