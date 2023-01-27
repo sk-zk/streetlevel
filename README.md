@@ -83,7 +83,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
   <tr>
     <td align="right">Heading, pitch, roll</td>
     <td align="center">🟡<br>
-      <small>(heading only></small></td>
+      <small>(heading only)</small></td>
     <td align="center">✔</td>
   </tr>
   <tr>
