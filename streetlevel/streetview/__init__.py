@@ -224,36 +224,40 @@ def _parse_pano_message(msg):
     except (IndexError, TypeError):
         other_dates = {}
 
-    pano = StreetViewPanorama(panoid, lat, lon)
-    pano.year = date[0]
-    pano.month = date[1]
-    if len(date) > 2:
-        pano.day = date[2]
-    pano.tile_size = msg[2][3][1]
-    pano.image_sizes = img_sizes
-    pano.country_code = _try_get(lambda: msg[5][0][1][4])
-    pano.street_name = _try_get(lambda: msg[5][0][12][0][0][0][2])
-    pano.address = _try_get(lambda: msg[3][2])
-    pano.copyright_message = _try_get(lambda: msg[4][0][0][0][0])
-    pano.uploader = _try_get(lambda: msg[4][1][0][0][0])
-    pano.uploader_icon_url = _try_get(lambda: msg[4][1][0][2])
+    pano = StreetViewPanorama(
+        id=panoid,
+        lat=lat,
+        lon=lon,
+        year=date[0],
+        month=date[1],
+        day=date[2] if len(date) > 2 else None,
+        tile_size=msg[2][3][1],
+        image_sizes=img_sizes,
+        country_code=_try_get(lambda: msg[5][0][1][4]),
+        street_name=_try_get(lambda: msg[5][0][12][0][0][0][2]),
+        address=_try_get(lambda: msg[3][2]),
+        copyright_message=_try_get(lambda: msg[4][0][0][0][0]),
+        uploader=_try_get(lambda: msg[4][1][0][0][0]),
+        uploader_icon_url=_try_get(lambda: msg[4][1][0][2]),
+    )
 
+    # parse neighbors and other dates
     if others is not None and len(others) > 1:
         for idx, other in enumerate(others[1:], start=1):
             panoid = other[0][1]
             lat = float(other[2][0][2])
             lon = float(other[2][0][3])
 
-            new_pano = StreetViewPanorama(panoid, lat, lon)
+            neighbor_or_historical = StreetViewPanorama(panoid, lat, lon)
 
             if idx in other_dates:
-                new_pano.year = other_dates[idx][0]
-                new_pano.month = other_dates[idx][1]
-                pano.historical.append(new_pano)
+                neighbor_or_historical.year = other_dates[idx][0]
+                neighbor_or_historical.month = other_dates[idx][1]
+                pano.historical.append(neighbor_or_historical)
             else:
-                pano.neighbors.append(new_pano)
+                pano.neighbors.append(neighbor_or_historical)
 
-            new_pano.street_name = _try_get(lambda: other[3][2][0])
+            neighbor_or_historical.street_name = _try_get(lambda: other[3][2][0])
     pano.historical = sorted(pano.historical, key=lambda x: (x.year, x.month), reverse=True)
 
     return pano

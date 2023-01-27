@@ -1,12 +1,19 @@
+from dataclasses import dataclass
+from datetime import datetime
+
+
+@dataclass
 class StreetsidePanorama:
-    def __init__(self, id, lat, lon):
-        self.id = id
-        self.lat = lat
-        self.lon = lon
-        self.date = None
-        self.next = None
-        self.previous = None
-        self.elevation = None
+    id: int
+    lat: float
+    lon: float
+    date: datetime
+    next: int = None
+    previous: int = None
+    elevation: int = None
+    heading: float = None
+    pitch: float = None
+    roll: float = None
 
     def __repr__(self):
         output = str(self)

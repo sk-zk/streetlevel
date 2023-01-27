@@ -1,25 +1,31 @@
+from __future__ import annotations
+from dataclasses import dataclass, field
+from typing import List
+
+
+@dataclass
 class StreetViewPanorama:
-    def __init__(self, id, lat, lon):
-        self.id = id
-        self.lat = lat
-        self.lon = lon
+    id: int
+    lat: float
+    lon: float
 
-        self.day = None
-        self.month = None
-        self.year = None
+    day: int = None
+    month: int = None
+    year: int = None
 
-        self.country_code = None
-        self.street_name = None
+    country_code: str = None
+    street_name: List[str] = None
+    address: List[List[str]] = None
 
-        self.neighbors = []
-        self.historical = []
+    neighbors: List[StreetViewPanorama] = field(default_factory=list)
+    historical: List[StreetViewPanorama] = field(default_factory=list)
 
-        self.tile_size = []
-        self.image_sizes = []
+    tile_size: List[int] = None
+    image_sizes: List[List[int]] = None
 
-        self.copyright_message = None
-        self.uploader = None
-        self.uploader_icon_url = None
+    copyright_message: str = None
+    uploader: str = None
+    uploader_icon_url: str = None
 
     def __repr__(self):
         output = str(self)

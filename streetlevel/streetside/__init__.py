@@ -28,30 +28,30 @@ def find_panoramas_in_rectangle(north, west, south, east, limit=50, session=None
 
     panos = []
     for pano in response[1:]:  # first object is elapsed time
-        # todo: parse bl, ml, nbn, pbn, ad fields
-        pano_obj = StreetsidePanorama(pano["id"], pano["la"], pano["lo"])
-        if "cd" in pano:
-            # as it turns out, months/days without leading zeros
-            # don't have a cross-platform format code in strptime.
-            # wanna guess what kind of dates bing returns?
-            datestr = pano["cd"]
-            datestr = datestr.split("/")
-            datestr[0] = datestr[0].rjust(2, "0")
-            datestr[1] = datestr[1].rjust(2, "0")
-            datestr = "/".join(datestr)
-            pano_obj.date = datetime.strptime(datestr, "%m/%d/%Y %I:%M:%S %p")
-        if "ne" in pano:
-            pano_obj.next = pano["ne"]
-        if "pr" in pano:
-            pano_obj.previous = pano["pr"]
-        if "al" in pano:
-            pano_obj.elevation = pano["al"]
-        if "ro" in pano:
-            pano_obj.roll = math.radians(pano["ro"])
-        if "pi" in pano:
-            pano_obj.pitch = math.radians(pano["pi"])
-        if "he" in pano:
-            pano_obj.heading = math.radians(pano["he"])
+        # TODO: parse bl, ml, nbn, pbn, ad fields
+
+        # as it turns out, months/days without leading zeros
+        # don't have a cross-platform format code in strptime.
+        # wanna guess what kind of dates bing returns?
+        datestr = pano["cd"]
+        datestr = datestr.split("/")
+        datestr[0] = datestr[0].rjust(2, "0")
+        datestr[1] = datestr[1].rjust(2, "0")
+        datestr = "/".join(datestr)
+        date = datetime.strptime(datestr, "%m/%d/%Y %I:%M:%S %p")
+
+        pano_obj = StreetsidePanorama(
+            id=pano["id"],
+            lat=pano["la"],
+            lon=pano["lo"],
+            date=date,
+            next=pano["ne"] if "ne" in pano else None,
+            previous=pano["pr"] if "pr" in pano else None,
+            elevation=pano["al"] if "al" in pano else None,
+            heading=math.radians(pano["he"]) if "he" in pano else None,
+            pitch=math.radians(pano["pi"]) if "pi" in pano else None,
+            roll=math.radians(pano["ro"]) if "ro" in pano else None,
+        )
         panos.append(pano_obj)
     return panos
 
