@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import List
 
 
@@ -9,6 +10,12 @@ class StreetViewPanorama:
     lat: float
     lon: float
 
+    tile_size: List[int] = None
+    image_sizes: List[List[int]] = None
+
+    neighbors: List[StreetViewPanorama] = field(default_factory=list)
+    historical: List[StreetViewPanorama] = field(default_factory=list)
+
     day: int = None
     month: int = None
     year: int = None
@@ -17,11 +24,7 @@ class StreetViewPanorama:
     street_name: List[str] = None
     address: List[List[str]] = None
 
-    neighbors: List[StreetViewPanorama] = field(default_factory=list)
-    historical: List[StreetViewPanorama] = field(default_factory=list)
-
-    tile_size: List[int] = None
-    image_sizes: List[List[int]] = None
+    source: str = None
 
     copyright_message: str = None
     uploader: str = None

@@ -8,6 +8,7 @@ import time
 from .maps import *
 from .panorama import StreetViewPanorama
 from .protobuf import *
+from enum import Enum
 
 
 def is_third_party_panoid(panoid):
@@ -218,6 +219,9 @@ def _parse_pano_message(msg):
     lon = msg[5][0][1][0][3]
     others = _try_get(lambda: msg[5][0][3][0])
     date = msg[6][7]
+
+    source = _try_get(lambda: msg[6][5][2]).lower()
+
     try:
         other_dates = msg[5][0][8]
         other_dates = dict([(x[0], x[1]) for x in other_dates])
@@ -233,6 +237,7 @@ def _parse_pano_message(msg):
         day=date[2] if len(date) > 2 else None,
         tile_size=msg[2][3][1],
         image_sizes=img_sizes,
+        source=source,
         country_code=_try_get(lambda: msg[5][0][1][4]),
         street_name=_try_get(lambda: msg[5][0][12][0][0][0][2]),
         address=_try_get(lambda: msg[3][2]),
@@ -326,8 +331,6 @@ def _stitch_tiles(pano, tile_list, tile_data, zoom):
     img_size = pano.image_sizes[zoom]
     tile_width = pano.tile_size[0]
     tile_height = pano.tile_size[1]
-    cols = math.ceil(img_size[1] / tile_width)
-    rows = math.ceil(img_size[0] / tile_height)
 
     panorama = Image.new('RGB', (img_size[1], img_size[0]))
 
