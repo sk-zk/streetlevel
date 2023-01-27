@@ -24,6 +24,9 @@ The country in which the panorama is located.
 **day/month/year**:  
 The capture date. Note that, for official coverage, only month and year are available.
 
+**heading**:  
+Heading of the camera / north offset (meaning the phi of the center of the panorama) in radians, where 0 is due north.
+
 **historical**:  
 A list of panoramas with a different date at the same location.
 

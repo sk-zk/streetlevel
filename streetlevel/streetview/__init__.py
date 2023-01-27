@@ -3,6 +3,7 @@ import itertools
 import json
 from PIL import Image
 import requests
+import math
 from streetlevel.geo import *
 from .panorama import StreetViewPanorama
 from .protobuf import *
@@ -229,6 +230,7 @@ def _parse_pano_message(msg):
         id=panoid,
         lat=lat,
         lon=lon,
+        heading=_try_get(lambda: math.radians(msg[5][0][1][2][0])),
         year=date[0],
         month=date[1],
         day=date[2] if len(date) > 2 else None,
