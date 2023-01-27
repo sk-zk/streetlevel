@@ -1,7 +1,8 @@
 import math
-
+import pyproj
 
 TILE_SIZE = 256
+geod = pyproj.Geod(ellps="WGS84")
 
 
 def mercator_to_wgs84(x, y):
@@ -33,3 +34,10 @@ def wgs84_to_mercator(lat, lon):
         TILE_SIZE * (0.5 + lon / 360.0),
         TILE_SIZE * (0.5 - math.log((1 + siny) / (1 - siny)) / (4 * math.pi))
     )
+
+
+def create_bounding_box_around_point(lat, lon, radius):
+    dist_to_corner = math.sqrt(2 * pow(2 * radius, 2)) / 2
+    top_left = geod.fwd(lon, lat, 315, dist_to_corner)
+    bottom_right = geod.fwd(lon, lat, 135, dist_to_corner)
+    return top_left, bottom_right

@@ -5,7 +5,7 @@ import os
 from PIL import Image
 import requests
 import time
-from .maps import *
+from streetlevel.geo import *
 from .panorama import StreetViewPanorama
 from .protobuf import *
 from enum import Enum

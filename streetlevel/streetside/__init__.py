@@ -1,13 +1,10 @@
-import os
 from datetime import datetime
 from io import BytesIO
-import math
 import numpy as np
 from PIL import Image
-import pyproj
 import requests
 from .panorama import StreetsidePanorama
-
+from streetlevel.geo import *
 
 TILE_SIZE = 256
 
@@ -57,7 +54,8 @@ def find_panoramas_in_rectangle(north, west, south, east, limit=50, session=None
 
 
 def _find_panoramas_raw(north, west, south, east, limit=50, session=None):
-    url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?count={limit}&north={north}&south={south}&east={east}&west={west}"
+    url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?" \
+          f"count={limit}&north={north}&south={south}&east={east}&west={west}"
     if session is None:
         response = requests.get(url)
     else:
@@ -70,19 +68,11 @@ def find_panoramas(lat, lon, radius=25, limit=50, session=None):
     """
     Retrieves panoramas within a square around a point.
     """
-    top_left, bottom_right = _create_bounding_box_around_point(lat, lon, radius)
+    top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
     return find_panoramas_in_rectangle(
         top_left[1], top_left[0],
         bottom_right[1], bottom_right[0],
         limit=limit, session=session)
-
-
-def _create_bounding_box_around_point(lat, lon, radius):
-    geod = pyproj.Geod(ellps="WGS84")
-    dist_to_corner = math.sqrt(2 * pow(2 * radius, 2)) / 2
-    top_left = geod.fwd(lon, lat, 315, dist_to_corner)
-    bottom_right = geod.fwd(lon, lat, 135, dist_to_corner)
-    return top_left, bottom_right
 
 
 def download_panorama(panoid, filename, zoom=3):
