@@ -24,17 +24,11 @@ def find_panoramas_in_rectangle(north, west, south, east, limit=50, session=None
     """
     Retrieves panoramas within a rectangle.
     """
-    url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?count={limit}&north={north}&south={south}&east={east}&west={west}"
-    
-    if session is None:
-        response = requests.get(url)
-    else:
-        response = session.get(url) 
-    response_panos = response.json()
+    response = _find_panoramas_raw(north, west, south, east, limit, session)
 
     panos = []
-    for pano in response_panos[1:]:  # first object is elapsed time
-        # todo: parse ro, pi, he, bl, ml, nbn, pbn, ad fields
+    for pano in response[1:]:  # first object is elapsed time
+        # todo: parse bl, ml, nbn, pbn, ad fields
         pano_obj = StreetsidePanorama(pano["id"], pano["la"], pano["lo"])
         if "cd" in pano:
             # as it turns out, months/days without leading zeros
@@ -51,8 +45,24 @@ def find_panoramas_in_rectangle(north, west, south, east, limit=50, session=None
         if "pr" in pano:
             pano_obj.previous = pano["pr"]
         if "al" in pano:
-            pano_obj.altitude = pano["al"]
+            pano_obj.elevation = pano["al"]
+        if "ro" in pano:
+            pano_obj.roll = math.radians(pano["ro"])
+        if "pi" in pano:
+            pano_obj.pitch = math.radians(pano["pi"])
+        if "he" in pano:
+            pano_obj.heading = math.radians(pano["he"])
         panos.append(pano_obj)
+    return panos
+
+
+def _find_panoramas_raw(north, west, south, east, limit=50, session=None):
+    url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?count={limit}&north={north}&south={south}&east={east}&west={west}"
+    if session is None:
+        response = requests.get(url)
+    else:
+        response = session.get(url)
+    panos = response.json()
     return panos
 
 
@@ -60,14 +70,21 @@ def find_panoramas(lat, lon, radius=25, limit=50, session=None):
     """
     Retrieves panoramas within a square around a point.
     """
+    top_left, bottom_right = _create_bounding_box_around_point(lat, lon, radius)
+    return find_panoramas_in_rectangle(
+        top_left[1], top_left[0],
+        bottom_right[1], bottom_right[0],
+        limit=limit, session=session)
+
+
+def _create_bounding_box_around_point(lat, lon, radius):
     geod = pyproj.Geod(ellps="WGS84")
-    dist_to_corner = math.sqrt(2 * pow(2*radius, 2)) / 2
+    dist_to_corner = math.sqrt(2 * pow(2 * radius, 2)) / 2
     top_left = geod.fwd(lon, lat, 315, dist_to_corner)
     bottom_right = geod.fwd(lon, lat, 135, dist_to_corner)
-    return find_panoramas_in_rectangle(top_left[1], top_left[0], 
-        bottom_right[1], bottom_right[0], limit=limit, session=session)
-    
-    
+    return top_left, bottom_right
+
+
 def download_panorama(panoid, filename, zoom=3):
     """
     Downloads a panorama to the given directory.

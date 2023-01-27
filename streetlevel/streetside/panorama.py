@@ -6,7 +6,7 @@ class StreetsidePanorama:
         self.date = None
         self.next = None
         self.previous = None
-        self.altitude = None
+        self.elevation = None
 
     def __repr__(self):
         output = str(self)
