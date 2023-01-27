@@ -180,7 +180,7 @@ def _stitch_panorama(faces):
     full_tile_size = int(math.sqrt(len(faces[1]))) * TILE_SIZE
     pano_width = 4 * full_tile_size
     pano_height = 3 * full_tile_size
-    panorama = Image.new('RGB', (pano_width, pano_height))
+    image = Image.new('RGB', (pano_width, pano_height))
     stitched_faces = []
     if len(faces[1]) == 1:
         for i in range(0, 6):
@@ -188,11 +188,10 @@ def _stitch_panorama(faces):
     else:
         for i in range(0, 6):
             stitched_faces.append(_stitch_face(faces[i]))
-    panorama.paste(im=stitched_faces[0], box=(1 * full_tile_size, 1 * full_tile_size))
-    panorama.paste(im=stitched_faces[1], box=(2 * full_tile_size, 1 * full_tile_size))
-    panorama.paste(im=stitched_faces[2], box=(3 * full_tile_size, 1 * full_tile_size))
-    panorama.paste(im=stitched_faces[3], box=(0, 1 * full_tile_size))
-    panorama.paste(im=stitched_faces[4], box=(1 * full_tile_size, 0))
-    panorama.paste(im=stitched_faces[5], box=(1 * full_tile_size, 2 * full_tile_size))
-    return panorama
-
+    image.paste(im=stitched_faces[0], box=(1 * full_tile_size, 1 * full_tile_size))
+    image.paste(im=stitched_faces[1], box=(2 * full_tile_size, 1 * full_tile_size))
+    image.paste(im=stitched_faces[2], box=(3 * full_tile_size, 1 * full_tile_size))
+    image.paste(im=stitched_faces[3], box=(0,                  1 * full_tile_size))
+    image.paste(im=stitched_faces[4], box=(1 * full_tile_size, 0))
+    image.paste(im=stitched_faces[5], box=(1 * full_tile_size, 2 * full_tile_size))
+    return image
