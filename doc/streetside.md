@@ -1,3 +1,35 @@
+## StreetsidePanorama class
+
+The StreetsidePanorama class has the following properties:
+
+**id**:  
+The panorama ID.
+
+**lat/lon**:  
+The WGS84 latitude and longitude at which the panorama was taken.
+
+**date**:  
+The capture date and time.
+
+**elevation**:  
+Elevation in meters.
+
+**heading**:  
+Heading of the car in radians. 0 means the car is heading due north.
+
+**next**:  
+ID of the next image in the sequence.
+
+**pitch**:  
+Pitch offset of the panorama in radians.
+
+**previous**:  
+ID of the previous image in the sequence.
+
+**roll**:  
+Roll offset of the panorama in radians.
+
+
 ## Finding panoramas
 
 #### <code>find_panoramas(<em>lat, lon, radius=25, limit=50, session=None</em>)</code>
