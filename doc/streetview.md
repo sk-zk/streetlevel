@@ -33,15 +33,15 @@ Fetches metadata of a specific panorama.
 
 ## Downloading panoramas
 
-#### <code>download_panorama(<em>pano, filename, zoom=5</em>)</code>
+#### <code>download_panorama(<em>pano, path, zoom=5</em>)</code>
 Downloads a panorama to a file.
 
 Supports all camera generations as well as third-party coverage.
 
 **pano**: A `StreetViewPanorama` object.  
-**filename**: Output filename.  
-**zoom**: Image size; 0 is lowest, 5 is highest. The actual dimensions of the panorama depend on the camera generation used.
-If the requested zoom level does not exist, the highest available level will be used.
+**path**: Output path.  
+**zoom**: Image size; 0 is lowest, 5 is highest. The dimensions of a zoom level of a specific panorama depend on the camera used.
+If the requested zoom level does not exist, the highest available level will be downloaded.
 
 #### <code>get_panorama(<em>pano, zoom=5</em>)</code>
 Like `download_panorama()`, but the panorama is returned as a PIL image.

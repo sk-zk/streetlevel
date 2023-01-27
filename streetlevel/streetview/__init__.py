@@ -1,14 +1,11 @@
 from io import BytesIO
 import itertools
 import json
-import os
 from PIL import Image
 import requests
-import time
 from streetlevel.geo import *
 from .panorama import StreetViewPanorama
 from .protobuf import *
-from enum import Enum
 
 
 def is_third_party_panoid(panoid):
@@ -268,12 +265,12 @@ def _parse_pano_message(msg):
     return pano
 
 
-def download_panorama(pano, filename, zoom=5):
+def download_panorama(pano, path, zoom=5):
     """
-    Downloads a panorama.
+    Downloads a panorama to a file.
     """
-    stitched = get_panorama(pano, zoom=zoom)
-    stitched.save(filename)
+    pano = get_panorama(pano, zoom=zoom)
+    pano.save(path)
 
 
 def get_panorama(pano, zoom=5):

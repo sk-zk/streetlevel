@@ -19,11 +19,11 @@ Retrieves panoramas within a bounding box.
 
 ## Downloading panoramas
 
-#### <code>download_panorama(<em>panoid, filename, zoom=3</em>)</code>
+#### <code>download_panorama(<em>panoid, path, zoom=3</em>)</code>
 Downloads a panorama to a file.
 
 **panoid**: The pano ID.  
-**filename**: Output filename.  
+**path**: Output path.  
 **zoom**: Image size; 0 is lowest, 3 is highest.
 
 #### <code>get_panorama(<em>panoid, zoom=3</em>)</code>
