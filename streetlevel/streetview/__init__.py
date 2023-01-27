@@ -251,17 +251,18 @@ def _parse_pano_message(msg):
             panoid = other[0][1]
             lat = float(other[2][0][2])
             lon = float(other[2][0][3])
+            heading = _try_get(lambda: math.radians(float(other[2][2][0])))
 
-            neighbor_or_historical = StreetViewPanorama(panoid, lat, lon)
+            connected = StreetViewPanorama(panoid, lat, lon, heading=heading)
 
             if idx in other_dates:
-                neighbor_or_historical.year = other_dates[idx][0]
-                neighbor_or_historical.month = other_dates[idx][1]
-                pano.historical.append(neighbor_or_historical)
+                connected.year = other_dates[idx][0]
+                connected.month = other_dates[idx][1]
+                pano.historical.append(connected)
             else:
-                pano.neighbors.append(neighbor_or_historical)
+                pano.neighbors.append(connected)
 
-            neighbor_or_historical.street_name = _try_get(lambda: other[3][2][0])
+            connected.street_name = _try_get(lambda: other[3][2][0])
     pano.historical = sorted(pano.historical, key=lambda x: (x.year, x.month), reverse=True)
 
     return pano
