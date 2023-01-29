@@ -54,8 +54,7 @@ def test_lookup_panoid():
 
 def test_find_panorama():
     pano = streetview.find_panorama(47.15048822721601, 11.13385612403307,
-                                    radius=100, download_depth=False,
-                                    locale="en", session=None)
+                                    radius=100, locale="en", session=None)
     assert pano.id == "n-Zd6bDDL_XOc_jkNgFsGg"
     assert pano.lat == approx(47.15048822721601, 0.001)
     assert pano.lon == approx(11.13385612403307, 0.001)
