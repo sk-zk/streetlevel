@@ -24,14 +24,6 @@ def find_panorama(lat: float, lon: float,
     pan_info = response["result"]["panInfo"]
     pano = _parse_pan_info_dict(pan_info)
 
-    if "extra" in pan_info \
-            and "carDirection" in pan_info["extra"]:
-            pano.heading = math.radians(pan_info["extra"]["carDirection"])
-    # TODO convert omega/phi/kappa
-    pano.omega = pan_info["omega"]
-    pano.phi = pan_info["phi"]
-    pano.kappa = pan_info["kappa"]
-
     pano.neighbors = get_neighbors(pano.id)
 
     for year in pan_info["timeline"]:
@@ -82,6 +74,27 @@ def _parse_pan_info_dict(pan_info: dict) -> MapyPanorama:
         elevation=pan_info["mark"]["alt"],
         provider=pan_info["provider"],
     )
+
+    if "extra" in pan_info and "carDirection" in pan_info["extra"]:
+        pano.heading = math.radians(pan_info["extra"]["carDirection"])
+    # TODO convert omega/phi/kappa
+    pano.omega = pan_info["omega"]
+    pano.phi = pan_info["phi"]
+    pano.kappa = pan_info["kappa"]
+
+    # zoom level 0
+    num_tiles = [[1, 1]]
+    # zoom levels 1 and 2 for cyclomedia
+    if "extra" in pan_info and "tileNumX" in pan_info["extra"]:
+        for i in range(0, len(pan_info["extra"]["tileNumX"])):
+            num = [int(pan_info["extra"]["tileNumX"][i]),
+                   int(pan_info["extra"]["tileNumY"][i])]
+            num_tiles.append(num)
+    # zoom level 1 for other providers
+    else:
+        num_tiles.append([pan_info["tileNumX"], pan_info["tileNumY"]])
+    pano.num_tiles = num_tiles
+
     return pano
 
 
@@ -129,9 +142,7 @@ def _generate_tile_list(pano: MapyPanorama, zoom: int):
     url = f"https://panorama-mapserver.mapy.cz/panorama/" \
           f"{pano.domain_prefix}/{pano.uri_path}/{file_mask}"
 
-    num_tiles_x, num_tiles_y = _get_num_tiles(zoom)
-
-    coords = list(itertools.product(range(num_tiles_x), range(num_tiles_y)))
+    coords = list(itertools.product(range(pano.num_tiles[zoom][0]), range(pano.num_tiles[zoom][1])))
     tiles = [(x, y, url.format(x, y, zoom)) for x, y in coords]
     return tiles
 
@@ -156,9 +167,8 @@ def _stitch_tiles(pano: MapyPanorama, tile_list, tile_images, zoom: int) -> Imag
     """
     Stitches downloaded tiles to a full image.
     """
-    num_tiles_x, num_tiles_y = _get_num_tiles(zoom)
-    img_width = pano.tile_size[0] * num_tiles_x
-    img_height = pano.tile_size[1] * num_tiles_y
+    img_width = pano.tile_size[0] * pano.num_tiles[zoom][0]
+    img_height = pano.tile_size[1] * pano.num_tiles[zoom][1]
     tile_width = pano.tile_size[0]
     tile_height = pano.tile_size[1]
 
@@ -170,13 +180,3 @@ def _stitch_tiles(pano: MapyPanorama, tile_list, tile_images, zoom: int) -> Imag
         del tile
 
     return stitched
-
-
-def _get_num_tiles(zoom: int) -> (int, int):
-    if zoom == 0:
-        num_tiles_x, num_tiles_y = 1, 1
-    elif zoom == 1:
-        num_tiles_x, num_tiles_y = 16, 8
-    else:
-        num_tiles_x, num_tiles_y = 28, 14
-    return num_tiles_x, num_tiles_y

@@ -9,7 +9,7 @@ class MapyPanorama:
     lat: float
     lon: float
 
-    tile_size: [int]
+    tile_size: list[int]
     max_zoom: int
     domain_prefix: str
     uri_path: str
@@ -19,6 +19,8 @@ class MapyPanorama:
     elevation: float
 
     provider: str
+
+    num_tiles: list[list[int]] = None
 
     heading: float = None
     omega: float = None

@@ -34,6 +34,9 @@ Highest zoom level available; either 1 or 2.
 **neighbors**:  
 A list of nearby panoramas.
 
+**num_tiles**:  
+Amount of columns and rows of tiles for each zoom level.
+
 **omega/phi/kappa**:  
 Some kind of photogrammetry format for angles which can probably be converted to yaw/pitch/roll somehow.
 
