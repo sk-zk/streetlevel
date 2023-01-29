@@ -24,6 +24,9 @@ The country in which the panorama is located.
 **day/month/year**:  
 The capture date. Note that, for official coverage, only month and year are available.
 
+**depth**:  
+The depth map, if it was requested. Values are in meters. -1 is used for the horizon.
+
 **heading**:  
 Heading of the camera / north offset (meaning the phi of the center of the panorama) in radians, where 0 is due north.
 
@@ -59,12 +62,11 @@ URL to the icon displayed next to the uploader on Google Maps.
 
 ## Finding panoramas
 
-#### <code>find_panorama(<em>lat, lon, radius=50, download_depth=False, locale="en", session=None</em>)</code>
+#### <code>find_panorama(<em>lat, lon, radius=50, locale="en", session=None</em>)</code>
 Searches for a panorama within a radius around a point.
 
 **lat**, **lon**: Latitude and longitude.  
 **radius**: Search radius in meters.  
-**download_depth**: Whether to download the depth map. The library does not yet parse this data, so for now, this should always be false.  
 **locale**: Desired language of the location's address as IETF code.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).
 
@@ -85,7 +87,7 @@ As above, but for fetching a tile on which a lat/lon coordinate is located.
 Fetches metadata of a specific panorama.
 
 **panoid**: The pano ID.  
-**download_depth**: Whether or not to download the depth map. The library does not yet parse this data, so for now, this should always be false.  
+**download_depth**: Whether to download and parse the depth map.  
 **locale**: Desired language of the location's address as IETF code.  
 **session**: A [session object](https://docs.python-requests.org/en/master/user/advanced/#session-objects).  
 

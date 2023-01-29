@@ -59,6 +59,11 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
     <td align="center">✔</td>
   </tr>
   <tr>
+    <td align="right">Download depth information</td>
+    <td align="center">✔</td>
+    <td align="center">⚫</td>
+  </tr>
+  <tr>
     <td align="right">Image projection</td>
     <td align="center">Equirectangular</td>
     <td align="center">Cubemap</td>
@@ -101,11 +106,6 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
   <tr>
     <td align="right">Historical panoramas</td>
     <td align="center">✔</td>
-    <td align="center">⚫</td>
-  </tr>
-  <tr>
-    <td align="right">Depth information</td>
-    <td align="center">❌</td>
     <td align="center">⚫</td>
   </tr>
   <tr>

@@ -3,10 +3,10 @@ import itertools
 import json
 from PIL import Image
 import requests
-import math
 from streetlevel.geo import *
 from .panorama import StreetViewPanorama
 from .protobuf import *
+from .depth import parse as parse_depth
 
 
 def is_third_party_panoid(panoid):
@@ -30,6 +30,8 @@ def _try_get(accessor):
     try:
         return accessor()
     except IndexError:
+        return None
+    except TypeError:
         return None
 
 
@@ -101,11 +103,14 @@ def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", s
     return pano_data
 
 
-def find_panorama(lat, lon, radius=50, download_depth=False, locale="en", session=None):
+def find_panorama(lat, lon, radius=50, locale="en", session=None):
     """
     Searches for a panorama within a radius around a point.
     """
-    resp = _find_panorama_raw(lat, lon, radius=radius, download_depth=download_depth,
+    # TODO
+    # the `SingleImageSearch` call returns a different kind of depth data
+    # than `photometa`; need to deal with that at some point
+    resp = _find_panorama_raw(lat, lon, radius=radius, download_depth=False,
                               locale=locale, session=session)
 
     response_code = resp[0][0][0]
@@ -244,6 +249,11 @@ def _parse_pano_message(msg):
         uploader=_try_get(lambda: msg[4][1][0][0][0]),
         uploader_icon_url=_try_get(lambda: msg[4][1][0][2]),
     )
+
+    # depth
+    raw_depth = _try_get(lambda: msg[5][0][5][1][2])
+    if raw_depth:
+        pano.depth = parse_depth(raw_depth)
 
     # parse neighbors and other dates
     if others is not None and len(others) > 1:

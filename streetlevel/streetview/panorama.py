@@ -10,6 +10,7 @@ class StreetViewPanorama:
     lon: float
 
     heading: float = None
+    depth: dict = None
 
     tile_size: List[int] = None
     image_sizes: List[List[int]] = None
