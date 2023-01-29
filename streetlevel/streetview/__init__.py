@@ -7,6 +7,7 @@ from streetlevel.geo import *
 from .panorama import StreetViewPanorama
 from .protobuf import *
 from .depth import parse as parse_depth
+from ..util import _try_get
 
 
 def is_third_party_panoid(panoid):
@@ -24,15 +25,6 @@ def _split_ietf(tag):
     lang = tag[0]
     country = tag[1] if len(tag) > 1 else tag[0]
     return lang, country
-
-
-def _try_get(accessor):
-    try:
-        return accessor()
-    except IndexError:
-        return None
-    except TypeError:
-        return None
 
 
 def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", session=None):
