@@ -1,0 +1,74 @@
+## MapyPanorama class
+
+The MapyPanorama class has the following properties:
+
+**id**:  
+The panorama ID.
+
+**lat/lon**:  
+The WGS84 latitude and longitude at which the panorama was taken.
+
+**date**:  
+The capture date and time.
+
+**domain_prefix**:  
+Part of the panorama tile URL.
+
+**elevation**:  
+Elevation in meters.
+
+**file_mask**:  
+Part of the panorama tile URL.
+
+**heading**:  
+Heading of the car (returned in radians), where 0° is north, 90° is east, -180°/180° is south, and -90° is west.
+
+Cyclomedia only, as their imagery has north in the center of the image. The other providers use omega/phi/kappa angles.
+
+**historical**:  
+A list of panoramas with a different date at the same location.
+
+**max_zoom**:  
+Highest zoom level available; either 1 or 2.
+
+**neighbors**:  
+A list of nearby panoramas.
+
+**omega/phi/kappa**:  
+Some kind of photogrammetry format for angles which can probably be converted to yaw/pitch/roll somehow.
+
+**provider**:  
+The name of the company which created the panorama.
+
+**tile_size**:  
+Mapy panoramas are broken up into multiple tiles. This returns the size of one tile.
+
+**uri_path**:  
+Part of the panorama tile URL.
+
+
+## Finding panoramas
+
+#### <code>find_panorama(<em>lat: float, lon: float, radius: float = 100.0</em>) -> MapyPanorama | None</code>
+Searches for a panorama within a radius around a point.
+
+**lat**, **lon**: Latitude and longitude.  
+**radius**: Search radius in meters.  
+
+#### <code>get_neighbors(<em>panoid: int</em>) -> list[MapyPanorama]</code>
+Gets neighbors of a panorama.
+
+**panoid**: ID of the panorama.
+
+
+## Downloading panoramas
+
+#### <code>download_panorama(<em>pano: MapyPanorama, path: str, zoom: int = 2</em>) -> None</code>
+Downloads a panorama to a file.
+
+**pano**: The panorama.  
+**path**: Output path.  
+**zoom**: Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+
+#### <code>get_panorama(<em>pano: MapyPanorama, zoom: int = 2</em>) -> Image</code>
+Like `download_panorama()`, but the panorama is returned as a PIL image.

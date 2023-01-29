@@ -290,7 +290,7 @@ def get_panorama(pano, zoom=5):
     """
     Downloads a panorama as PIL image.
     """
-    zoom = min(zoom, len(pano.image_sizes) - 1)
+    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     tile_list = _generate_tile_list(pano, zoom)
     tiles = _download_tiles(tile_list)
     stitched = _stitch_tiles(pano, tile_list, tiles, zoom)
