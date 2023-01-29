@@ -7,6 +7,8 @@ from pyfrpc.client import FrpcClient
 from .panorama import MapyPanorama
 from requests import Session
 
+from ..dataclasses import Size
+
 client = FrpcClient("https://pro.mapy.cz/panorpc")
 headers = {
     # Panoramas from Cyclomedia (2020+) are only returned if this header is set
@@ -29,7 +31,9 @@ def find_panorama(lat: float, lon: float,
     for year in pan_info["timeline"]:
         if pano.date.year == year:
             continue
-        response = _rpc_getbest(lat, lon, 19.0, options={'year': year, 'nopenalties': True})
+        response = _rpc_getbest(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
+        if response["status"] != 200:
+            continue
         pan_info = response["result"]["panInfo"]
         historical = _parse_pan_info_dict(pan_info)
         pano.historical.append(historical)
@@ -65,7 +69,7 @@ def _parse_pan_info_dict(pan_info: dict) -> MapyPanorama:
         id=pan_info["pid"],
         lat=pan_info["mark"]["lat"],
         lon=pan_info["mark"]["lon"],
-        tile_size=[pan_info["tileWidth"], pan_info["tileHeight"]],
+        tile_size=Size(pan_info["tileWidth"], pan_info["tileHeight"]),
         domain_prefix=pan_info["domainPrefix"],
         uri_path=pan_info["uriPath"],
         file_mask=pan_info["fileMask"],
@@ -83,16 +87,16 @@ def _parse_pan_info_dict(pan_info: dict) -> MapyPanorama:
     pano.kappa = pan_info["kappa"]
 
     # zoom level 0
-    num_tiles = [[1, 1]]
+    num_tiles = [Size(1, 1)]
     # zoom levels 1 and 2 for cyclomedia
     if "extra" in pan_info and "tileNumX" in pan_info["extra"]:
         for i in range(0, len(pan_info["extra"]["tileNumX"])):
-            num = [int(pan_info["extra"]["tileNumX"][i]),
-                   int(pan_info["extra"]["tileNumY"][i])]
+            num = Size(int(pan_info["extra"]["tileNumX"][i]),
+                       int(pan_info["extra"]["tileNumY"][i]))
             num_tiles.append(num)
     # zoom level 1 for other providers
     else:
-        num_tiles.append([pan_info["tileNumX"], pan_info["tileNumY"]])
+        num_tiles.append(Size(pan_info["tileNumX"], pan_info["tileNumY"]))
     pano.num_tiles = num_tiles
 
     return pano
@@ -142,7 +146,7 @@ def _generate_tile_list(pano: MapyPanorama, zoom: int):
     url = f"https://panorama-mapserver.mapy.cz/panorama/" \
           f"{pano.domain_prefix}/{pano.uri_path}/{file_mask}"
 
-    coords = list(itertools.product(range(pano.num_tiles[zoom][0]), range(pano.num_tiles[zoom][1])))
+    coords = list(itertools.product(range(pano.num_tiles[zoom].x), range(pano.num_tiles[zoom].y)))
     tiles = [(x, y, url.format(x, y, zoom)) for x, y in coords]
     return tiles
 
@@ -167,10 +171,10 @@ def _stitch_tiles(pano: MapyPanorama, tile_list, tile_images, zoom: int) -> Imag
     """
     Stitches downloaded tiles to a full image.
     """
-    img_width = pano.tile_size[0] * pano.num_tiles[zoom][0]
-    img_height = pano.tile_size[1] * pano.num_tiles[zoom][1]
-    tile_width = pano.tile_size[0]
-    tile_height = pano.tile_size[1]
+    img_width = pano.tile_size.x * pano.num_tiles[zoom].x
+    img_height = pano.tile_size.y * pano.num_tiles[zoom].y
+    tile_width = pano.tile_size.x
+    tile_height = pano.tile_size.y
 
     stitched = Image.new('RGB', (img_width, img_height))
 

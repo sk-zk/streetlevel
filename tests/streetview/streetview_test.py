@@ -2,6 +2,7 @@ import pytest
 from pytest import approx
 import json
 from streetlevel import streetview
+from streetlevel.dataclasses import Size
 
 
 def mocked_lookup_panoid_raw(panoid, download_depth=False, locale="en", session=None):
@@ -38,9 +39,9 @@ def test_lookup_panoid():
     assert pano.month == 3
     assert pano.year == 2021
     assert pano.country_code == "AT"
-    assert pano.tile_size == [512, 512]
+    assert pano.tile_size == Size(512, 512)
     assert len(pano.image_sizes) == 6
-    assert pano.image_sizes[-1] == [8192, 16384]
+    assert pano.image_sizes[-1] == Size(16384, 8192)
 
 
 # todo mock image requests

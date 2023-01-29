@@ -2,6 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List
 
+from streetlevel.dataclasses import Size
+
 
 @dataclass
 class StreetViewPanorama:
@@ -12,8 +14,8 @@ class StreetViewPanorama:
     heading: float = None
     depth: dict = None
 
-    tile_size: List[int] = None
-    image_sizes: List[List[int]] = None
+    tile_size: Size = None
+    image_sizes: List[Size] = None
 
     neighbors: List[StreetViewPanorama] = field(default_factory=list)
     historical: List[StreetViewPanorama] = field(default_factory=list)

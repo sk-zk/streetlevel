@@ -7,6 +7,7 @@ from streetlevel.geo import *
 from .panorama import StreetViewPanorama
 from .protobuf import *
 from .depth import parse as parse_depth
+from ..dataclasses import Size
 from ..util import _try_get
 
 
@@ -208,7 +209,7 @@ def lookup_panoid(panoid, download_depth=False, locale="en", session=None):
 
 def _parse_pano_message(msg):
     img_sizes = msg[2][3][0]
-    img_sizes = list(map(lambda x: x[0], img_sizes))
+    img_sizes = list(map(lambda x: Size(x[0][1], x[0][0]), img_sizes))
     panoid = msg[1][1]
     lat = msg[5][0][1][0][2]
     lon = msg[5][0][1][0][3]
@@ -231,7 +232,7 @@ def _parse_pano_message(msg):
         year=date[0],
         month=date[1],
         day=date[2] if len(date) > 2 else None,
-        tile_size=msg[2][3][1],
+        tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),
         image_sizes=img_sizes,
         source=source,
         country_code=_try_get(lambda: msg[5][0][1][4]),
@@ -295,10 +296,10 @@ def _generate_tile_list(pano, zoom):
     Returns a list of (x, y, tile_url) tuples.
     """
     img_size = pano.image_sizes[zoom]
-    tile_width = pano.tile_size[0]
-    tile_height = pano.tile_size[1]
-    cols = math.ceil(img_size[1] / tile_width)
-    rows = math.ceil(img_size[0] / tile_height)
+    tile_width = pano.tile_size.x
+    tile_height = pano.tile_size.y
+    cols = math.ceil(img_size.x / tile_width)
+    rows = math.ceil(img_size.y / tile_height)
 
     image_url = "https://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
     third_party_image_url = "https://lh3.ggpht.com/p/{0:}=x{1:}-y{2:}-z{3:}"
@@ -331,10 +332,10 @@ def _stitch_tiles(pano, tile_list, tile_data, zoom):
     Stitches downloaded tiles to a full image.
     """
     img_size = pano.image_sizes[zoom]
-    tile_width = pano.tile_size[0]
-    tile_height = pano.tile_size[1]
+    tile_width = pano.tile_size.x
+    tile_height = pano.tile_size.y
 
-    panorama = Image.new('RGB', (img_size[1], img_size[0]))
+    panorama = Image.new('RGB', (img_size.x, img_size.y))
 
     for x, y, url in tile_list:
         tile = Image.open(BytesIO(tile_data[(x, y)]))

@@ -1,6 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import List
+
+from streetlevel.dataclasses import Size
 
 
 @dataclass
@@ -9,7 +12,7 @@ class MapyPanorama:
     lat: float
     lon: float
 
-    tile_size: list[int]
+    tile_size: Size
     max_zoom: int
     domain_prefix: str
     uri_path: str
@@ -20,15 +23,15 @@ class MapyPanorama:
 
     provider: str
 
-    num_tiles: list[list[int]] = None
+    num_tiles: List[Size] = None
 
     heading: float = None
     omega: float = None
     phi: float = None
     kappa: float = None
 
-    neighbors: list[MapyPanorama] = field(default_factory=list)
-    historical: list[MapyPanorama] = field(default_factory=list)
+    neighbors: List[MapyPanorama] = field(default_factory=list)
+    historical: List[MapyPanorama] = field(default_factory=list)
 
     def __repr__(self):
         return str(self)
