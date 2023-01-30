@@ -1,5 +1,7 @@
 import math
 import pyproj
+from numpy import ndarray
+from scipy.spatial.transform import Rotation
 
 TILE_SIZE = 256
 geod = pyproj.Geod(ellps="WGS84")
@@ -41,3 +43,10 @@ def create_bounding_box_around_point(lat, lon, radius):
     top_left = geod.fwd(lon, lat, 315, dist_to_corner)
     bottom_right = geod.fwd(lon, lat, 135, dist_to_corner)
     return top_left, bottom_right
+
+
+def opk_to_rotation(omega: float, phi: float, kappa: float) -> Rotation:
+    """
+    Creates a SciPy rotation object from omega/phi/kappa angles.
+    """
+    return Rotation.from_euler('zxy', [phi, -omega, kappa])

@@ -38,10 +38,16 @@ A list of nearby panoramas.
 Amount of columns and rows of tiles for each zoom level.
 
 **omega/phi/kappa**:  
-Some kind of photogrammetry format for angles which can probably be converted to yaw/pitch/roll somehow.
+Some kind of photogrammetry format for angles, in radians. Look, I don't know what this is, I just convert them 🤷‍♂️
+
+**pitch**:  
+Pitch offset of the panorama in radians, converted from OPK.
 
 **provider**:  
 The name of the company which created the panorama.
+
+**roll**:  
+Roll offset of the panorama in radians, converted from OPK.
 
 **tile_size**:  
 Mapy panoramas are broken up into multiple tiles. This returns the size of one tile.

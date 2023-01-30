@@ -29,6 +29,8 @@ class MapyPanorama:
     omega: float = None
     phi: float = None
     kappa: float = None
+    pitch: float = None
+    roll: float = None
 
     neighbors: List[MapyPanorama] = field(default_factory=list)
     historical: List[MapyPanorama] = field(default_factory=list)
