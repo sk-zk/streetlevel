@@ -21,9 +21,7 @@ Elevation in meters.
 Part of the panorama tile URL.
 
 **heading**:  
-Heading of the car (returned in radians), where 0° is north, 90° is east, -180°/180° is south, and -90° is west.
-
-Cyclomedia only, as their imagery has north in the center of the image. The other providers use omega/phi/kappa angles.
+Heading offset in radians, where 0° is north, 90° is east, -180°/180° is south, and -90° is west.
 
 **historical**:  
 A list of panoramas with a different date at the same location.
@@ -38,7 +36,7 @@ A list of nearby panoramas.
 Amount of columns and rows of tiles for each zoom level.
 
 **omega/phi/kappa**:  
-Some kind of photogrammetry format for angles, in radians. Look, I don't know what this is, I just convert them 🤷‍♂️
+Some kind of photogrammetry format for angles, in radians. Look, I don't know what this is, I just convert it 🤷‍♂️
 
 **pitch**:  
 Pitch offset of the panorama in radians, converted from OPK.
