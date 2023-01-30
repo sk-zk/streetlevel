@@ -75,12 +75,14 @@ def find_panoramas(lat, lon, radius=25, limit=50, session=None):
         limit=limit, session=session)
 
 
-def download_panorama(panoid, path, zoom=3):
+def download_panorama(panoid, path, zoom=3, pil_args=None):
     """
     Downloads a panorama to a file.
     """
+    if pil_args is None:
+        pil_args = {}
     pano = get_panorama(panoid, zoom)
-    pano.save(path)
+    pano.save(path, **pil_args)
 
 
 def get_panorama(panoid, zoom=3):

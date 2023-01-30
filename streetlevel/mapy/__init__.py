@@ -117,12 +117,14 @@ def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image:
         return stitched
 
 
-def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2) -> None:
+def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
     """
+    if pil_args is None:
+        pil_args = {}
     pano = get_panorama(pano, zoom=zoom)
-    pano.save(path)
+    pano.save(path, **pil_args)
 
 
 def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image:

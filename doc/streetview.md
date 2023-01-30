@@ -94,15 +94,16 @@ Fetches metadata of a specific panorama.
 
 ## Downloading panoramas
 
-#### <code>download_panorama(<em>pano, path, zoom=5</em>)</code>
+#### <code>download_panorama(<em>pano, path, zoom=5, pil_args=None</em>)</code>
 Downloads a panorama to a file.
 
 Supports all camera generations as well as third-party coverage.
 
 **pano**: A `StreetViewPanorama` object.  
 **path**: Output path.  
-**zoom**: Image size; 0 is lowest, 5 is highest. The dimensions of a zoom level of a specific panorama depend on the camera used.
+**zoom**: Image size; 0 is lowest, 5 is highest. The dimensions of a zoom level of a specific panorama depend on the camera used.  
 If the requested zoom level does not exist, the highest available level will be downloaded.
+**pil_args**: Additional arguments for the [`Image.save()`](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save) method, e.g. `pil_args={"quality":100}`.
 
 #### <code>get_panorama(<em>pano, zoom=5</em>)</code>
 Like `download_panorama()`, but the panorama is returned as a PIL image.

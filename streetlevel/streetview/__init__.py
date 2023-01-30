@@ -271,12 +271,14 @@ def _parse_pano_message(msg):
     return pano
 
 
-def download_panorama(pano, path, zoom=5):
+def download_panorama(pano, path, zoom=5, pil_args=None):
     """
     Downloads a panorama to a file.
     """
+    if pil_args is None:
+        pil_args = {}
     pano = get_panorama(pano, zoom=zoom)
-    pano.save(path)
+    pano.save(path, **pil_args)
 
 
 def get_panorama(pano, zoom=5):
