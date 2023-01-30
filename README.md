@@ -99,7 +99,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
     <td align="center">🟡<br>
       <small>(heading only)</small></td>
     <td align="center">✔</td>
-    <td align="center">🟡<br></td>
+    <td align="center">✔<br></td>
   </tr>
   <tr>
     <td align="right">Elevation</td>
