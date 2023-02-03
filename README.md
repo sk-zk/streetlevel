@@ -88,7 +88,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
   </thead>
   <tr>
     <td align="right">Capture date</td>
-    <td align="center">🟡<br>
+    <td align="center">✔<br>
       <small>(month and year only for official coverage; full date for inofficial coverage)</small>
     </td>
     <td align="center">✔</td>
