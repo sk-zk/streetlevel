@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 from io import BytesIO
 from typing import List
@@ -9,6 +10,7 @@ from requests import Session
 
 from .panorama import StreetsidePanorama
 from streetlevel.geo import *
+from ..util import download_files_async
 
 TILE_SIZE = 256
 
@@ -129,12 +131,10 @@ def _download_tiles(faces):
     """
     Downloads the tiles of a panorama.
     """
-    session = requests.Session()
     for face_id, face in faces.items():
-        for tile in face:
-            url = tile["url"]
-            response = session.get(url)
-            tile["image"] = response.content
+        tiles = asyncio.run(download_files_async([tile["url"] for tile in face]))
+        for idx, tile in enumerate(face):
+            tile["image"] = tiles[idx]
 
 
 def _stitch_four(face):
