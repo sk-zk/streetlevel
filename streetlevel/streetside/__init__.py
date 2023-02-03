@@ -1,23 +1,28 @@
 from datetime import datetime
 from io import BytesIO
+from typing import List
+
 import numpy as np
 from PIL import Image
 import requests
+from requests import Session
+
 from .panorama import StreetsidePanorama
 from streetlevel.geo import *
 
 TILE_SIZE = 256
 
 
-def to_base4(n):
+def to_base4(n: int) -> str:
     return np.base_repr(n, 4)
 
 
-def from_base4(n):
+def from_base4(n: str) -> int:
     return int(n, 4)
 
 
-def find_panoramas_in_bbox(north, west, south, east, limit=50, session=None):
+def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
+                           limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
     """
     Retrieves panoramas within a bounding box.
     """
@@ -64,7 +69,8 @@ def _find_panoramas_raw(north, west, south, east, limit=50, session=None):
     return panos
 
 
-def find_panoramas(lat, lon, radius=25, limit=50, session=None):
+def find_panoramas(lat: float, lon: float, radius: float = 25,
+                   limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
     """
     Retrieves panoramas within a square around a point.
     """
@@ -75,7 +81,7 @@ def find_panoramas(lat, lon, radius=25, limit=50, session=None):
         limit=limit, session=session)
 
 
-def download_panorama(panoid, path, zoom=3, pil_args=None):
+def download_panorama(panoid: int, path: str, zoom: int = 3, pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
     """
@@ -85,7 +91,7 @@ def download_panorama(panoid, path, zoom=3, pil_args=None):
     pano.save(path, **pil_args)
 
 
-def get_panorama(panoid, zoom=3):
+def get_panorama(panoid: int, zoom: int = 3) -> Image:
     """
     Downloads a panorama as PIL image.
     """
