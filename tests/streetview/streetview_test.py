@@ -20,9 +20,9 @@ def mocked_get_coverage_tile_raw(tile_x, tile_y, session=None):
         return json.load(f)
 
 
-streetview._lookup_panoid_raw = mocked_lookup_panoid_raw
-streetview._find_panorama_raw = mocked_find_panorama_raw
-streetview._get_coverage_tile_raw = mocked_get_coverage_tile_raw
+streetview.streetview._lookup_panoid_raw = mocked_lookup_panoid_raw
+streetview.streetview._find_panorama_raw = mocked_find_panorama_raw
+streetview.streetview._get_coverage_tile_raw = mocked_get_coverage_tile_raw
 
 
 def test_is_third_party_panoid():
