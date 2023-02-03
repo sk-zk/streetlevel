@@ -2,7 +2,7 @@
 
 The MapyPanorama class has the following properties:
 
-**id: *int**  
+**id: *int***  
 The panorama ID.
 
 **lat/lon: *float***  
@@ -11,7 +11,7 @@ The WGS84 latitude and longitude at which the panorama was taken.
 **date: *datetime***  
 The capture date and time.
 
-**domain_prefix: *str**  
+**domain_prefix: *str***  
 Part of the panorama tile URL.
 
 **elevation: *float***  
