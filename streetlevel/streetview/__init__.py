@@ -1,8 +1,12 @@
 from io import BytesIO
 import itertools
 import json
+from typing import List
+
 from PIL import Image
 import requests
+from requests import Session
+
 from streetlevel.geo import *
 from .panorama import StreetViewPanorama, LocalizedString
 from .protobuf import *
@@ -11,14 +15,14 @@ from ..dataclasses import Size
 from ..util import _try_get
 
 
-def is_third_party_panoid(panoid):
+def is_third_party_panoid(panoid: str) -> bool:
     """
     Returns whether a panoid refers to a third-party panorama.
     """
     return len(panoid) > 22
 
 
-def _split_ietf(tag):
+def _split_ietf(tag: str) -> (str, str):
     """
     Splits an IETF language tag into its language part and country part.
     """
@@ -96,7 +100,8 @@ def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", s
     return pano_data
 
 
-def find_panorama(lat, lon, radius=50, locale="en", session=None):
+def find_panorama(lat: float, lon: float, radius: int = 50,
+                  locale: str = "en", session: Session = None) -> StreetViewPanorama | None:
     """
     Searches for a panorama within a radius around a point.
     """
@@ -189,7 +194,8 @@ def _lookup_panoid_raw(panoid, download_depth=False, locale="en", session=None):
     return pano_data
 
 
-def lookup_panoid(panoid, download_depth=False, locale="en", session=None):
+def lookup_panoid(panoid: str, download_depth: bool = False,
+                  locale: str = "en", session: Session = None) -> StreetViewPanorama | None:
     """
     Fetches metadata for a specific panorama.
     """
@@ -279,9 +285,9 @@ def _parse_pano_message(msg):
     return pano
 
 
-def download_panorama(pano, path, zoom=5, pil_args=None):
+def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_args: dict = None) -> None:
     """
-    Downloads a panorama to a file.
+    Downloads and stitches a panorama and saves it to a file.
     """
     if pil_args is None:
         pil_args = {}
@@ -289,9 +295,9 @@ def download_panorama(pano, path, zoom=5, pil_args=None):
     pano.save(path, **pil_args)
 
 
-def get_panorama(pano, zoom=5):
+def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
     """
-    Downloads a panorama as PIL image.
+    Downloads and stitches a panorama and returns it as PIL image.
     """
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     tile_list = _generate_tile_list(pano, zoom)
@@ -355,13 +361,13 @@ def _stitch_tiles(pano, tile_list, tile_data, zoom):
     return panorama
 
 
-def get_coverage_tile(tile_x, tile_y, session=None):
+def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List[StreetViewPanorama]:
     """
     Gets all panoramas on a Google Maps tile (at zoom level 17 specifically, for some reason).
     Returns panoid, lat, lon only.
     This function uses the API call which is triggered when zooming into a tile in globe view on Google Maps,
     so it can be used to find hidden coverage.
-    Unlike get_panos_at_position(), the list only contains the most recent panorama of a location.
+    This call only returns the most recent coverage for a location.
     """
     resp = _get_coverage_tile_raw(tile_x, tile_y, session)
 
@@ -393,13 +399,13 @@ def _get_coverage_tile_raw(tile_x, tile_y, session=None):
     return data
 
 
-def get_coverage_tile_by_latlon(lat, lon, session=None):
+def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> List[StreetViewPanorama]:
     """
     Gets all panoramas on a Google Maps tile (at zoom level 17 specifically, for some reason).
     Returns panoid, lat, lon only.
     This function uses the API call which is triggered when zooming into a tile in globe view on Google Maps,
     so it can be used to find hidden coverage.
-    Unlike get_panos_at_position(), the list only contains the most recent panorama of a location.
+    This call only returns the most recent coverage for a location.
     """
     tile_coord = wgs84_to_tile_coord(lat, lon, 17)
     return get_coverage_tile(tile_coord[0], tile_coord[1], session=session)
