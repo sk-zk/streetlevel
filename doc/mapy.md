@@ -2,55 +2,55 @@
 
 The MapyPanorama class has the following properties:
 
-**id**:  
+**id: *int**  
 The panorama ID.
 
-**lat/lon**:  
+**lat/lon: *float***  
 The WGS84 latitude and longitude at which the panorama was taken.
 
-**date**:  
+**date: *datetime***  
 The capture date and time.
 
-**domain_prefix**:  
+**domain_prefix: *str**  
 Part of the panorama tile URL.
 
-**elevation**:  
+**elevation: *float***  
 Elevation in meters.
 
-**file_mask**:  
+**file_mask: *str***  
 Part of the panorama tile URL.
 
-**heading**:  
+**heading: *float***  
 Heading offset in radians, where 0° is north, 90° is east, -180°/180° is south, and -90° is west.
 
-**historical**:  
+**historical: *List[MapyPanorama]***  
 A list of panoramas with a different date at the same location.
 
-**max_zoom**:  
+**max_zoom: *int***  
 Highest zoom level available; either 1 or 2.
 
-**neighbors**:  
+**neighbors: *List[MapyPanorama]***  
 A list of nearby panoramas.
 
-**num_tiles**:  
+**num_tiles: *List[Size]***  
 Amount of columns and rows of tiles for each zoom level.
 
-**omega/phi/kappa**:  
+**omega/phi/kappa: *float***  
 Some kind of photogrammetry format for angles, in radians. Look, I don't know what this is, I just convert it 🤷‍♂️
 
-**pitch**:  
+**pitch: *float***  
 Pitch offset of the panorama in radians, converted from OPK.
 
-**provider**:  
+**provider: *str***  
 The name of the company which created the panorama.
 
-**roll**:  
+**roll: *float***  
 Roll offset of the panorama in radians, converted from OPK.
 
-**tile_size**:  
+**tile_size: *Size***  
 Mapy panoramas are broken up into multiple tiles. This returns the size of one tile.
 
-**uri_path**:  
+**uri_path: *str***  
 Part of the panorama tile URL.
 
 
