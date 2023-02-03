@@ -1,6 +1,5 @@
 import math
 import pyproj
-from numpy import ndarray
 from scipy.spatial.transform import Rotation
 
 TILE_SIZE = 256

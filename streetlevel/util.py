@@ -1,6 +1,4 @@
 import asyncio
-import concurrent.futures
-import threading
 from typing import List
 
 import aiohttp
