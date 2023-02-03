@@ -28,7 +28,7 @@ The capture date. Note that, for official coverage, only month and year are avai
 The depth map, if it was requested. Values are in meters. -1 is used for the horizon.
 
 **heading: *float***  
-Heading of the camera / north offset (meaning the phi of the center of the panorama) in radians, where 0 is due north.
+Heading of the camera / north offset (meaning the phi of the center of the panorama) in radians, where 0° is north, 90° is east, 180° is south and 270° is west.
 
 **historical: *List[StreetViewPanorama]***  
 A list of panoramas with a different date at the same location.

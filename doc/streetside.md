@@ -15,7 +15,7 @@ The capture date.
 Elevation in meters.
 
 **heading: *float***  
-Heading of the car in radians. 0 means the car is heading due north.
+Heading of the car in radians, where 0° is north, 270° is east.
 
 **next: *int***  
 ID of the next image in the sequence.
