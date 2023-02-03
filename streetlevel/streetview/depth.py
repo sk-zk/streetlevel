@@ -9,19 +9,21 @@ import base64
 import numpy as np
 import struct
 
+from streetlevel.streetview.panorama import DepthMap
+
 INFINITELY_FAR = -1
 
 
-def parse(b64_string):
+def parse(b64_string: str) -> DepthMap:
     raw_data = decode_b64(b64_string)
     header = parse_header(raw_data)
     planes = parse_planes(header, raw_data)
     depth_map = compute_depth_map(header, planes["planes"], planes["indices"])
     depth_map["data"] = depth_map["data"].reshape((depth_map["height"], depth_map["width"]))
-    return depth_map
+    return DepthMap(depth_map["width"], depth_map["height"], depth_map["data"])
 
 
-def decode_b64(b64_string):
+def decode_b64(b64_string: str) -> np.ndarray:
     b64_string += "=" * ((4 - len(b64_string) % 4) % 4)  # add padding if necessary
     data = base64.urlsafe_b64decode(b64_string)
     return np.array([d for d in data])

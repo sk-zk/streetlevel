@@ -9,9 +9,9 @@ The panorama ID.
 The WGS84 latitude and longitude at which the panorama was taken.
 
 **address**:  
-The address of the location and the languages of the names, e.g. `[['39 Obertaler Str.', 'de'], ['Trentino-South Tyrol', 'en']]`.
+The address of the location and the languages of the names, e.g. `[LocalizedString(value='3 Theaterpl.', language='de'), LocalizedString(value='Merano, Trentino-South Tyrol', language='en')]`.
 This can be localized using the `locale` parameter on the find/lookup functions (if a localization is available). For instance,
-requesting Danish locale (`da`) would yield `[['39 Obertaler Str.', 'de'], ['Trentino-Sydtyrol', 'da']]`.
+requesting Italian locale (`it`) yields `[LocalizedString(value='3 Piazza Teatro', language='it'), LocalizedString(value='Merano, Trentino-Alto Adige', language='it')]`.
 
 Typically only set for official road coverage.
 
@@ -43,10 +43,10 @@ A list of nearby panoramas.
 The source program of the imagery. For official coverage, `launch` refers to car coverage and `scout` refers to trekker or tripod coverage. (Note, however,
 that not all trekker coverage is marked `scout`: the sidewalk trekker in Helsinki, for example, returns `launch`.)
 
-For third party coverage, this returns the app the panorama was uploaded with.
+For third party coverage, this returns the app the panorama was uploaded with, like `photos:street_view_android` or `photos:street_view_publish_api`
 
 **street_name**:  
-The name of the street the panorama is located on, and the language of that name, e.g. `['Obertaler Str.', 'de']`.
+The name of the street the panorama is located on, and the language of that name, e.g. `LocalizedString(value='Piazza Teatro', language='it')`.
 
 Typically only set for official road coverage.
 

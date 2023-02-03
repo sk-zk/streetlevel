@@ -4,7 +4,7 @@ import json
 from PIL import Image
 import requests
 from streetlevel.geo import *
-from .panorama import StreetViewPanorama
+from .panorama import StreetViewPanorama, LocalizedString
 from .protobuf import *
 from .depth import parse as parse_depth
 from ..dataclasses import Size
@@ -224,6 +224,14 @@ def _parse_pano_message(msg):
     except (IndexError, TypeError):
         other_dates = {}
 
+    street_name = _try_get(lambda: msg[5][0][12][0][0][0][2])
+    if street_name is not None:
+        street_name = LocalizedString(street_name[0], street_name[1])
+
+    address = _try_get(lambda: msg[3][2])
+    if address is not None:
+        address = [LocalizedString(x[0], x[1]) for x in address]
+
     pano = StreetViewPanorama(
         id=panoid,
         lat=lat,
@@ -236,8 +244,8 @@ def _parse_pano_message(msg):
         image_sizes=img_sizes,
         source=source,
         country_code=_try_get(lambda: msg[5][0][1][4]),
-        street_name=_try_get(lambda: msg[5][0][12][0][0][0][2]),
-        address=_try_get(lambda: msg[3][2]),
+        street_name=street_name,
+        address=address,
         copyright_message=_try_get(lambda: msg[4][0][0][0][0]),
         uploader=_try_get(lambda: msg[4][1][0][0][0]),
         uploader_icon_url=_try_get(lambda: msg[4][1][0][2]),
