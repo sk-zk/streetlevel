@@ -51,15 +51,16 @@ Retrieves panoramas within a bounding box.
 
 ## Downloading panoramas
 
-#### <code>download_panorama(<em>panoid: int, path: str, zoom: int = 3, pil_args: dict = None</em>) -> None</code>
+#### <code>download_panorama(<em>panoid: int, path: str, zoom: int = 3, single_image: bool = True, pil_args: dict = None</em>) -> None</code>
 Downloads a panorama to a file.
 
 **panoid**: The pano ID.  
 **path**: Output path.  
 **zoom**: Image size; 0 is lowest, 3 is highest.  
+**single_image**: Whether to output a single image or six indiviual images.
 **pil_args**: Additional arguments for the [`Image.save()`](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save) method, e.g. `pil_args={"quality":100}`.
 
-#### <code>get_panorama(<em>panoid: int, zoom: int = 3</em>) -> Image</code>
+#### <code>get_panorama(<em>panoid: int, zoom: int = 3, single_image: bool = True</em>) -> Image | List[Image] </code>
 Like `download_panorama()`, but the panorama is returned as a PIL image.
 
 ## Misc

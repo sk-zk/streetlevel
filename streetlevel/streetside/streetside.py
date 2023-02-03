@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 from typing import List
 
 import numpy as np
@@ -83,23 +84,31 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
         limit=limit, session=session)
 
 
-def download_panorama(panoid: int, path: str, zoom: int = 3, pil_args: dict = None) -> None:
+def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool = True, pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
     """
     if pil_args is None:
         pil_args = {}
-    pano = get_panorama(panoid, zoom)
-    pano.save(path, **pil_args)
+
+    if single_image:
+        pano = get_panorama(panoid, zoom=zoom, single_image=single_image)
+        pano.save(path, **pil_args)
+    else:
+        faces = get_panorama(panoid, zoom=zoom, single_image=single_image)
+        path = Path(path)
+        for idx, face in enumerate(faces):
+            face_path = path.parent / f"{path.stem}_{idx}{path.suffix}"
+            face.save(face_path, **pil_args)
 
 
-def get_panorama(panoid: int, zoom: int = 3) -> Image:
+def get_panorama(panoid: int, zoom: int = 3, single_image: bool = True) -> List[Image.Image] | Image.Image:
     """
     Downloads a panorama as PIL image.
     """
     faces = _generate_tile_list(panoid, zoom)
     _download_tiles(faces)
-    return _stitch_panorama(faces)
+    return _stitch_panorama(faces, single_image=single_image)
 
 
 def _generate_tile_list(panoid, zoom):
@@ -171,14 +180,12 @@ def _stitch_face(face):
         return tile
 
 
-def _stitch_panorama(faces):
+def _stitch_panorama(faces, single_image: bool = True) -> List[Image.Image] | Image.Image:
     """
-    Stitches downloaded tiles into a full image.
+    Stitches downloaded tiles into full faces or one full image.
     """
     full_tile_size = int(math.sqrt(len(faces[1]))) * TILE_SIZE
-    pano_width = 4 * full_tile_size
-    pano_height = 3 * full_tile_size
-    image = Image.new('RGB', (pano_width, pano_height))
+
     stitched_faces = []
     if len(faces[1]) == 1:
         for i in range(0, 6):
@@ -186,10 +193,18 @@ def _stitch_panorama(faces):
     else:
         for i in range(0, 6):
             stitched_faces.append(_stitch_face(faces[i]))
-    image.paste(im=stitched_faces[0], box=(1 * full_tile_size, 1 * full_tile_size))
-    image.paste(im=stitched_faces[1], box=(2 * full_tile_size, 1 * full_tile_size))
-    image.paste(im=stitched_faces[2], box=(3 * full_tile_size, 1 * full_tile_size))
-    image.paste(im=stitched_faces[3], box=(0,                  1 * full_tile_size))
-    image.paste(im=stitched_faces[4], box=(1 * full_tile_size, 0))
-    image.paste(im=stitched_faces[5], box=(1 * full_tile_size, 2 * full_tile_size))
-    return image
+
+    if not single_image:
+        return stitched_faces
+    else:
+        pano_width = 4 * full_tile_size
+        pano_height = 3 * full_tile_size
+        image = Image.new('RGB', (pano_width, pano_height))
+
+        image.paste(im=stitched_faces[0], box=(1 * full_tile_size, 1 * full_tile_size))
+        image.paste(im=stitched_faces[1], box=(2 * full_tile_size, 1 * full_tile_size))
+        image.paste(im=stitched_faces[2], box=(3 * full_tile_size, 1 * full_tile_size))
+        image.paste(im=stitched_faces[3], box=(0,                  1 * full_tile_size))
+        image.paste(im=stitched_faces[4], box=(1 * full_tile_size, 0))
+        image.paste(im=stitched_faces[5], box=(1 * full_tile_size, 2 * full_tile_size))
+        return image
