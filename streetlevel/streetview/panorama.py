@@ -2,6 +2,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List
 
+from numpy import ndarray
+
+from streetlevel.dataclasses import Size
+
 
 @dataclass
 class StreetViewPanorama:
@@ -10,9 +14,12 @@ class StreetViewPanorama:
     lon: float
 
     heading: float = None
+    pitch: float = None
+    roll: float = None
+    depth: DepthMap = None
 
-    tile_size: List[int] = None
-    image_sizes: List[List[int]] = None
+    tile_size: Size = None
+    image_sizes: List[Size] = None
 
     neighbors: List[StreetViewPanorama] = field(default_factory=list)
     historical: List[StreetViewPanorama] = field(default_factory=list)
@@ -22,8 +29,8 @@ class StreetViewPanorama:
     year: int = None
 
     country_code: str = None
-    street_name: List[str] = None
-    address: List[List[str]] = None
+    street_name: LocalizedString = None
+    address: List[LocalizedString] = None
 
     source: str = None
 
@@ -42,3 +49,16 @@ class StreetViewPanorama:
 
     def __str__(self):
         return f"{self.id} ({self.lat:.6}, {self.lon:.6})"
+
+
+@dataclass
+class LocalizedString:
+    value: str
+    language: str
+
+
+@dataclass
+class DepthMap:
+    width: int
+    height: int
+    data: ndarray

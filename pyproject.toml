@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "streetlevel"
+version = "0.3.0"
+license = "MIT"
+authors = [
+  { name="sk-zk", email="sk-zk@users.noreply.github.com" },
+]
+description = "Download panoramas and metadata from Street View and others"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/sk-zk/streetlevel"
+"Bug Tracker" = "https://github.com/sk-zk/streetlevel/issues"
