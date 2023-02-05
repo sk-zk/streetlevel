@@ -75,7 +75,7 @@ Downloads a panorama to a file.
 
 **pano**: The panorama.  
 **path**: Output path.  
-**zoom**: Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+**zoom**: Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.  
 **pil_args**: Additional arguments for the [`Image.save()`](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save) method, e.g. `pil_args={"quality":100}`.
 
 #### <code>get_panorama(<em>pano: MapyPanorama, zoom: int = 2</em>) -> Image</code>
