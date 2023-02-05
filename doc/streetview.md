@@ -28,7 +28,7 @@ The capture date. Note that, for official coverage, only month and year are avai
 The depth map, if it was requested. Values are in meters. -1 is used for the horizon.
 
 **heading: *float***  
-Heading of the camera / north offset (meaning the phi of the center of the panorama) in radians, where 0° is north, 90° is east, 180° is south and 270° is west.
+Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west.
 
 **historical: *List[StreetViewPanorama]***  
 A list of panoramas with a different date at the same location.
@@ -38,6 +38,12 @@ The image sizes in which this panorama can be downloaded, from lowest to highest
 
 **neighbors: *List[StreetViewPanorama]*** 
 A list of nearby panoramas.
+
+**pitch: *float***  
+Pitch offset of the panorama in radians.
+
+**roll: *float***  
+Roll offset of the panorama in radians.
 
 **source: *str***  
 The source program of the imagery. For official coverage, `launch` refers to car coverage and `scout` refers to trekker or tripod coverage. (Note, however,

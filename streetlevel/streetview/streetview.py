@@ -244,6 +244,8 @@ def _parse_pano_message(msg):
         lat=lat,
         lon=lon,
         heading=try_get(lambda: math.radians(msg[5][0][1][2][0])),
+        pitch=try_get(lambda: math.radians(90 - msg[5][0][1][2][1])),
+        roll=try_get(lambda: math.radians(msg[5][0][1][2][2])),
         year=date[0],
         month=date[1],
         day=date[2] if len(date) > 2 else None,

@@ -3,6 +3,11 @@
 
 Since it relies on internal / inofficial API calls, it may break unexpectedly.
 
+## Installation
+```sh
+pip install streetlevel
+```
+
 ## Example
 Downloading the closest Street View panorama to a specific location:
 

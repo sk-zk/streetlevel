@@ -14,6 +14,8 @@ class StreetViewPanorama:
     lon: float
 
     heading: float = None
+    pitch: float = None
+    roll: float = None
     depth: DepthMap = None
 
     tile_size: Size = None
