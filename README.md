@@ -36,18 +36,20 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
   <tr>
     <td align="right">Find panoramas around a point</td>
     <td align="center">✔<br>
-      <small>(returns closest only)</small>
+      (returns closest only)
     </td>
     <td align="center">✔</td>
-    <td align="center">✔</td>
+    <td align="center">✔<br>
+      (returns closest only)
+    </td>
   </tr>
   <tr>
     <td align="right">Find panoramas by slippy map tile or bounding box</td>
     <td align="center">✔<br>
-      <small>(tile, z=17)</small>
+      (tile, z=17)
     </td>
     <td align="center">✔<br>
-      <small>(bounding box)</small>
+      (bounding box)
     </td>
     <td align="center">⚫</td>
   </tr>
@@ -94,15 +96,14 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
   <tr>
     <td align="right">Capture date</td>
     <td align="center">✔<br>
-      <small>(month and year only for official coverage; full date for inofficial coverage)</small>
+      (month and year only for official coverage; full date for inofficial coverage)
     </td>
     <td align="center">✔</td>
     <td align="center">✔</td>
   </tr>
   <tr>
     <td align="right">Yaw/heading, pitch, roll</td>
-    <td align="center">🟡<br>
-      <small>(heading only)</small></td>
+    <td align="center">✔<br>
     <td align="center">✔</td>
     <td align="center">✔<br></td>
   </tr>
@@ -116,7 +117,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
     <td align="right">Nearby / linked panoramas</td>
     <td align="center">✔</td>
     <td align="center">✔<br>
-      <small>(previous and next image in sequence)</small>
+      (previous and next image in sequence)
     </td>
     <td align="center">✔</td>
   </tr>
