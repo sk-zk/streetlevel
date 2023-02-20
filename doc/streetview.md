@@ -36,7 +36,7 @@ A list of panoramas with a different date at the same location.
 **image_sizes: *List[Size]***  
 The image sizes in which this panorama can be downloaded, from lowest to highest.
 
-**neighbors: *List[StreetViewPanorama]*** 
+**neighbors: *List[StreetViewPanorama]***  
 A list of nearby panoramas.
 
 **pitch: *float***  
