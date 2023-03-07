@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import numpy as np
 from PIL import Image
@@ -102,7 +102,7 @@ def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool 
             face.save(face_path, **pil_args)
 
 
-def get_panorama(panoid: int, zoom: int = 3, single_image: bool = True) -> List[Image.Image] | Image.Image:
+def get_panorama(panoid: int, zoom: int = 3, single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
     """
     Downloads a panorama as PIL image.
     """
@@ -180,7 +180,7 @@ def _stitch_face(face):
         return tile
 
 
-def _stitch_panorama(faces, single_image: bool = True) -> List[Image.Image] | Image.Image:
+def _stitch_panorama(faces, single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
     """
     Stitches downloaded tiles into full faces or one full image.
     """

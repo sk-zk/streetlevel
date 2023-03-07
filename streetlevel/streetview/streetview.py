@@ -2,7 +2,7 @@ import asyncio
 from io import BytesIO
 import itertools
 import json
-from typing import List
+from typing import List, Union
 
 from PIL import Image
 import requests
@@ -102,7 +102,7 @@ def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", s
 
 
 def find_panorama(lat: float, lon: float, radius: int = 50,
-                  locale: str = "en", session: Session = None) -> StreetViewPanorama | None:
+                  locale: str = "en", session: Session = None) -> Union[StreetViewPanorama, None]:
     """
     Searches for a panorama within a radius around a point.
     """
@@ -196,7 +196,7 @@ def _lookup_panoid_raw(panoid, download_depth=False, locale="en", session=None):
 
 
 def lookup_panoid(panoid: str, download_depth: bool = False,
-                  locale: str = "en", session: Session = None) -> StreetViewPanorama | None:
+                  locale: str = "en", session: Session = None) -> Union[StreetViewPanorama, None]:
     """
     Fetches metadata for a specific panorama.
     """

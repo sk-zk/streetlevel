@@ -2,6 +2,8 @@ import asyncio
 import itertools
 import math
 from io import BytesIO
+from typing import Union
+
 import requests
 from PIL import Image
 from pyfrpc.client import FrpcClient
@@ -19,7 +21,7 @@ headers = {
 
 
 def find_panorama(lat: float, lon: float,
-                  radius: float = 100.0) -> MapyPanorama | None:
+                  radius: float = 100.0) -> Union[MapyPanorama, None]:
     response = _rpc_getbest(lat, lon, radius)
 
     if response["status"] != 200:
