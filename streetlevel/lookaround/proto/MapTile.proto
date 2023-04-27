@@ -1,0 +1,117 @@
+syntax = "proto3";
+package streetlevel;
+
+// Reverse-engineered identifiers for the coverage tile message.
+
+message MapTile {
+  repeated Pano pano = 1;
+  repeated Unknown13 unknown13 = 4;
+  repeated Projection projection = 5;
+  TileCoordinate tile_coordinate = 6;
+  
+  message Pano {
+    // The pano id, a number with up to 20 digits.
+    uint64 panoid = 1;
+
+    int32 unknown1 = 4;
+
+    // Capture date and time of the pano as unix timestamp (in milliseconds).
+    int64 timestamp = 5;
+
+    // Index of the `Unknown13` message which holds the region id for this pano.
+    int32 region_id_idx = 7;
+
+    // Indices for the projection parameters below
+    repeated int32 projection_idx = 9;
+
+    Location location = 10;
+    Unknown5 unknown5 = 12;
+    
+    message Location {
+      // The tile coordinates of the pano, from which the lat/lon is calculated.
+      int32 longitude_offset = 1;
+      int32 latitude_offset = 2;
+      
+      // this encodes the elevation in some way I don't fully understand -
+      // probably the height above some geoid, and then encoded in some specific way,
+      // but the details are still beyond my understanding.
+      int32 elevation = 3;
+      
+      // Heading of the car; North is 0 and it goes around CCW from there.
+      // For some reason this has an offset based on the current longitude applied to it;
+      // see convert_heading() in geo.py for the formula.
+      int32 heading = 4;
+
+      // Probably roll
+      int32 unknown10 = 5;
+      
+      // Probably tilt
+      int32 unknown11 = 6;
+    }
+    
+    message Unknown5 {
+      // Always four of these if they appear. Values range from 0 to 63.
+      repeated int32 unknown12 = 1;
+    }
+  }
+  
+  message Unknown13 {
+    int32 unknown14 = 1;
+
+    // This is the param that appears in pano URLs after the pano ID.
+    // No idea what this does exactly, but I had to call it _something_.
+    int32 region_id = 3;
+
+    int32 unknown15 = 4;
+    int32 unknown16 = 5;
+
+    CoverageType coverage_type = 6;
+
+    int32 unknown18 = 9;
+    int32 unknown19 = 10;
+    int32 unknown20 = 11;
+    int32 unknown21 = 12;
+    
+    enum CoverageType {
+      DEFAULT = 0;
+      CAR = 2;
+      TREKKER = 3;
+    }
+  }
+  
+  message Projection {
+    int32 face = 1;
+    Unknown24 unknown24 = 4;
+    Unknown25 unknown25 = 5;
+    int32 unknown26 = 6;
+
+    message Unknown24 {
+      int32 unknown27 = 1;
+      double longitude_size = 2;
+      double latitude_size = 3;
+      double unknown30 = 4;
+      double unknown31 = 5;
+      double unknown32 = 6;
+      double unknown33 = 7;
+      double unknown34 = 8;
+      double unknown35 = 9;
+      double unknown36 = 10;
+    }
+
+    message Unknown25 {
+      double unknown37 = 1;
+      double unknown38 = 2;
+      double unknown39 = 3;
+      double longitude_center = 4;
+      double unknown41 = 5;
+      double unknown42 = 6;
+    }
+  }
+
+  // The tile's coordinates in the slippy map standard.
+  message TileCoordinate {
+    int32 x = 1;
+    int32 y = 2;
+    int32 z = 3;
+  }
+}
