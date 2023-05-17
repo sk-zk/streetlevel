@@ -92,6 +92,8 @@ As above, but for fetching a tile on which a lat/lon coordinate is located.
 #### <code>lookup_panoid(<em>panoid: str, download_depth: bool = False, locale: str = "en", session: Session = None</em>) -> StreetViewPanorama | None</code>
 Fetches metadata of a specific panorama.
 
+Bear in mind that, [as mentioned on this page](https://developers.google.com/maps/documentation/tile/streetview#panoid_response), pano IDs are not stable.
+
 **panoid**: The pano ID.  
 **download_depth**: Whether to download and parse the depth map.  
 **locale**: Desired language of the location's address as IETF code.  
