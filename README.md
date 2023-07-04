@@ -79,7 +79,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
   </tr>
   <tr>
     <td align="right">Download depth information</td>
-    <td align="center">✔<br>(simplified)</td>
+    <td align="center">✔<br>(not a "real" depth map; generated from DTM and building outlines)</td>
     <td align="center">❌</td>
     <td align="center">⚫</td>
     <td align="center">⚫<br>(?)</td>
