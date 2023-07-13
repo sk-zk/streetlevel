@@ -17,17 +17,11 @@ Elevation in meters.
 **heading: *float***  
 Heading of the car in radians, where 0° is north, 90° is east, 180° is south and 270° is west.
 
-**next: *int***  
-ID of the next image in the sequence.
+**next/previous: *int***  
+ID of the next and previous image in the sequence.
 
-**pitch: *float***  
-Pitch offset of the panorama in radians.
-
-**previous: *int***  
-ID of the previous image in the sequence.
-
-**roll: *float***  
-Roll offset of the panorama in radians.
+**pitch/roll: *float***  
+Pitch and roll offset for upright correction of the panorama, in radians.
 
 
 ## Finding panoramas
@@ -57,7 +51,7 @@ Downloads a panorama to a file.
 **panoid**: The pano ID.  
 **path**: Output path.  
 **zoom**: Image size; 0 is lowest, 3 is highest.  
-**single_image**: Whether to output a single image or six indiviual images.
+**single_image**: Whether to output a single image containing all sides or six indiviual images.  
 **pil_args**: Additional arguments for the [`Image.save()`](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save) method, e.g. `pil_args={"quality":100}`.
 
 #### <code>get_panorama(<em>panoid: int, zoom: int = 3, single_image: bool = True</em>) -> Image | List[Image] </code>
