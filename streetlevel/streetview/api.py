@@ -195,3 +195,35 @@ async def lookup_panoid_raw_async(panoid, session, download_depth=False, locale=
         text = await response.text()
 
     return convert_lookup_panoid_response_to_json(text)
+
+
+def build_coverage_tile_request_url(tile_x, tile_y):
+    url = "https://www.google.com/maps/photometa/ac/v1?pb=!1m1!1smaps_sv.tactile!6m3!1i{0}!2i{1}!3i17!8b1"
+    url = url.format(tile_x, tile_y)
+    return url
+
+
+def convert_coverage_tile_response_to_json(response):
+    panos_json = response[4:]
+    panos = json.loads(panos_json)
+    return panos
+
+
+def get_coverage_tile_raw(tile_x, tile_y, session=None):
+    url = build_coverage_tile_request_url(tile_x, tile_y)
+
+    if session is None:
+        text = requests.get(url).text
+    else:
+        text = session.get(url).text
+
+    return convert_coverage_tile_response_to_json(text)
+
+
+async def get_coverage_tile_raw_async(tile_x, tile_y, session):
+    url = build_coverage_tile_request_url(tile_x, tile_y)
+
+    async with session.get(url) as response:
+        text = await response.text()
+
+    return convert_coverage_tile_response_to_json(text)

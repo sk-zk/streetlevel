@@ -253,34 +253,34 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     so it can be used to find hidden coverage.
     This call only returns the most recent coverage for a location.
     """
-    resp = _get_coverage_tile_raw(tile_x, tile_y, session)
+    resp = api.get_coverage_tile_raw(tile_x, tile_y, session)
 
     if resp is None:
         return []
 
+    return _parse_coverage_tile_response(resp)
+
+
+async def get_coverage_tile_async(tile_x: int, tile_y: int, session: aiohttp.ClientSession) -> List[StreetViewPanorama]:
+    resp = await api.get_coverage_tile_raw_async(tile_x, tile_y, session)
+
+    if resp is None:
+        return []
+
+    return _parse_coverage_tile_response(resp)
+
+
+def _parse_coverage_tile_response(tile):
     panos = []
-    if resp[1] is not None and len(resp[1]) > 0:
-        for pano in resp[1][1]:
+    if tile[1] is not None and len(tile[1]) > 0:
+        for pano in tile[1][1]:
             if pano[0][0] == 1:
                 continue
             panoid = pano[0][0][1]
             lat = pano[0][2][0][2]
             lon = pano[0][2][0][3]
             panos.append(StreetViewPanorama(panoid, lat, lon))
-
     return panos
-
-
-def _get_coverage_tile_raw(tile_x, tile_y, session=None):
-    url = "https://www.google.com/maps/photometa/ac/v1?pb=!1m1!1smaps_sv.tactile!6m3!1i{0}!2i{1}!3i17!8b1"
-    url = url.format(tile_x, tile_y)
-    if session is None:
-        response = requests.get(url).text
-    else:
-        response = session.get(url).text
-    data_json = response[4:]
-    data = json.loads(data_json)
-    return data
 
 
 def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> List[StreetViewPanorama]:
@@ -293,3 +293,8 @@ def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None)
     """
     tile_coord = wgs84_to_tile_coord(lat, lon, 17)
     return get_coverage_tile(tile_coord[0], tile_coord[1], session=session)
+
+
+async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: aiohttp.ClientSession) -> List[StreetViewPanorama]:
+    tile_coord = wgs84_to_tile_coord(lat, lon, 17)
+    return await get_coverage_tile_async(tile_coord[0], tile_coord[1], session)
