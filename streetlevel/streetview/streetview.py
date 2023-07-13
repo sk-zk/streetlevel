@@ -2,7 +2,7 @@ import asyncio
 from io import BytesIO
 import itertools
 import json
-from typing import List, Union
+from typing import List, Tuple, Union
 
 from PIL import Image
 import requests
@@ -23,7 +23,7 @@ def is_third_party_panoid(panoid: str) -> bool:
     return len(panoid) > 22
 
 
-def _split_ietf(tag: str) -> (str, str):
+def _split_ietf(tag: str) -> Tuple[str, str]:
     """
     Splits an IETF language tag into its language part and country part.
     """
