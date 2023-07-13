@@ -38,17 +38,14 @@ Amount of columns and rows of tiles for each zoom level.
 **omega/phi/kappa: *float***  
 Some kind of photogrammetry format for angles, in radians. Look, I don't know what this is, I just convert it 🤷‍♂️
 
-**pitch: *float***  
-Pitch offset of the panorama in radians, converted from OPK.
+**pitch/roll: *float***  
+ Pitch and roll offset for upright correction of the panorama, in radians. Converted from omega/phi/kappa angles.
 
 **provider: *str***  
 The name of the company which created the panorama.
 
-**roll: *float***  
-Roll offset of the panorama in radians, converted from OPK.
-
 **tile_size: *Size***  
-Mapy panoramas are broken up into multiple tiles. This returns the size of one tile.
+Mapy panoramas are broken up into a grid of tiles. This returns the size of one tile.
 
 **uri_path: *str***  
 Part of the panorama tile URL.
@@ -59,7 +56,7 @@ Part of the panorama tile URL.
 #### <code>find_panorama(<em>lat: float, lon: float, radius: float = 100.0</em>) -> MapyPanorama | None</code>
 Searches for a panorama within a radius around a point.
 
-**lat**, **lon**: Latitude and longitude.  
+**lat**, **lon**: Latitude and longitude of the point to search around.  
 **radius**: Search radius in meters.  
 
 #### <code>get_neighbors(<em>panoid: int</em>) -> list[MapyPanorama]</code>
