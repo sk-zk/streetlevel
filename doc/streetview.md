@@ -41,11 +41,8 @@ The image sizes in which this panorama can be downloaded, from lowest to highest
 **neighbors: *List[StreetViewPanorama]***  
 A list of nearby panoramas.
 
-**pitch: *float***  
-Pitch offset for upright correction of the panorama, in radians.
-
-**roll: *float***  
-Roll offset for upright correction of the panorama, in radians.
+**pitch/roll: *float***  
+Pitch and roll offset for upright correction of the panorama, in radians.
 
 **source: *str***  
 The source program of the imagery.  
