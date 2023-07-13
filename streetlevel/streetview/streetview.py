@@ -1,9 +1,9 @@
+import aiohttp
 import asyncio
 from io import BytesIO
 import itertools
 import json
-from typing import List, Tuple, Union
-
+from typing import List, Union
 from PIL import Image
 import requests
 from requests import Session
@@ -12,93 +12,10 @@ from streetlevel.geo import *
 from .panorama import StreetViewPanorama, LocalizedString
 from .protobuf import *
 from .depth import parse as parse_depth
+from . import api
 from ..dataclasses import Size
 from ..util import try_get, download_files_async
-
-
-def is_third_party_panoid(panoid: str) -> bool:
-    """
-    Returns whether a panoid refers to a third-party panorama.
-    """
-    return len(panoid) > 22
-
-
-def _split_ietf(tag: str) -> Tuple[str, str]:
-    """
-    Splits an IETF language tag into its language part and country part.
-    """
-    tag = tag.split("-")
-    lang = tag[0]
-    country = tag[1] if len(tag) > 1 else tag[0]
-    return lang, country
-
-
-def _find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", session=None):
-    radius = float(radius)
-    toggles = []
-    search_third_party = False
-    include_resolution_info = True
-    include_street_name_and_date = True
-    include_copyright_information = True
-    include_neighbors_and_historical = True
-    ietf_lang, ietf_country = _split_ietf(locale)
-
-    if search_third_party:
-        image_type = 10
-    else:
-        image_type = 2
-
-    if download_depth:
-        depth1 = {1: ProtobufEnum(0)}
-        depth2 = {1: ProtobufEnum(2)}
-    else:
-        depth1 = {}
-        depth2 = {}
-
-    if include_resolution_info:
-        toggles.append(ProtobufEnum(1))
-    if include_street_name_and_date:
-        toggles.append(ProtobufEnum(2))
-    if include_copyright_information:
-        toggles.append(ProtobufEnum(3))
-    toggles.append(ProtobufEnum(4))
-    if include_neighbors_and_historical:
-        toggles.append(ProtobufEnum(6))
-    toggles.append(ProtobufEnum(8))
-
-    search_message = {
-        1: {
-            1: 'apiv3',
-            5: 'US',
-            11: {1: {1: False}}
-        },
-        2: {1: {3: lat, 4: lon}, 2: radius},
-        3: {
-            2: {1: ietf_lang, 2: ietf_country},
-            9: {1: ProtobufEnum(2)},
-            11: {
-                1: {1: ProtobufEnum(image_type), 2: True, 3: ProtobufEnum(2)}
-            },
-        },
-        4: {
-            1: toggles,
-            5: depth1,
-            6: depth2,
-        }
-    }
-
-    url = "https://maps.googleapis.com/maps/api/js/GeoPhotoService.SingleImageSearch?pb=" \
-          + to_protobuf_url(search_message) + "&callback=_xdc_._v2mub5"
-
-    if session is None:
-        response = requests.get(url).text
-    else:
-        response = session.get(url).text
-    first_paren = response.index("(")
-    last_paren = response.rindex(")")
-    pano_data_json = "[" + response[first_paren + 1:last_paren] + "]"
-    pano_data = json.loads(pano_data_json)
-    return pano_data
+from .util import is_third_party_panoid
 
 
 def find_panorama(lat: float, lon: float, radius: int = 50,
@@ -109,7 +26,8 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
-    resp = _find_panorama_raw(lat, lon, radius=radius, download_depth=False,
+    
+    resp = api.find_panorama_raw(lat, lon, radius=radius, download_depth=False,
                               locale=locale, session=session)
 
     response_code = resp[0][0][0]
@@ -123,76 +41,23 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     return pano
 
 
-def _lookup_panoid_raw(panoid, download_depth=False, locale="en", session=None):
-    pano_type = 10 if is_third_party_panoid(panoid) else 2
-    toggles = []
-    include_resolution_info = True
-    include_street_name_and_date = True
-    include_copyright_information = True
-    include_neighbors_and_historical = True
-    ietf_lang, ietf_country = _split_ietf(locale)
+async def find_panorama_async(lat: float, lon: float, session: aiohttp.ClientSession, 
+                               radius: int = 50, locale: str = "en") -> Union[StreetViewPanorama, None]:
+    # TODO
+    # the `SingleImageSearch` call returns a different kind of depth data
+    # than `photometa`; need to deal with that at some point
+    resp = await api.find_panorama_raw_async(lat, lon, session, radius=radius, download_depth=False,
+                              locale=locale)
 
-    if include_resolution_info:
-        toggles.append(ProtobufEnum(1))
-    if include_street_name_and_date:
-        toggles.append(ProtobufEnum(2))
-    if include_copyright_information:
-        toggles.append(ProtobufEnum(3))
-    toggles.append(ProtobufEnum(4))  # does nothing?
-    toggles.append(ProtobufEnum(5))  # does nothing?
-    if include_neighbors_and_historical:
-        toggles.append(ProtobufEnum(6))
+    response_code = resp[0][0][0]
+    # 0: OK
+    # 5: search returned no images
+    # don't know if there are others
+    if response_code != 0:
+        return None
 
-    # these change stuff, but idk what exactly:
-    toggles.append(ProtobufEnum(8))
-    # toggles.append(ProtobufEnum(11))
-    toggles.append(ProtobufEnum(12))
-    # toggles.append(ProtobufEnum(13))
-
-    if download_depth:
-        depth1 = [{1: ProtobufEnum(1)}, {1: ProtobufEnum(2)}]
-        depth2 = [{1: ProtobufEnum(1)}, {1: ProtobufEnum(2)}]
-    else:
-        depth1 = [{}]
-        depth2 = [{}]
-
-    # this is the protobuf message in the request URL written out as a dict
-    pano_request_message = {
-        1: {1: 'maps_sv.tactile', 11: {2: {1: True}}},
-        2: {1: ietf_lang, 2: ietf_country},
-        3: {1: {1: ProtobufEnum(pano_type), 2: panoid}},
-        4: {
-            1: toggles,
-            2: {1: ProtobufEnum(1)},  # changing this to any other value causes huge changes;
-            # haven't looked into it any further though
-            4: {1: 48},  # all this does is change the size param in an icon URL
-            5: depth1,
-            6: depth2,
-            9: {  # none of these seem to do anything
-                1: [
-                    {1: ProtobufEnum(2), 2: True, 3: ProtobufEnum(2)},
-                    {1: ProtobufEnum(2), 2: False, 3: ProtobufEnum(3)},
-                    {1: ProtobufEnum(3), 2: True, 3: ProtobufEnum(2)},
-                    {1: ProtobufEnum(3), 2: False, 3: ProtobufEnum(3)},
-                    {1: ProtobufEnum(8), 2: False, 3: ProtobufEnum(3)},
-                    {1: ProtobufEnum(1), 2: False, 3: ProtobufEnum(3)},
-                    {1: ProtobufEnum(4), 2: False, 3: ProtobufEnum(3)},
-                    {1: ProtobufEnum(10), 2: True, 3: ProtobufEnum(2)},
-                    {1: ProtobufEnum(10), 2: False, 3: ProtobufEnum(3)}
-                ]
-            }
-        }
-    }
-    url = f"https://www.google.com/maps/photometa/v1?authuser=0&hl={ietf_lang}&gl={ietf_country}&pb=" \
-          + to_protobuf_url(pano_request_message)
-
-    if session is None:
-        response = requests.get(url).text
-    else:
-        response = session.get(url).text
-    pano_data_json = response[4:]  # skip that junk at the start
-    pano_data = json.loads(pano_data_json)
-    return pano_data
+    pano = _parse_pano_message(resp[0][1])
+    return pano
 
 
 def lookup_panoid(panoid: str, download_depth: bool = False,
@@ -200,8 +65,27 @@ def lookup_panoid(panoid: str, download_depth: bool = False,
     """
     Fetches metadata for a specific panorama.
     """
-    resp = _lookup_panoid_raw(panoid, download_depth=download_depth,
+    resp = api.lookup_panoid_raw(panoid, download_depth=download_depth,
                               locale=locale, session=session)
+
+    response_code = resp[1][0][0][0]
+    # 1: OK
+    # 2: Not found
+    # don't know if there are others
+    if response_code != 1:
+        return None
+
+    pano = _parse_pano_message(resp[1][0])
+    return pano
+
+
+async def lookup_panoid_async(panoid: str, session: aiohttp.ClientSession,
+                  download_depth: bool = False, locale: str = "en") -> Union[StreetViewPanorama, None]:
+    """
+    Fetches metadata for a specific panorama.
+    """
+    resp = await api.lookup_panoid_raw_async(panoid, session, 
+        download_depth=download_depth, locale=locale)
 
     response_code = resp[1][0][0][0]
     # 1: OK
