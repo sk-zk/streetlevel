@@ -15,7 +15,7 @@ The capture date.
 Elevation in meters.
 
 **heading: *float***  
-Heading of the car in radians, where 0° is north, 90° is east, 180° is south and 270° is west.
+Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west.
 
 **next/previous: *int***  
 ID of the next and previous image in the sequence.
