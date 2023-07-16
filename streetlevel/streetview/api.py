@@ -2,7 +2,6 @@ import aiohttp
 import json
 from typing import Tuple
 import requests
-from requests import Session
 from .protobuf import *
 from .util import is_third_party_panoid
 
@@ -96,7 +95,8 @@ def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", se
     return convert_find_panorama_response_to_json(text)
 
 
-async def find_panorama_raw_async(lat, lon, session : aiohttp.ClientSession, radius=50, download_depth=False, locale="en"):
+async def find_panorama_raw_async(lat, lon, session: aiohttp.ClientSession, radius=50,
+                                  download_depth=False, locale="en"):
     url = build_find_panorama_request_url(lat, lon, radius, download_depth, locale)
 
     async with session.get(url) as response:

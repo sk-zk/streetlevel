@@ -2,15 +2,12 @@ import aiohttp
 import asyncio
 from io import BytesIO
 import itertools
-import json
 from typing import List, Union
 from PIL import Image
-import requests
 from requests import Session
 
 from streetlevel.geo import *
 from .panorama import StreetViewPanorama, LocalizedString
-from .protobuf import *
 from .depth import parse as parse_depth
 from . import api
 from ..dataclasses import Size
@@ -26,9 +23,9 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
-    
+
     resp = api.find_panorama_raw(lat, lon, radius=radius, download_depth=False,
-                              locale=locale, session=session)
+                                 locale=locale, session=session)
 
     response_code = resp[0][0][0]
     # 0: OK
@@ -41,13 +38,13 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     return pano
 
 
-async def find_panorama_async(lat: float, lon: float, session: aiohttp.ClientSession, 
-                               radius: int = 50, locale: str = "en") -> Union[StreetViewPanorama, None]:
+async def find_panorama_async(lat: float, lon: float, session: aiohttp.ClientSession,
+                              radius: int = 50, locale: str = "en") -> Union[StreetViewPanorama, None]:
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
     resp = await api.find_panorama_raw_async(lat, lon, session, radius=radius, download_depth=False,
-                              locale=locale)
+                                             locale=locale)
 
     response_code = resp[0][0][0]
     # 0: OK
@@ -66,7 +63,7 @@ def lookup_panoid(panoid: str, download_depth: bool = False,
     Fetches metadata for a specific panorama.
     """
     resp = api.lookup_panoid_raw(panoid, download_depth=download_depth,
-                              locale=locale, session=session)
+                                 locale=locale, session=session)
 
     response_code = resp[1][0][0][0]
     # 1: OK
@@ -80,12 +77,12 @@ def lookup_panoid(panoid: str, download_depth: bool = False,
 
 
 async def lookup_panoid_async(panoid: str, session: aiohttp.ClientSession,
-                  download_depth: bool = False, locale: str = "en") -> Union[StreetViewPanorama, None]:
+                              download_depth: bool = False, locale: str = "en") -> Union[StreetViewPanorama, None]:
     """
     Fetches metadata for a specific panorama.
     """
-    resp = await api.lookup_panoid_raw_async(panoid, session, 
-        download_depth=download_depth, locale=locale)
+    resp = await api.lookup_panoid_raw_async(panoid, session,
+                                             download_depth=download_depth, locale=locale)
 
     response_code = resp[1][0][0][0]
     # 1: OK
@@ -295,6 +292,7 @@ def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None)
     return get_coverage_tile(tile_coord[0], tile_coord[1], session=session)
 
 
-async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: aiohttp.ClientSession) -> List[StreetViewPanorama]:
+async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: aiohttp.ClientSession) \
+        -> List[StreetViewPanorama]:
     tile_coord = wgs84_to_tile_coord(lat, lon, 17)
     return await get_coverage_tile_async(tile_coord[0], tile_coord[1], session)
