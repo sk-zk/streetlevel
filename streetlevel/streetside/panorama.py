@@ -15,7 +15,7 @@ class StreetsidePanorama:
     lon: float
     """Longitude of the panorama's location."""
     date: datetime
-    """Capture date of the panorama."""
+    """Capture date and time of the panorama."""
     next: int = None
     """ID of the next image in the sequence."""
     previous: int = None
