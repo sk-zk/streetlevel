@@ -15,12 +15,18 @@ def try_get(accessor):
 
 
 async def download_files_async(urls: List[str], session: ClientSession = None) -> List[bytes]:
+    close_session = session is None
     session = session if session else ClientSession()
+
     tasks = [session.get(url) for url in urls]
     responses = await asyncio.gather(*tasks)
     data = []
     for response in responses:
         data.append(await response.read())
+
+    if close_session:
+        await session.close()
+
     return data
 
 
