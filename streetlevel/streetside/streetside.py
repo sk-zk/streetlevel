@@ -16,18 +16,18 @@ from ..util import download_files_async
 TILE_SIZE = 256
 
 
-def to_base4(n: int) -> str:
-    return np.base_repr(n, 4)
-
-
-def from_base4(n: str) -> int:
-    return int(n, 4)
-
-
 def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
                            limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
     """
     Retrieves panoramas within a bounding box.
+
+    :param north: lat1.
+    :param west: lon1.
+    :param south: lat2.
+    :param east: lon2.
+    :param limit: *(optional)* Maximum number of results to return. Defaults to 50.
+    :param session: *(optional)* A requests session.
+    :return: A list of StreetsidePanoramas.
     """
     response = _find_panoramas_raw(north, west, south, east, limit, session)
 
@@ -76,6 +76,13 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
                    limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
     """
     Retrieves panoramas within a square around a point.
+
+    :param lat: Latitude of the center point.
+    :param lon: Longitude of the center point.
+    :param radius: *(optional)* Search radius in meters. Defaults to 25.
+    :param limit: *(optional)* Maximum number of results to return. Defaults to 50.
+    :param session: *(optional)* A requests session.
+    :return: A list of StreetsidePanoramas.
     """
     top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
     return find_panoramas_in_bbox(
@@ -87,6 +94,15 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
 def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool = True, pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
+
+    :param panoid: The pano ID.
+    :param path: Output path.
+    :param zoom: *(optional)* Image size; 0 is lowest, 3 is highest. Defaults to 3.
+    :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
+      Defaults to true.
+    :param pil_args: *(optional)* Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
     """
     if pil_args is None:
         pil_args = {}
@@ -104,11 +120,37 @@ def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool 
 
 def get_panorama(panoid: int, zoom: int = 3, single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
     """
-    Downloads a panorama as PIL image.
+    Downloads a panorama and returns it as PIL image.
+
+    :param panoid: The pano ID.
+    :param zoom: *(optional)* Image size; 0 is lowest, 3 is highest. Defaults to 3.
+    :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
+      Defaults to true.
+    :return: A PIL image if ``single_image`` is true, and a list of six PIL images otherwise.
     """
     faces = _generate_tile_list(panoid, zoom)
     _download_tiles(faces)
     return _stitch_panorama(faces, single_image=single_image)
+
+
+def to_base4(n: int) -> str:
+    """
+    Converts an integer to a base 4 string.
+
+    :param n: The integer.
+    :return: The base 4 representation of the integer.
+    """
+    return np.base_repr(n, 4)
+
+
+def from_base4(n: str) -> int:
+    """
+    Converts a string containing a base 4 number to integer.
+
+    :param n: The string containing a base 4 number.
+    :return: The integer represented by the string.
+    """
+    return int(n, 4)
 
 
 def _generate_tile_list(panoid, zoom):

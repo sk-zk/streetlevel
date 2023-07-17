@@ -15,3 +15,7 @@
 #streetlevel\.streetview\.panorama\.LocalizedString + dd .field-list {
   display:none !important;
 }
+
+#streetlevel\.streetside\.panorama\.StreetsidePanorama + dd .field-list {
+  display:none !important;
+}

@@ -11,6 +11,7 @@ Welcome to streetlevel's documentation!
    :caption: Contents:
    
    streetlevel.streetview
+   streetlevel.streetside
 
 
 Indices and tables
