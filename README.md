@@ -62,7 +62,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
     <td align="right">Get specific panorama by ID</td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
-    <td align="center">⚫</td>
+    <td align="center">✔</td>
     <td align="center">⚫</td>
   </tr>
   <thead>
@@ -79,7 +79,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
   </tr>
   <tr>
     <td align="right">Download depth information</td>
-    <td align="center">✔<br>(not a "real" depth map; generated from DTM and building outlines)</td>
+    <td align="center">✔<br>(simplified)</td>
     <td align="center">❌</td>
     <td align="center">⚫</td>
     <td align="center">⚫<br>(?)</td>
@@ -113,7 +113,7 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
     <td align="center">✔</td>
   </tr>
   <tr>
-    <td align="right">Yaw/heading, pitch, roll</td>
+    <td align="right">Heading, pitch, roll</td>
     <td align="center">✔</td>
     <td align="center">🟡<br>(only heading is implemented; inaccurate in some locations)</td>
     <td align="center">✔</td>
