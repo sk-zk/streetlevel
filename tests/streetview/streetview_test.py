@@ -36,8 +36,8 @@ def test_lookup_panoid():
     assert pano.id == panoid
     assert pano.lat == approx(47.15048822721601, 0.001)
     assert pano.lon == approx(11.13385612403307, 0.001)
-    assert pano.month == 3
-    assert pano.year == 2021
+    assert pano.capture_date.month == 3
+    assert pano.capture_date.year == 2021
     assert pano.country_code == "AT"
     assert pano.tile_size == Size(512, 512)
     assert len(pano.image_sizes) == 6

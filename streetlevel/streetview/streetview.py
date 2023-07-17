@@ -7,7 +7,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from streetlevel.geo import *
-from .panorama import StreetViewPanorama, LocalizedString
+from .panorama import StreetViewPanorama, LocalizedString, CaptureDate
 from .depth import parse as parse_depth
 from . import api
 from ..dataclasses import Size
@@ -19,7 +19,15 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
                   locale: str = "en", session: Session = None) -> Union[StreetViewPanorama, None]:
     """
     Searches for a panorama within a radius around a point.
+
+    :param lat: Latitude of the point to search around.
+    :param lon: Longitude of the point to search around.
+    :param radius: *(optional)* Search radius in meters. Defaults to 50.
+    :param locale: *(optional)* Desired language of the location's address as IETF code. Defaults to ``en``.
+    :param session: *(optional)* A requests session.
+    :return: A StreetViewPanorama object if a panorama was found, or None.
     """
+
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
@@ -95,50 +103,23 @@ async def lookup_panoid_async(panoid: str, session: ClientSession,
     return pano
 
 
-def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_args: dict = None) -> None:
-    """
-    Downloads and stitches a panorama and saves it to a file.
-    """
-    if pil_args is None:
-        pil_args = {}
-    pano = get_panorama(pano, zoom=zoom)
-    pano.save(path, **pil_args)
-
-
-def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
-    """
-    Downloads and stitches a panorama and returns it as PIL image.
-    """
-    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
-    tile_list = _generate_tile_list(pano, zoom)
-    tiles = _download_tiles(tile_list)
-    stitched = _stitch_tiles(pano, tile_list, tiles, zoom)
-    return stitched
-
-
-async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image:
-    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
-    tile_list = _generate_tile_list(pano, zoom)
-    tiles = await _download_tiles_async(tile_list, session)
-    stitched = _stitch_tiles(pano, tile_list, tiles, zoom)
-    return stitched
-
-
-async def download_panorama_async(pano: StreetViewPanorama, path: str, session: ClientSession,
-                                  zoom: int = 5, pil_args: dict = None) -> None:
-    if pil_args is None:
-        pil_args = {}
-    pano = await get_panorama_async(pano, session, zoom=zoom)
-    pano.save(path, **pil_args)
-
-
 def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List[StreetViewPanorama]:
     """
-    Gets all panoramas on a Google Maps tile (at zoom level 17 specifically, for some reason).
-    Returns panoid, lat, lon only.
-    This function uses the API call which is triggered when zooming into a tile in globe view on Google Maps,
-    so it can be used to find hidden coverage.
-    This call only returns the most recent coverage for a location.
+    Fetches Street View coverage on a specific map tile. Coordinates are in Slippy Map aka XYZ format
+    at zoom level 17.
+
+    When viewing Google Maps with satellite imagery in globe view and zooming into a spot,
+    it makes this API call. This is useful because 1) it allows for fetching coverage for a whole area, and
+    2) there are various hidden/removed locations which cannot be found by any other method
+    (unless you access them by pano ID directly).
+
+    Note, however, that only ID, latitude and longitude of the most recent coverage are returned.
+    The rest of the metadata, as well as historical panoramas, must be fetched manually one by one.
+
+    :param tile_x: X coordinate of the tile.
+    :param tile_y: Y coordinate of the tile.
+    :param session: *(optional)* A requests session.
+    :return: A list of StreetViewPanoramas. If no coverage was returned by the API, the list is empty.
     """
     resp = api.get_coverage_tile_raw(tile_x, tile_y, session)
 
@@ -159,11 +140,12 @@ async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSessi
 
 def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> List[StreetViewPanorama]:
     """
-    Gets all panoramas on a Google Maps tile (at zoom level 17 specifically, for some reason).
-    Returns panoid, lat, lon only.
-    This function uses the API call which is triggered when zooming into a tile in globe view on Google Maps,
-    so it can be used to find hidden coverage.
-    This call only returns the most recent coverage for a location.
+    Same as :func:`get_coverage_tile <get_coverage_tile>`, but for fetching the tile on which a point is located.
+
+    :param lat: Latitude of the point.
+    :param lon: Longitude of the point.
+    :param session: *(optional)* A requests session.
+    :return: A list of StreetViewPanoramas. If no coverage was returned by the API, the list is empty.
     """
     tile_coord = wgs84_to_tile_coord(lat, lon, 17)
     return get_coverage_tile(tile_coord[0], tile_coord[1], session=session)
@@ -173,6 +155,58 @@ async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: Cli
         -> List[StreetViewPanorama]:
     tile_coord = wgs84_to_tile_coord(lat, lon, 17)
     return await get_coverage_tile_async(tile_coord[0], tile_coord[1], session)
+
+
+def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_args: dict = None) -> None:
+    """
+    Downloads a panorama to a file.
+
+    :param pano: The panorama to download.
+    :param path: Output path.
+    :param zoom: *(optional)* Image size; 0 is lowest, 5 is highest. The dimensions of a zoom level of a
+        specific panorama depend on the camera used. If the requested zoom level does not exist,
+        the highest available level will be downloaded. Defaults to 5.
+    :param pil_args: *(optional)* Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
+    """
+    if pil_args is None:
+        pil_args = {}
+    pano = get_panorama(pano, zoom=zoom)
+    pano.save(path, **pil_args)
+
+
+async def download_panorama_async(pano: StreetViewPanorama, path: str, session: ClientSession,
+                                  zoom: int = 5, pil_args: dict = None) -> None:
+    if pil_args is None:
+        pil_args = {}
+    pano = await get_panorama_async(pano, session, zoom=zoom)
+    pano.save(path, **pil_args)
+
+
+def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
+    """
+    Downloads a panorama and returns it as PIL image.
+
+    :param pano: The panorama to download.
+    :param zoom: *(optional)* Image size; 0 is lowest, 5 is highest. The dimensions of a zoom level of a
+        specific panorama depend on the camera used. If the requested zoom level does not exist,
+        the highest available level will be downloaded. Defaults to 5.
+    :return: A PIL image containing the panorama.
+    """
+    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
+    tile_list = _generate_tile_list(pano, zoom)
+    tiles = _download_tiles(tile_list)
+    stitched = _stitch_tiles(pano, tile_list, tiles, zoom)
+    return stitched
+
+
+async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image:
+    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
+    tile_list = _generate_tile_list(pano, zoom)
+    tiles = await _download_tiles_async(tile_list, session)
+    stitched = _stitch_tiles(pano, tile_list, tiles, zoom)
+    return stitched
 
 
 def _parse_coverage_tile_response(tile):
@@ -220,9 +254,7 @@ def _parse_pano_message(msg):
         heading=try_get(lambda: math.radians(msg[5][0][1][2][0])),
         pitch=try_get(lambda: math.radians(90 - msg[5][0][1][2][1])),
         roll=try_get(lambda: math.radians(msg[5][0][1][2][2])),
-        year=date[0],
-        month=date[1],
-        day=date[2] if len(date) > 2 else None,
+        capture_date=CaptureDate(date[0], date[1], date[2] if len(date) > 2 else None),
         tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),
         image_sizes=img_sizes,
         source=source,
