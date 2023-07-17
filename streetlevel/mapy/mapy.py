@@ -22,6 +22,7 @@ headers = {
 
 def find_panorama(lat: float, lon: float,
                   radius: float = 100.0) -> Union[MapyPanorama, None]:
+    radius = float(radius)
     response = _rpc_getbest(lat, lon, radius)
 
     if response["status"] != 200:
