@@ -67,7 +67,17 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession,
 def lookup_panoid(panoid: str, download_depth: bool = False,
                   locale: str = "en", session: Session = None) -> Union[StreetViewPanorama, None]:
     """
-    Fetches metadata for a specific panorama.
+    Fetches metadata of a specific panorama.
+
+    Unfortunately, `as mentioned on this page
+    <https://developers.google.com/maps/documentation/tile/streetview#panoid_response>`_,
+    pano IDs are not stable, so a request that works today may return nothing a few months into the future.
+
+    :param panoid: The pano ID.
+    :param download_depth: Whether to download and parse the depth map.
+    :param locale: Desired language of the location's address as IETF code.
+    :param session: *(optional)* A requests session.
+    :return: A StreetViewPanorama object if a panorama with this ID exists, or None.
     """
     resp = api.lookup_panoid_raw(panoid, download_depth=download_depth,
                                  locale=locale, session=session)
@@ -85,9 +95,6 @@ def lookup_panoid(panoid: str, download_depth: bool = False,
 
 async def lookup_panoid_async(panoid: str, session: ClientSession,
                               download_depth: bool = False, locale: str = "en") -> Union[StreetViewPanorama, None]:
-    """
-    Fetches metadata for a specific panorama.
-    """
     resp = await api.lookup_panoid_raw_async(panoid, session,
                                              download_depth=download_depth, locale=locale)
 
