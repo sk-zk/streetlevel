@@ -1,7 +1,6 @@
 import asyncio
 from typing import List
-
-import aiohttp
+from aiohttp import ClientSession
 
 
 def try_get(accessor):
@@ -13,8 +12,8 @@ def try_get(accessor):
         return None
 
 
-async def download_files_async(urls: List[str], session: aiohttp.ClientSession = None) -> List[bytes]:
-    session = session if session else aiohttp.ClientSession()
+async def download_files_async(urls: List[str], session: ClientSession = None) -> List[bytes]:
+    session = session if session else ClientSession()
     tasks = [session.get(url) for url in urls]
     responses = await asyncio.gather(*tasks)
     data = []

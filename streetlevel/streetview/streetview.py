@@ -1,9 +1,9 @@
-import aiohttp
 import asyncio
 from io import BytesIO
 import itertools
 from typing import List, Union
 from PIL import Image
+from aiohttp import ClientSession
 from requests import Session
 
 from streetlevel.geo import *
@@ -38,7 +38,7 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     return pano
 
 
-async def find_panorama_async(lat: float, lon: float, session: aiohttp.ClientSession,
+async def find_panorama_async(lat: float, lon: float, session: ClientSession,
                               radius: int = 50, locale: str = "en") -> Union[StreetViewPanorama, None]:
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
@@ -76,7 +76,7 @@ def lookup_panoid(panoid: str, download_depth: bool = False,
     return pano
 
 
-async def lookup_panoid_async(panoid: str, session: aiohttp.ClientSession,
+async def lookup_panoid_async(panoid: str, session: ClientSession,
                               download_depth: bool = False, locale: str = "en") -> Union[StreetViewPanorama, None]:
     """
     Fetches metadata for a specific panorama.
@@ -116,7 +116,7 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
     return stitched
 
 
-async def get_panorama_async(pano: StreetViewPanorama, session: aiohttp.ClientSession, zoom: int = 5) -> Image:
+async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image:
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     tile_list = _generate_tile_list(pano, zoom)
     tiles = await _download_tiles_async(tile_list, session)
@@ -124,7 +124,7 @@ async def get_panorama_async(pano: StreetViewPanorama, session: aiohttp.ClientSe
     return stitched
 
 
-async def download_panorama_async(pano: StreetViewPanorama, path: str, session: aiohttp.ClientSession,
+async def download_panorama_async(pano: StreetViewPanorama, path: str, session: ClientSession,
                                   zoom: int = 5, pil_args: dict = None) -> None:
     if pil_args is None:
         pil_args = {}
@@ -148,7 +148,7 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     return _parse_coverage_tile_response(resp)
 
 
-async def get_coverage_tile_async(tile_x: int, tile_y: int, session: aiohttp.ClientSession) -> List[StreetViewPanorama]:
+async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> List[StreetViewPanorama]:
     resp = await api.get_coverage_tile_raw_async(tile_x, tile_y, session)
 
     if resp is None:
@@ -169,7 +169,7 @@ def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None)
     return get_coverage_tile(tile_coord[0], tile_coord[1], session=session)
 
 
-async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: aiohttp.ClientSession) \
+async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: ClientSession) \
         -> List[StreetViewPanorama]:
     tile_coord = wgs84_to_tile_coord(lat, lon, 17)
     return await get_coverage_tile_async(tile_coord[0], tile_coord[1], session)
