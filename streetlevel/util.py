@@ -35,7 +35,7 @@ def download_tiles(tile_list):
 
     tile_images = {}
     for i, (x, y, url) in enumerate(tile_list):
-        tile_images[(x, y, url)] = tiles[i]
+        tile_images[(x, y)] = tiles[i]
 
     return tile_images
 
