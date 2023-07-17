@@ -1,8 +1,10 @@
 @import 'theme.css';
 
+
 /* Workaround for removing that parameter vomit which Sphinx generates 
  * for dataclass constructors.
  */
+ 
 #streetlevel\.streetview\.panorama\.StreetViewPanorama + dd .field-list {
   display:none !important;
 }
@@ -17,5 +19,9 @@
 }
 
 #streetlevel\.streetside\.panorama\.StreetsidePanorama + dd .field-list {
+  display:none !important;
+}
+
+#streetlevel\.mapy\.panorama\.MapyPanorama + dd .field-list {
   display:none !important;
 }

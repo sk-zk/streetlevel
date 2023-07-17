@@ -10,8 +10,9 @@ Welcome to streetlevel's documentation!
    :maxdepth: 2
    :caption: Contents:
    
-   streetlevel.streetview
+   streetlevel.mapy
    streetlevel.streetside
+   streetlevel.streetview
 
 
 Indices and tables

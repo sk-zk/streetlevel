@@ -2,7 +2,7 @@ import asyncio
 import itertools
 import math
 from io import BytesIO
-from typing import Union
+from typing import Union, List
 
 import requests
 from PIL import Image
@@ -22,6 +22,14 @@ headers = {
 
 def find_panorama(lat: float, lon: float,
                   radius: float = 100.0) -> Union[MapyPanorama, None]:
+    """
+    Searches for a panorama within a radius around a point.
+
+    :param lat: Latitude of the center point.
+    :param lon: Longitude of the center point.
+    :param radius: *(optional)* Search radius in meters. Defaults to 100.
+    :return: A MapyPanorama object if a panorama was found, or None.
+    """
     radius = float(radius)
     response = _rpc_getbest(lat, lon, radius)
 
@@ -55,7 +63,13 @@ def _rpc_getbest(lat, lon, radius, options=None):
     return response
 
 
-def get_neighbors(panoid: int) -> list[MapyPanorama]:
+def get_neighbors(panoid: int) -> List[MapyPanorama]:
+    """
+    Gets neighbors of a panorama. (:func:`find_panorama` calls this automatically.)
+
+    :param panoid: The pano ID.
+    :return: A list of nearby panoramas.
+    """
     response = client.call("getneighbours",
                            args=(panoid,),
                            headers=headers)
@@ -121,7 +135,11 @@ def _parse_angles(pan_info, pano):
 
 def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image:
     """
-    Downloads a panorama as PIL image.
+    Downloads a panorama and returns it as PIL image.
+
+    :param pano: The panorama.
+    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+    :return: A PIL image containing the panorama.
     """
     zoom = max(0, min(zoom, pano.max_zoom))
 
@@ -137,6 +155,13 @@ def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image:
 def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
+
+    :param pano: The panorama.
+    :param path: Output path.
+    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+    :param pil_args: *(optional)* Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
     """
     if pil_args is None:
         pil_args = {}
