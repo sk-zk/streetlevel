@@ -1,0 +1,17 @@
+@import 'theme.css';
+
+/* Workaround for removing that parameter vomit which Sphinx generates 
+ * for dataclass constructors.
+ */
+#streetlevel\.streetview\.panorama\.StreetViewPanorama + dd .field-list {
+  display:none !important;
+}
+#streetlevel\.streetview\.panorama\.CaptureDate + dd .field-list {
+  display:none !important;
+}
+#streetlevel\.streetview\.panorama\.DepthMap + dd .field-list {
+  display:none !important;
+}
+#streetlevel\.streetview\.panorama\.LocalizedString + dd .field-list {
+  display:none !important;
+}
