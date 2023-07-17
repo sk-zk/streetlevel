@@ -28,6 +28,11 @@ class StreetsidePanorama:
     """Pitch offset for upright correction of the panorama, in radians."""
     roll: float = None
     """Roll offset for upright correction of the panorama, in radians."""
+    max_zoom: int = None
+    """
+    Highest zoom level available; 
+    4 for the original Microsoft panoramas, 3 for the TomTom-provided ones.
+    """
 
     def __repr__(self):
         output = str(self)

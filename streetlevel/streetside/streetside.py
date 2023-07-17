@@ -95,13 +95,16 @@ async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
         session, limit=limit)
 
 
-def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool = True, pil_args: dict = None) -> None:
+def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4, single_image: bool = True,
+                      pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
 
-    :param panoid: The pano ID.
+    :param pano: The panorama.
     :param path: Output path.
-    :param zoom: *(optional)* Image size; 0 is lowest, 3 is highest. Defaults to 3.
+    :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
+      downloaded.
+      (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
     :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
       Defaults to true.
     :param pil_args: *(optional)* Additional arguments for PIL's
@@ -111,39 +114,44 @@ def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool 
     if pil_args is None:
         pil_args = {}
 
-    pano = get_panorama(panoid, zoom=zoom, single_image=single_image)
+    pano = get_panorama(pano, zoom=zoom, single_image=single_image)
 
     _save_panorama(pano, path, single_image, pil_args)
 
 
-async def download_panorama_async(panoid: int, path: str, session: ClientSession, zoom: int = 3,
+async def download_panorama_async(pano: StreetsidePanorama, path: str, session: ClientSession, zoom: int = 4,
                                   single_image: bool = True, pil_args: dict = None) -> None:
     if pil_args is None:
         pil_args = {}
 
-    pano = await get_panorama_async(panoid, session, zoom=zoom, single_image=single_image)
+    pano = await get_panorama_async(pano, session, zoom=zoom, single_image=single_image)
 
     _save_panorama(pano, path, single_image, pil_args)
 
 
-def get_panorama(panoid: int, zoom: int = 3, single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
+def get_panorama(pano: StreetsidePanorama, zoom: int = 4, single_image: bool = True) \
+        -> Union[List[Image.Image], Image.Image]:
     """
     Downloads a panorama and returns it as PIL image.
 
-    :param panoid: The pano ID.
-    :param zoom: *(optional)* Image size; 0 is lowest, 3 is highest. Defaults to 3.
+    :param pano: The panorama.
+    :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
+      downloaded.
+      (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
     :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
       Defaults to true.
     :return: A PIL image if ``single_image`` is true, and a list of six PIL images otherwise.
     """
-    faces = _generate_tile_list(panoid, zoom)
+    zoom = max(0, min(zoom, pano.max_zoom))
+    faces = _generate_tile_list(pano.id, zoom)
     _download_tiles(faces)
     return _stitch_panorama(faces, single_image=single_image)
 
 
-async def get_panorama_async(panoid: int, session: ClientSession, zoom: int = 3, single_image: bool = True) \
-        -> Union[List[Image.Image], Image.Image]:
-    faces = _generate_tile_list(panoid, zoom)
+async def get_panorama_async(pano: StreetsidePanorama, session: ClientSession, zoom: int = 4,
+                             single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
+    zoom = max(0, min(zoom, pano.max_zoom))
+    faces = _generate_tile_list(pano.id, zoom)
     await _download_tiles_async(faces, session)
     return _stitch_panorama(faces, single_image=single_image)
 
@@ -157,7 +165,7 @@ def _parse_panos(response):
 
 
 def _parse_pano(pano):
-    # TODO: parse bl, ml, nbn, pbn, ad fields
+    # TODO: parse bl, nbn, pbn, ad fields
     # as it turns out, months/days without leading zeros
     # don't have a cross-platform format code in strptime.
     # wanna guess what kind of dates bing returns?
@@ -178,6 +186,7 @@ def _parse_pano(pano):
         heading=math.radians(pano["he"]) if "he" in pano else None,
         pitch=math.radians(pano["pi"]) if "pi" in pano else None,
         roll=math.radians(pano["ro"]) if "ro" in pano else None,
+        max_zoom=int(pano["ml"])
     )
     return pano_obj
 
@@ -187,8 +196,8 @@ def _generate_tile_list(panoid, zoom):
     Generates a list of a panorama's tiles.
     Returns a list of faces and its tiles.
     """
-    if zoom > 3:
-        raise ValueError("Zoom can't be greater than 3")
+    if zoom > 4:
+        raise ValueError("Zoom can't be greater than 4")
     panoid_base4 = to_base4(panoid).rjust(16, "0")
     subdivs = pow(4, zoom)
     faces = {}
