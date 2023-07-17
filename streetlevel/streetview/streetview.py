@@ -195,8 +195,8 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
     """
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     tile_list = _generate_tile_list(pano, zoom)
-    tiles = download_tiles(tile_list)
-    stitched = stitch_tiles(tiles,
+    tile_images = download_tiles(tile_list)
+    stitched = stitch_tiles(tile_images,
                             pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
                             pano.tile_size.x, pano.tile_size.y)
     return stitched
@@ -205,8 +205,8 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
 async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image:
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     tile_list = _generate_tile_list(pano, zoom)
-    tiles = await download_tiles_async(tile_list, session)
-    stitched = stitch_tiles(tiles,
+    tile_images = await download_tiles_async(tile_list, session)
+    stitched = stitch_tiles(tile_images,
                             pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
                             pano.tile_size.x, pano.tile_size.y)
     return stitched
