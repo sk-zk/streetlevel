@@ -6,18 +6,14 @@ from typing import Union, List
 
 import requests
 from PIL import Image
-from pyfrpc.client import FrpcClient
+from aiohttp import ClientSession
+
 from .panorama import MapyPanorama
+from . import api
 from requests import Session
 from ..dataclasses import Size
 from ..geo import opk_to_rotation
 from ..util import download_files_async
-
-client = FrpcClient("https://pro.mapy.cz/panorpc")
-headers = {
-    # Cyclomedia panos (2020+) are only returned if this header is set
-    "Referer": "https://en.mapy.cz/",
-}
 
 
 def find_panorama(lat: float, lon: float,
@@ -31,7 +27,7 @@ def find_panorama(lat: float, lon: float,
     :return: A MapyPanorama object if a panorama was found, or None.
     """
     radius = float(radius)
-    response = _rpc_getbest(lat, lon, radius)
+    response = api.getbest(lat, lon, radius)
 
     if response["status"] != 200:
         return None
@@ -44,7 +40,7 @@ def find_panorama(lat: float, lon: float,
     for year in pan_info["timeline"]:
         if pano.date.year == year:
             continue
-        response = _rpc_getbest(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
+        response = api.getbest(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
         if response["status"] != 200:
             continue
         pan_info = response["result"]["panInfo"]
@@ -54,13 +50,31 @@ def find_panorama(lat: float, lon: float,
     return pano
 
 
-def _rpc_getbest(lat, lon, radius, options=None):
-    if options is None:
-        options = {}
-    response = client.call("getbest",
-                           args=(lon, lat, radius, options),
-                           headers=headers)
-    return response
+async def find_panorama_async(lat: float, lon: float,
+                              radius: float = 100.0) -> Union[MapyPanorama, None]:
+    # TODO reduce duplication
+    radius = float(radius)
+    response = await api.getbest_async(lat, lon, radius)
+
+    if response["status"] != 200:
+        return None
+
+    pan_info = response["result"]["panInfo"]
+    pano = _parse_pan_info_dict(pan_info)
+
+    pano.neighbors = await get_neighbors_async(pano.id)
+
+    for year in pan_info["timeline"]:
+        if pano.date.year == year:
+            continue
+        response = await api.getbest_async(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
+        if response["status"] != 200:
+            continue
+        pan_info = response["result"]["panInfo"]
+        historical = _parse_pan_info_dict(pan_info)
+        pano.historical.append(historical)
+
+    return pano
 
 
 def get_neighbors(panoid: int) -> List[MapyPanorama]:
@@ -70,13 +84,80 @@ def get_neighbors(panoid: int) -> List[MapyPanorama]:
     :param panoid: The pano ID.
     :return: A list of nearby panoramas.
     """
-    response = client.call("getneighbours",
-                           args=(panoid,),
-                           headers=headers)
+    response = api.getneighbors(panoid)
 
     if response["status"] != 200:
         return []
 
+    return _getneighbors_response_to_list(response)
+
+
+async def get_neighbors_async(panoid: int) -> List[MapyPanorama]:
+    response = await api.getneighbors_async(panoid)
+
+    if response["status"] != 200:
+        return []
+
+    return _getneighbors_response_to_list(response)
+
+
+def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image:
+    """
+    Downloads a panorama and returns it as PIL image.
+
+    :param pano: The panorama.
+    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+    :return: A PIL image containing the panorama.
+    """
+    zoom = max(0, min(zoom, pano.max_zoom))
+
+    if zoom == 0:
+        return _get_zoom_0(pano)
+    else:
+        tiles = _generate_tile_list(pano, zoom)
+        tile_images = _download_tiles(tiles)
+        stitched = _stitch_tiles(pano, tiles, tile_images, zoom)
+        return stitched
+
+
+async def get_panorama_async(pano: MapyPanorama, session: ClientSession, zoom: int = 2) -> Image:
+    zoom = max(0, min(zoom, pano.max_zoom))
+
+    if zoom == 0:
+        return await _get_zoom_0_async(pano, session)
+    else:
+        tiles = _generate_tile_list(pano, zoom)
+        tile_images = await _download_tiles_async(tiles, session)
+        stitched = _stitch_tiles(pano, tiles, tile_images, zoom)
+        return stitched
+
+
+def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
+    """
+    Downloads a panorama to a file.
+
+    :param pano: The panorama.
+    :param path: Output path.
+    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+    :param pil_args: *(optional)* Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
+    """
+    if pil_args is None:
+        pil_args = {}
+    pano = get_panorama(pano, zoom=zoom)
+    pano.save(path, **pil_args)
+
+
+async def download_panorama_async(pano: MapyPanorama, path: str, session: ClientSession,
+                                  zoom: int = 2, pil_args: dict = None) -> None:
+    if pil_args is None:
+        pil_args = {}
+    pano = await get_panorama_async(pano, session, zoom=zoom)
+    pano.save(path, **pil_args)
+
+
+def _getneighbors_response_to_list(response):
     panos = []
     for pan_info in response["result"]["neighbours"]:
         panos.append(_parse_pan_info_dict(pan_info["near"]))
@@ -133,48 +214,19 @@ def _parse_angles(pan_info, pano):
     pano.roll = roll
 
 
-def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image:
-    """
-    Downloads a panorama and returns it as PIL image.
-
-    :param pano: The panorama.
-    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
-    :return: A PIL image containing the panorama.
-    """
-    zoom = max(0, min(zoom, pano.max_zoom))
-
-    if zoom == 0:
-        return _get_zoom_0(pano)
-    else:
-        tiles = _generate_tile_list(pano, zoom)
-        tile_images = _download_tiles(tiles)
-        stitched = _stitch_tiles(pano, tiles, tile_images, zoom)
-        return stitched
-
-
-def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
-    """
-    Downloads a panorama to a file.
-
-    :param pano: The panorama.
-    :param path: Output path.
-    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
-    :param pil_args: *(optional)* Additional arguments for PIL's
-        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
-        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
-    """
-    if pil_args is None:
-        pil_args = {}
-    pano = get_panorama(pano, zoom=zoom)
-    pano.save(path, **pil_args)
-
-
 def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image:
     tile_url = _generate_tile_list(pano, 0)[0][2]
     if session is None:
         session = requests.Session()
     response = session.get(tile_url)
     image = Image.open(BytesIO(response.content))
+    return image
+
+
+async def _get_zoom_0_async(pano: MapyPanorama, session: ClientSession) -> Image:
+    tile_url = _generate_tile_list(pano, 0)[0][2]
+    response = await session.get(tile_url)
+    image = Image.open(BytesIO(await response.read()))
     return image
 
 
@@ -200,6 +252,16 @@ def _download_tiles(tile_list):
     Downloads tiles from a tile list generated by _generate_tile_list().
     """
     tiles = asyncio.run(download_files_async([t[2] for t in tile_list]))
+
+    tile_images = {}
+    for i, (x, y, url) in enumerate(tile_list):
+        tile_images[(x, y)] = tiles[i]
+
+    return tile_images
+
+
+async def _download_tiles_async(tile_list, session: ClientSession):
+    tiles = await download_files_async([t[2] for t in tile_list], session=session)
 
     tile_images = {}
     for i, (x, y, url) in enumerate(tile_list):
