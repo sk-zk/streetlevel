@@ -17,6 +17,29 @@ from ..util import download_files_async
 TILE_SIZE = 256
 
 
+def find_panorama_by_id(panoid: int, session: Session = None) -> Union[StreetsidePanorama, None]:
+    """
+    Fetches metadata for a specific panorama.
+
+    :param panoid: The pano ID.
+    :param session: *(optional)* A requests session.
+    :return: A StreetsidePanorama object if a panorama was found, or None.
+    """
+    response = api.find_panorama_by_id_raw(panoid, session)
+    if len(response) < 2:
+        return None
+    pano = _parse_pano(response[1])
+    return pano
+
+
+async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Union[StreetsidePanorama, None]:
+    response = await api.find_panorama_by_id_raw_async(panoid, session)
+    if len(response) < 2:
+        return None
+    pano = _parse_pano(response[1])
+    return pano
+
+
 def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
                            limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
     """
@@ -94,7 +117,7 @@ def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool 
 
 
 async def download_panorama_async(panoid: int, path: str, session: ClientSession, zoom: int = 3,
-                            single_image: bool = True, pil_args: dict = None) -> None:
+                                  single_image: bool = True, pil_args: dict = None) -> None:
     if pil_args is None:
         pil_args = {}
 
@@ -178,7 +201,8 @@ def _generate_tile_list(panoid, zoom):
             else:
                 subdiv_base4 = to_base4(subdiv).rjust(zoom, "0")
             tile_key = f"{face_id_base4}{subdiv_base4}"
-            url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/hs{panoid_base4}{tile_key}.jpg?g=0"
+            url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/hs{panoid_base4}{tile_key}.jpg?" \
+                  f"g=13716"
             face_tiles.append({"face": face_id_base4, "subdiv": subdiv, "url": url})
         faces[face_id] = face_tiles
     return faces

@@ -8,6 +8,9 @@ Finding panoramas
     .. autofunction:: streetlevel.streetside.find_panoramas_async
     .. autofunction:: streetlevel.streetside.find_panoramas_in_bbox
     .. autofunction:: streetlevel.streetside.find_panoramas_in_bbox_async
+    .. autofunction:: streetlevel.streetside.find_panorama_by_id
+    .. autofunction:: streetlevel.streetside.find_panorama_by_id_async
+
 
 
 Downloading panoramas
