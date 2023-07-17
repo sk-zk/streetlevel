@@ -10,7 +10,7 @@ def mocked_find_panoramas_raw(north, west, south, east, limit=50, session=None):
         return json.load(f)
 
 
-streetside.streetside._find_panoramas_raw = mocked_find_panoramas_raw
+streetside.streetside.api.find_panoramas_raw = mocked_find_panoramas_raw
 
 
 def test_find_panoramas_in_bbox():
