@@ -20,8 +20,8 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     """
     Searches for a panorama within a radius around a point.
 
-    :param lat: Latitude of the point to search around.
-    :param lon: Longitude of the point to search around.
+    :param lat: Latitude of the center point.
+    :param lon: Longitude of the center point.
     :param radius: *(optional)* Search radius in meters. Defaults to 50.
     :param locale: *(optional)* Desired language of the location's address as IETF code. Defaults to ``en``.
     :param session: *(optional)* A requests session.
