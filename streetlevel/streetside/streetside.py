@@ -4,13 +4,13 @@ from io import BytesIO
 from pathlib import Path
 from typing import List, Union
 
-import numpy as np
 from PIL import Image
 import requests
 from requests import Session
 
 from .panorama import StreetsidePanorama
 from streetlevel.geo import *
+from .util import to_base4
 from ..util import download_files_async
 
 TILE_SIZE = 256
@@ -79,7 +79,8 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
 
     :param lat: Latitude of the center point.
     :param lon: Longitude of the center point.
-    :param radius: *(optional)* Search radius in meters. Defaults to 25.
+    :param radius: *(optional)* Radius of the square in meters. (Not sure if that's the correct mathematical
+      term, but you get the idea.)
     :param limit: *(optional)* Maximum number of results to return. Defaults to 50.
     :param session: *(optional)* A requests session.
     :return: A list of StreetsidePanoramas.
@@ -131,26 +132,6 @@ def get_panorama(panoid: int, zoom: int = 3, single_image: bool = True) -> Union
     faces = _generate_tile_list(panoid, zoom)
     _download_tiles(faces)
     return _stitch_panorama(faces, single_image=single_image)
-
-
-def to_base4(n: int) -> str:
-    """
-    Converts an integer to a base 4 string.
-
-    :param n: The integer.
-    :return: The base 4 representation of the integer.
-    """
-    return np.base_repr(n, 4)
-
-
-def from_base4(n: str) -> int:
-    """
-    Converts a string containing a base 4 number to integer.
-
-    :param n: The string containing a base 4 number.
-    :return: The integer represented by the string.
-    """
-    return int(n, 4)
 
 
 def _generate_tile_list(panoid, zoom):

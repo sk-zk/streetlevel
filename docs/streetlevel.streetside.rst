@@ -20,5 +20,5 @@ Data classes
 
 Miscellaneous
 -------------
-    .. autofunction:: streetlevel.streetside.from_base4
-    .. autofunction:: streetlevel.streetside.to_base4
+    .. autofunction:: streetlevel.streetside.util.from_base4
+    .. autofunction:: streetlevel.streetside.util.to_base4
