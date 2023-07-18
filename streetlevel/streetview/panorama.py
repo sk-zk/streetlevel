@@ -83,7 +83,7 @@ class StreetViewPanorama:
     therefore returns ``launch``.)
 
     For third-party coverage, this returns the app the panorama was uploaded with,
-    such as ``photos:street_view_android`` (The now-discontinued Street View app, RIP) or 
+    such as ``photos:street_view_android`` (the now-discontinued Street View app, RIP) or 
     ``photos:street_view_publish_api``.
     """
 

@@ -1,4 +1,3 @@
-from io import BytesIO
 import itertools
 from typing import List, Union
 from PIL import Image
@@ -14,15 +13,18 @@ from ..util import try_get, download_tiles, download_tiles_async, stitch_tiles
 from .util import is_third_party_panoid
 
 
-def find_panorama(lat: float, lon: float, radius: int = 50,
-                  locale: str = "en", session: Session = None) -> Union[StreetViewPanorama, None]:
+def find_panorama(lat: float, lon: float, radius: int = 50, locale: str = "en",
+                  search_third_party: bool = False, session: Session = None) -> Union[StreetViewPanorama, None]:
     """
     Searches for a panorama within a radius around a point.
 
     :param lat: Latitude of the center point.
     :param lon: Longitude of the center point.
     :param radius: *(optional)* Search radius in meters. Defaults to 50.
-    :param locale: *(optional)* Desired language of the location's address as IETF code. Defaults to ``en``.
+    :param locale: *(optional)* Desired language of the location's address as IETF code.
+      Defaults to ``en``.
+    :param search_third_party: *(optional)* Whether to search for third-party panoramas
+      rather than official ones. Defaults to false.
     :param session: *(optional)* A requests session.
     :return: A StreetViewPanorama object if a panorama was found, or None.
     """
@@ -32,7 +34,7 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     # than `photometa`; need to deal with that at some point
 
     resp = api.find_panorama_raw(lat, lon, radius=radius, download_depth=False,
-                                 locale=locale, session=session)
+                                 locale=locale, search_third_party=search_third_party, session=session)
 
     response_code = resp[0][0][0]
     # 0: OK
@@ -45,13 +47,13 @@ def find_panorama(lat: float, lon: float, radius: int = 50,
     return pano
 
 
-async def find_panorama_async(lat: float, lon: float, session: ClientSession,
-                              radius: int = 50, locale: str = "en") -> Union[StreetViewPanorama, None]:
+async def find_panorama_async(lat: float, lon: float, session: ClientSession, radius: int = 50,
+                              locale: str = "en", search_third_party: bool = False) -> Union[StreetViewPanorama, None]:
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
     resp = await api.find_panorama_raw_async(lat, lon, session, radius=radius, download_depth=False,
-                                             locale=locale)
+                                             locale=locale, search_third_party=search_third_party)
 
     response_code = resp[0][0][0]
     # 0: OK

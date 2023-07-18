@@ -10,7 +10,8 @@ def mocked_lookup_panoid_raw(panoid, download_depth=False, locale="en", session=
         return json.load(f)
 
 
-def mocked_find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", session=None):
+def mocked_find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en",
+                             search_third_party=False, session=None):
     with open("streetview/data/find_object.json", "r") as f:
         return json.load(f)
 

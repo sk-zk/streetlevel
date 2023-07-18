@@ -16,10 +16,9 @@ def split_ietf(tag: str) -> Tuple[str, str]:
     return lang, country
 
 
-def build_find_panorama_request_url(lat, lon, radius, download_depth, locale):
+def build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party):
     radius = float(radius)
     toggles = []
-    search_third_party = False
     include_resolution_info = True
     include_street_name_and_date = True
     include_copyright_information = True
@@ -84,8 +83,8 @@ def convert_find_panorama_response_to_json(text):
     return metadata
     
 
-def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", session=None):
-    url = build_find_panorama_request_url(lat, lon, radius, download_depth, locale)
+def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", search_third_party=False, session=None):
+    url = build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party)
 
     if session is None:
         text = requests.get(url).text
@@ -96,8 +95,8 @@ def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", se
 
 
 async def find_panorama_raw_async(lat, lon, session: aiohttp.ClientSession, radius=50,
-                                  download_depth=False, locale="en"):
-    url = build_find_panorama_request_url(lat, lon, radius, download_depth, locale)
+                                  download_depth=False, locale="en", search_third_party=False):
+    url = build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party)
 
     async with session.get(url) as response:
         text = await response.text()
