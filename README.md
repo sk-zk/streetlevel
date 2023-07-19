@@ -18,6 +18,9 @@ pano = streetview.find_panorama(46.8839586, 12.169002)
 streetview.download_panorama(pano, f"{pano.id}.jpg")
 ```
 
+## Documentation
+Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.readthedocs.io/).
+
 ## Functionality overview
 ✔ implemented / available; 🟡 partially implemented / available; ❌ not implemented; ⚫ not available / not applicable
 
@@ -157,6 +160,3 @@ streetview.download_panorama(pano, f"{pano.id}.jpg")
     <td align="center">✔</td>
   </tr>
 </table>
-
-## Documentation
-Documentation of all available functionality can be found in the `doc` folder.
