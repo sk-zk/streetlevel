@@ -1,7 +1,7 @@
 # streetlevel
-**streetlevel** is a module for downloading panoramas and metadata from Google Street View, Apple Look Around, Bing Streetside and Mapy.cz Panorama.
+**streetlevel** is a module for downloading panoramas and metadata from street-level imagery services including Google Street View and Apple Look Around.
 
-Since it relies on calls to internal API calls, it may break unexpectedly.
+Since it relies on calls to internal APIs, it may break unexpectedly.
 
 ## Installation
 ```sh
