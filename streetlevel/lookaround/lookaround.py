@@ -4,6 +4,7 @@ from enum import IntEnum
 from typing import List, Union, Tuple
 
 import requests
+from aiohttp import ClientSession
 from requests import Session
 
 from . import api
@@ -26,19 +27,6 @@ class Face(IntEnum):
     BOTTOM = 5  #:
 
 
-def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> List[LookaroundPanorama]:
-    """
-    Same as :func:`get_coverage_tile <get_coverage_tile>`, but for fetching the tile on which a point is located.
-
-    :param lat: Latitude of the point.
-    :param lon: Longitude of the point.
-    :param session: *(optional)* A requests session.
-    :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
-    """
-    x, y = geo.wgs84_to_tile_coord(lat, lon, 17)
-    return get_coverage_tile(x, y, session=session)
-
-
 def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List[LookaroundPanorama]:
     """
     Fetches Look Around coverage on a specific map tile. Coordinates are in Slippy Map aka XYZ format
@@ -53,6 +41,29 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     return _parse_panos(tile, tile_x, tile_y)
 
 
+async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> List[LookaroundPanorama]:
+    tile = await api.get_coverage_tile_raw_async(tile_x, tile_y, session)
+    return _parse_panos(tile, tile_x, tile_y)
+
+
+def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> List[LookaroundPanorama]:
+    """
+    Same as :func:`get_coverage_tile <get_coverage_tile>`, but for fetching the tile on which a point is located.
+
+    :param lat: Latitude of the point.
+    :param lon: Longitude of the point.
+    :param session: *(optional)* A requests session.
+    :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
+    """
+    x, y = geo.wgs84_to_tile_coord(lat, lon, 17)
+    return get_coverage_tile(x, y, session=session)
+
+
+async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: ClientSession) -> List[LookaroundPanorama]:
+    x, y = geo.wgs84_to_tile_coord(lat, lon, 17)
+    return await get_coverage_tile_async(x, y, session)
+
+
 def get_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
                       face: Face, zoom: int,
                       auth: Authenticator, session: Session = None) -> bytes:
@@ -64,7 +75,7 @@ def get_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
 
     :param pano: The panorama, or its ID.
     :param face: The face.
-    :param zoom: The zoom level. 0 is highest, 7 is lowest. Defaults to 0.
+    :param zoom: The zoom level. 0 is highest, 7 is lowest.
     :param auth: An Authenticator object.
     :param session: *(optional)* A requests session.
     :return: The HEIC file containing the face.
@@ -89,13 +100,36 @@ def download_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
     :param pano: The panorama, or its ID.
     :param path: Output path.
     :param face: The face.
-    :param zoom: The zoom level. 0 is highest, 7 is lowest. Defaults to 0.
+    :param zoom: The zoom level. 0 is highest, 7 is lowest.
     :param auth: An Authenticator object.
     :param session: *(optional)* A requests session.
     """
     face_bytes = get_panorama_face(pano, face, zoom, auth, session)
     with open(path, "wb") as f:
         f.write(face_bytes)
+
+
+"""
+# TODO make this work. as it is, it 403s every time
+
+async def get_panorama_face_async(pano: Union[LookaroundPanorama, Tuple[int, int]],
+                                  face: Face, zoom: int,
+                                  auth: Authenticator, session: ClientSession) -> bytes:
+    panoid, region_id = _panoid_to_string(pano)
+    url = _build_panorama_face_url(panoid, region_id, int(face), zoom, auth)
+    async with session.get(url) as response:
+        if response.ok:
+            return await response.read()
+        else:
+            raise Exception(str(response))
+
+async def download_panorama_face_async(pano: Union[LookaroundPanorama, Tuple[int, int]],
+                                       path: str, face: Face, zoom: int,
+                                       auth: Authenticator, session: ClientSession) -> None:
+    face_bytes = await get_panorama_face_async(pano, face, zoom, auth, session)
+    with open(path, "wb") as f:
+        f.write(face_bytes) 
+"""
 
 
 def _panoid_to_string(pano):
@@ -138,7 +172,7 @@ def _convert_heading(lat: float, lon: float, raw_heading: int) -> float:
     """
     Converts the raw heading value to radians.
     """
-    offset_factor = 1/(16384/360)
+    offset_factor = 1 / (16384 / 360)
     heading = (offset_factor * raw_heading) - lon
     # in the southern hemisphere, the heading also needs to be mirrored across the 90°/270° line
     if lat < 0:

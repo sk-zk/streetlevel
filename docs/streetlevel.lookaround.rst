@@ -8,7 +8,9 @@ but the top and bottom face are ... something else. (Please contact me if you kn
 Finding panoramas
 -----------------
     .. autofunction:: streetlevel.lookaround.get_coverage_tile
+    .. autofunction:: streetlevel.lookaround.get_coverage_tile_async
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_by_latlon
+    .. autofunction:: streetlevel.lookaround.get_coverage_tile_by_latlon_async
 
 
 Downloading panoramas
