@@ -1,7 +1,8 @@
 streetlevel
 ===========
 
-The documentation for streetlevel, a module for downloading panoramas and metadata from street-level imagery providers via internal APIs.
+The documentation for `streetlevel <https://github.com/sk-zk/streetlevel>`_, 
+a module for downloading panoramas and metadata from street-level imagery providers via internal APIs.
 
 .. toctree::
    :maxdepth: 1
@@ -15,9 +16,4 @@ The documentation for streetlevel, a module for downloading panoramas and metada
 
 Indices and tables
 ==================
-
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-
