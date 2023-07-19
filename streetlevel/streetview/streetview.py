@@ -66,8 +66,8 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession, ra
     return pano
 
 
-def lookup_panoid(panoid: str, download_depth: bool = False,
-                  locale: str = "en", session: Session = None) -> Union[StreetViewPanorama, None]:
+def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str = "en",
+                        session: Session = None) -> Union[StreetViewPanorama, None]:
     """
     Fetches metadata of a specific panorama.
 
@@ -95,8 +95,11 @@ def lookup_panoid(panoid: str, download_depth: bool = False,
     return pano
 
 
-async def lookup_panoid_async(panoid: str, session: ClientSession,
-                              download_depth: bool = False, locale: str = "en") -> Union[StreetViewPanorama, None]:
+lookup_panoid = find_panorama_by_id
+
+
+async def find_panorama_by_id_async(panoid: str, session: ClientSession, download_depth: bool = False,
+                                    locale: str = "en") -> Union[StreetViewPanorama, None]:
     resp = await api.lookup_panoid_raw_async(panoid, session,
                                              download_depth=download_depth, locale=locale)
 

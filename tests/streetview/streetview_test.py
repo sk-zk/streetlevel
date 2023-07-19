@@ -31,9 +31,9 @@ def test_is_third_party_panoid():
     assert streetview.is_third_party_panoid("AF1QipN3bwjvnpTUbfCZ18wsUMrpZ6Ul2mhVfNKl71_X")
 
 
-def test_lookup_panoid():
+def test_find_panorama_by_id():
     panoid = "n-Zd6bDDL_XOc_jkNgFsGg"
-    pano = streetview.lookup_panoid(panoid, download_depth=False, locale="en", session=None)
+    pano = streetview.find_panorama_by_id(panoid, download_depth=False, locale="en", session=None)
     assert pano.id == panoid
     assert pano.lat == approx(47.15048822721601, 0.001)
     assert pano.lon == approx(11.13385612403307, 0.001)
@@ -43,15 +43,6 @@ def test_lookup_panoid():
     assert pano.tile_size == Size(512, 512)
     assert len(pano.image_sizes) == 6
     assert pano.image_sizes[-1] == Size(16384, 8192)
-
-
-# todo mock image requests
-#def test_download_panorama():
-#    panoid = "n-Zd6bDDL_XOc_jkNgFsGg"
-#    pano = streetview.lookup_panoid(panoid, download_depth=False, locale="en", session=None)
-#    image = streetview.get_panorama(pano, zoom=1)
-#    assert image.width == pano.image_sizes[1][1]
-#    assert image.height == pano.image_sizes[1][0]
 
 
 def test_find_panorama():

@@ -6,8 +6,8 @@ Finding panoramas
 -----------------
     .. autofunction:: streetlevel.streetview.find_panorama
     .. autofunction:: streetlevel.streetview.find_panorama_async
-    .. autofunction:: streetlevel.streetview.lookup_panoid
-    .. autofunction:: streetlevel.streetview.lookup_panoid_async
+    .. autofunction:: streetlevel.streetview.find_panorama_by_id
+    .. autofunction:: streetlevel.streetview.find_panorama_by_id_async
     .. autofunction:: streetlevel.streetview.get_coverage_tile
     .. autofunction:: streetlevel.streetview.get_coverage_tile_async
     .. autofunction:: streetlevel.streetview.get_coverage_tile_by_latlon
