@@ -1,15 +1,13 @@
-.. streetlevel documentation master file, created by
-   sphinx-quickstart on Mon Jul 17 09:13:14 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+streetlevel
+===========
 
-Welcome to streetlevel's documentation!
-=======================================
+The documentation for streetlevel, a module for downloading panoramas and metadata from street-level imagery providers via internal APIs.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Contents
    
+   streetlevel.lookaround
    streetlevel.mapy
    streetlevel.streetside
    streetlevel.streetview

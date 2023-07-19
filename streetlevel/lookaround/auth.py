@@ -12,6 +12,11 @@ from urllib.parse import urlparse, quote
 
 
 class Authenticator:
+    """
+    Various requests to internal Apple Maps endpoints, such as Look Around imagery, must be
+    dynamically authenticated with a session ID and access key.
+    This class provides this functionality.
+    """
     TOKEN_P1 = "4cjLaD4jGRwlQ9U"
     TOKEN_P2 = "72xIzEBe0vHBmf9"
 
@@ -19,6 +24,12 @@ class Authenticator:
         self.session_id = _generate_session_id()
 
     def authenticate_url(self, url):
+        """
+        Appends an authentication key to a URL.
+
+        :param url: An unauthenticated URL.
+        :return: An authenticated URL.
+        """
         url_obj = urlparse(url)
 
         token_p3 = _generate_token_p3()

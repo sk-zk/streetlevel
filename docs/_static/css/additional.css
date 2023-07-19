@@ -25,3 +25,7 @@
 #streetlevel\.mapy\.panorama\.MapyPanorama + dd .field-list {
   display:none !important;
 }
+
+#streetlevel\.lookaround\.panorama\.LookaroundPanorama + dd .field-list {
+  display:none !important;
+}
