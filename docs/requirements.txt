@@ -1,1 +1,4 @@
 aiohttp
+pyfrpc
+pyproj
+protobuf~=4.21.9
