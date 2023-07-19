@@ -192,7 +192,7 @@ async def download_panorama_async(pano: StreetViewPanorama, path: str, session: 
     pano.save(path, **pil_args)
 
 
-def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
+def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
     """
     Downloads a panorama and returns it as PIL image.
 
@@ -211,7 +211,7 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image:
     return stitched
 
 
-async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image:
+async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image.Image:
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     tile_list = _generate_tile_list(pano, zoom)
     tile_images = await download_tiles_async(tile_list, session)

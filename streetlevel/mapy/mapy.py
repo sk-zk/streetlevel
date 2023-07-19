@@ -100,7 +100,7 @@ async def get_neighbors_async(panoid: int) -> List[MapyPanorama]:
     return _getneighbors_response_to_list(response)
 
 
-def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image:
+def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image.Image:
     """
     Downloads a panorama and returns it as PIL image.
 
@@ -123,7 +123,7 @@ def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image:
         return stitched
 
 
-async def get_panorama_async(pano: MapyPanorama, session: ClientSession, zoom: int = 2) -> Image:
+async def get_panorama_async(pano: MapyPanorama, session: ClientSession, zoom: int = 2) -> Image.Image:
     zoom = max(0, min(zoom, pano.max_zoom))
 
     if zoom == 0:
@@ -221,7 +221,7 @@ def _parse_angles(pan_info, pano):
     pano.roll = roll
 
 
-def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image:
+def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image.Image:
     tile_url = _generate_tile_list(pano, 0)[0][2]
     if session is None:
         session = requests.Session()
@@ -230,7 +230,7 @@ def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image:
     return image
 
 
-async def _get_zoom_0_async(pano: MapyPanorama, session: ClientSession) -> Image:
+async def _get_zoom_0_async(pano: MapyPanorama, session: ClientSession) -> Image.Image:
     tile_url = _generate_tile_list(pano, 0)[0][2]
     response = await session.get(tile_url)
     image = Image.open(BytesIO(await response.read()))
