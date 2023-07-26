@@ -1,7 +1,7 @@
 import itertools
 import math
 from io import BytesIO
-from typing import Union, List
+from typing import List, Optional
 
 import requests
 from PIL import Image
@@ -16,7 +16,7 @@ from ..util import download_tiles, download_tiles_async, stitch_tiles
 
 
 def find_panorama(lat: float, lon: float,
-                  radius: float = 100.0) -> Union[MapyPanorama, None]:
+                  radius: float = 100.0) -> Optional[MapyPanorama]:
     """
     Searches for a panorama within a radius around a point.
 
@@ -41,7 +41,7 @@ def find_panorama(lat: float, lon: float,
 
 
 async def find_panorama_async(lat: float, lon: float,
-                              radius: float = 100.0) -> Union[MapyPanorama, None]:
+                              radius: float = 100.0) -> Optional[MapyPanorama]:
     # TODO reduce duplication
     radius = float(radius)
     response = await api.getbest_async(lat, lon, radius)
@@ -58,7 +58,7 @@ async def find_panorama_async(lat: float, lon: float,
     return pano
 
 
-def find_panorama_by_id(panoid: int) -> Union[MapyPanorama, None]:
+def find_panorama_by_id(panoid: int) -> Optional[MapyPanorama]:
     """
     Fetches metadata of a specific panorama.
 
@@ -74,7 +74,7 @@ def find_panorama_by_id(panoid: int) -> Union[MapyPanorama, None]:
     return pano
 
 
-async def find_panorama_by_id_async(panoid: int) -> Union[MapyPanorama, None]:
+async def find_panorama_by_id_async(panoid: int) -> Optional[MapyPanorama]:
     response = await api.detail_async(panoid)
 
     if response["status"] != 200:

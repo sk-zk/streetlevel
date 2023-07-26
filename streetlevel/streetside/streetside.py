@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Optional
 
 from PIL import Image
 from aiohttp import ClientSession
@@ -17,7 +17,7 @@ from ..util import download_files_async
 TILE_SIZE = 256
 
 
-def find_panorama_by_id(panoid: int, session: Session = None) -> Union[StreetsidePanorama, None]:
+def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[StreetsidePanorama]:
     """
     Fetches metadata for a specific panorama.
 
@@ -32,7 +32,7 @@ def find_panorama_by_id(panoid: int, session: Session = None) -> Union[Streetsid
     return pano
 
 
-async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Union[StreetsidePanorama, None]:
+async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Optional[StreetsidePanorama]:
     response = await api.find_panorama_by_id_raw_async(panoid, session)
     if len(response) < 2:
         return None
@@ -154,7 +154,6 @@ async def get_panorama_async(pano: StreetsidePanorama, session: ClientSession, z
     faces = _generate_tile_list(pano.id, zoom)
     await _download_tiles_async(faces, session)
     return _stitch_panorama(faces, single_image=single_image)
-
 
 
 def _parse_panos(response):

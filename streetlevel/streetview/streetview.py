@@ -1,5 +1,5 @@
 import itertools
-from typing import List, Union
+from typing import List, Optional
 from PIL import Image
 from aiohttp import ClientSession
 from requests import Session
@@ -14,7 +14,7 @@ from .util import is_third_party_panoid
 
 
 def find_panorama(lat: float, lon: float, radius: int = 50, locale: str = "en",
-                  search_third_party: bool = False, session: Session = None) -> Union[StreetViewPanorama, None]:
+                  search_third_party: bool = False, session: Session = None) -> Optional[StreetViewPanorama]:
     """
     Searches for a panorama within a radius around a point.
 
@@ -48,7 +48,7 @@ def find_panorama(lat: float, lon: float, radius: int = 50, locale: str = "en",
 
 
 async def find_panorama_async(lat: float, lon: float, session: ClientSession, radius: int = 50,
-                              locale: str = "en", search_third_party: bool = False) -> Union[StreetViewPanorama, None]:
+                              locale: str = "en", search_third_party: bool = False) -> Optional[StreetViewPanorama]:
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
@@ -67,7 +67,7 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession, ra
 
 
 def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str = "en",
-                        session: Session = None) -> Union[StreetViewPanorama, None]:
+                        session: Session = None) -> Optional[StreetViewPanorama]:
     """
     Fetches metadata of a specific panorama.
 
@@ -99,9 +99,8 @@ lookup_panoid = find_panorama_by_id
 
 
 async def find_panorama_by_id_async(panoid: str, session: ClientSession, download_depth: bool = False,
-                                    locale: str = "en") -> Union[StreetViewPanorama, None]:
-    resp = await api.lookup_panoid_raw_async(panoid, session,
-                                             download_depth=download_depth, locale=locale)
+                                    locale: str = "en") -> Optional[StreetViewPanorama]:
+    resp = await api.lookup_panoid_raw_async(panoid, session, download_depth=download_depth, locale=locale)
 
     response_code = resp[1][0][0][0]
     # 1: OK
