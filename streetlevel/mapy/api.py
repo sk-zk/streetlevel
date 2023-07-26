@@ -28,14 +28,24 @@ async def getbest_async(lat, lon, radius, options=None):
     return response
 
 
-def getneighbors(panoid):
+def detail(panoid: int):
+    response = client.call("detail", args=[panoid], headers=headers)
+    return response
+
+
+async def detail_async(panoid: int):
+    response = await async_client.call("detail", args=[panoid], headers=headers)
+    return response
+
+
+def getneighbours(panoid):
     response = client.call("getneighbours",
                            args=(panoid,),
                            headers=headers)
     return response
 
 
-async def getneighbors_async(panoid):
+async def getneighbours_async(panoid):
     response = await async_client.call("getneighbours",
                                        args=(panoid,),
                                        headers=headers)

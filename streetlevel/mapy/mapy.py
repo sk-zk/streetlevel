@@ -35,16 +35,7 @@ def find_panorama(lat: float, lon: float,
     pano = _parse_pan_info_dict(pan_info)
 
     pano.neighbors = get_neighbors(pano.id)
-
-    for year in pan_info["timeline"]:
-        if pano.date.year == year:
-            continue
-        response = api.getbest(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
-        if response["status"] != 200:
-            continue
-        pan_info = response["result"]["panInfo"]
-        historical = _parse_pan_info_dict(pan_info)
-        pano.historical.append(historical)
+    _get_historical(lat, lon, pan_info, pano)
 
     return pano
 
@@ -62,17 +53,34 @@ async def find_panorama_async(lat: float, lon: float,
     pano = _parse_pan_info_dict(pan_info)
 
     pano.neighbors = await get_neighbors_async(pano.id)
+    await _get_historical_async(lat, lon, pan_info, pano)
 
-    for year in pan_info["timeline"]:
-        if pano.date.year == year:
-            continue
-        response = await api.getbest_async(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
-        if response["status"] != 200:
-            continue
-        pan_info = response["result"]["panInfo"]
-        historical = _parse_pan_info_dict(pan_info)
-        pano.historical.append(historical)
+    return pano
 
+
+def find_panorama_by_id(panoid: int) -> Union[MapyPanorama, None]:
+    """
+    Fetches metadata of a specific panorama.
+
+    :param panoid: The pano ID.
+    :return: A MapyPanorama object if a panorama with this ID exists, or None.
+    """
+    response = api.detail(panoid)
+
+    if response["status"] != 200:
+        return None
+
+    pano = _parse_pan_info_dict(response["result"])
+    return pano
+
+
+async def find_panorama_by_id_async(panoid: int) -> Union[MapyPanorama, None]:
+    response = await api.detail_async(panoid)
+
+    if response["status"] != 200:
+        return None
+
+    pano = _parse_pan_info_dict(response["result"])
     return pano
 
 
@@ -83,21 +91,21 @@ def get_neighbors(panoid: int) -> List[MapyPanorama]:
     :param panoid: The pano ID.
     :return: A list of nearby panoramas.
     """
-    response = api.getneighbors(panoid)
+    response = api.getneighbours(panoid)
 
     if response["status"] != 200:
         return []
 
-    return _getneighbors_response_to_list(response)
+    return _neighbors_response_to_list(response)
 
 
 async def get_neighbors_async(panoid: int) -> List[MapyPanorama]:
-    response = await api.getneighbors_async(panoid)
+    response = await api.getneighbours_async(panoid)
 
     if response["status"] != 200:
         return []
 
-    return _getneighbors_response_to_list(response)
+    return _neighbors_response_to_list(response)
 
 
 def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image.Image:
@@ -164,7 +172,31 @@ async def download_panorama_async(pano: MapyPanorama, path: str, session: Client
     pano.save(path, **pil_args)
 
 
-def _getneighbors_response_to_list(response: dict) -> List[MapyPanorama]:
+def _get_historical(lat, lon, pan_info, pano):
+    for year in pan_info["timeline"]:
+        if pano.date.year == year:
+            continue
+        response = api.getbest(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
+        if response["status"] != 200:
+            continue
+        pan_info = response["result"]["panInfo"]
+        historical = _parse_pan_info_dict(pan_info)
+        pano.historical.append(historical)
+
+
+async def _get_historical_async(lat, lon, pan_info, pano):
+    for year in pan_info["timeline"]:
+        if pano.date.year == year:
+            continue
+        response = await api.getbest_async(lat, lon, 50.0, options={'year': year, 'nopenalties': True})
+        if response["status"] != 200:
+            continue
+        pan_info = response["result"]["panInfo"]
+        historical = _parse_pan_info_dict(pan_info)
+        pano.historical.append(historical)
+
+
+def _neighbors_response_to_list(response: dict) -> List[MapyPanorama]:
     panos = []
     for pan_info in response["result"]["neighbours"]:
         panos.append(_parse_pan_info_dict(pan_info["near"]))
