@@ -6,6 +6,8 @@ Finding panoramas
 -----------------
     .. autofunction:: streetlevel.mapy.find_panorama
     .. autofunction:: streetlevel.mapy.find_panorama_async
+    .. autofunction:: streetlevel.mapy.find_panorama_by_id
+    .. autofunction:: streetlevel.mapy.find_panorama_by_id_async
     .. autofunction:: streetlevel.mapy.get_neighbors
     .. autofunction:: streetlevel.mapy.get_neighbors_async
 
