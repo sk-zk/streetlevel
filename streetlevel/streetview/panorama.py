@@ -15,7 +15,7 @@ class StreetViewPanorama:
     ID, latitude and longitude are always present. The availability of other metadata depends on which function
     was called and what was returned by the API.
     """
-    id: int
+    id: str
     """The pano ID."""
     lat: float
     """Latitude of the panorama's location."""

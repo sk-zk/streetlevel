@@ -10,7 +10,7 @@ from aiohttp import ClientSession
 from .panorama import MapyPanorama
 from . import api
 from requests import Session
-from ..dataclasses import Size
+from ..dataclasses import Size, Tile
 from ..geo import opk_to_rotation
 from ..util import download_tiles, download_tiles_async, stitch_tiles
 
@@ -164,7 +164,7 @@ async def download_panorama_async(pano: MapyPanorama, path: str, session: Client
     pano.save(path, **pil_args)
 
 
-def _getneighbors_response_to_list(response):
+def _getneighbors_response_to_list(response: dict) -> List[MapyPanorama]:
     panos = []
     for pan_info in response["result"]["neighbours"]:
         panos.append(_parse_pan_info_dict(pan_info["near"]))
@@ -187,12 +187,12 @@ def _parse_pan_info_dict(pan_info: dict) -> MapyPanorama:
     )
 
     _parse_angles(pan_info, pano)
-    _parse_num_tiles(pan_info, pano)
+    pano.num_tiles = _parse_num_tiles(pan_info)
 
     return pano
 
 
-def _parse_num_tiles(pan_info, pano):
+def _parse_num_tiles(pan_info: dict) -> List[Size]:
     # zoom level 0
     num_tiles = [Size(1, 1)]
     # zoom levels 1 and 2 for cyclomedia
@@ -204,10 +204,10 @@ def _parse_num_tiles(pan_info, pano):
     # zoom level 1 for other providers
     else:
         num_tiles.append(Size(pan_info["tileNumX"], pan_info["tileNumY"]))
-    pano.num_tiles = num_tiles
+    return num_tiles
 
 
-def _parse_angles(pan_info, pano):
+def _parse_angles(pan_info: dict, pano: MapyPanorama) -> None:
     if "extra" in pan_info and "carDirection" in pan_info["extra"]:
         pano.heading = math.radians(pan_info["extra"]["carDirection"])
 
@@ -222,7 +222,7 @@ def _parse_angles(pan_info, pano):
 
 
 def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image.Image:
-    tile_url = _generate_tile_list(pano, 0)[0][2]
+    tile_url = _generate_tile_list(pano, 0)[0].url
     if session is None:
         session = requests.Session()
     response = session.get(tile_url)
@@ -231,24 +231,22 @@ def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image.Image:
 
 
 async def _get_zoom_0_async(pano: MapyPanorama, session: ClientSession) -> Image.Image:
-    tile_url = _generate_tile_list(pano, 0)[0][2]
+    tile_url = _generate_tile_list(pano, 0)[0].url
     response = await session.get(tile_url)
     image = Image.open(BytesIO(await response.read()))
     return image
 
 
-def _generate_tile_list(pano: MapyPanorama, zoom: int):
+def _generate_tile_list(pano: MapyPanorama, zoom: int) -> List[Tile]:
     """
-    Generates a list of a panorama's tiles.
-    Returns a list of (x, y, tile_url) tuples.
+    Generates a list of a panorama's tiles and the URLs pointing to them.
     """
-    file_mask = pano.file_mask
-    file_mask = file_mask.replace("xx", "{0:02x}") \
+    file_mask = pano.file_mask.replace("xx", "{0:02x}") \
         .replace("yy", "{1:02x}") \
         .replace("zz", "{2:02x}")
-    url = f"https://panorama-mapserver.mapy.cz/panorama/" \
+    URL = f"https://panorama-mapserver.mapy.cz/panorama/" \
           f"{pano.domain_prefix}/{pano.uri_path}/{file_mask}"
 
     coords = list(itertools.product(range(pano.num_tiles[zoom].x), range(pano.num_tiles[zoom].y)))
-    tiles = [(x, y, url.format(x, y, zoom)) for x, y in coords]
+    tiles = [Tile(x, y, URL.format(x, y, zoom)) for x, y in coords]
     return tiles

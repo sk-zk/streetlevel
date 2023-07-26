@@ -4,6 +4,8 @@ from typing import List
 from aiohttp import ClientSession
 from PIL import Image
 
+from .dataclasses import Tile
+
 
 def try_get(accessor):
     try:
@@ -30,27 +32,27 @@ async def download_files_async(urls: List[str], session: ClientSession = None) -
     return data
 
 
-def download_tiles(tile_list):
-    tiles = asyncio.run(download_files_async([t[2] for t in tile_list]))
+def download_tiles(tile_list: List[Tile]) -> dict:
+    images = asyncio.run(download_files_async([t.url for t in tile_list]))
 
-    tile_images = {}
-    for i, (x, y, url) in enumerate(tile_list):
-        tile_images[(x, y)] = tiles[i]
+    images_dict = {}
+    for i, tile in enumerate(tile_list):
+        images_dict[(tile.x, tile.y)] = images[i]
 
-    return tile_images
-
-
-async def download_tiles_async(tile_list, session: ClientSession):
-    tiles = await download_files_async([t[2] for t in tile_list], session=session)
-
-    tile_images = {}
-    for i, (x, y, url) in enumerate(tile_list):
-        tile_images[(x, y)] = tiles[i]
-
-    return tile_images
+    return images_dict
 
 
-def stitch_tiles(tile_images, width, height, tile_width, tile_height):
+async def download_tiles_async(tile_list: List[Tile], session: ClientSession):
+    images = await download_files_async([t.url for t in tile_list], session=session)
+
+    images_dict = {}
+    for i, tile in enumerate(tile_list):
+        images_dict[(tile.x, tile.y)] = images[i]
+
+    return images_dict
+
+
+def stitch_tiles(tile_images: dict, width: int, height: int, tile_width: int, tile_height: int) -> Image.Image:
     """
     Stitches downloaded tiles to a full image.
     """

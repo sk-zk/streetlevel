@@ -156,6 +156,7 @@ async def get_panorama_async(pano: StreetsidePanorama, session: ClientSession, z
     return _stitch_panorama(faces, single_image=single_image)
 
 
+
 def _parse_panos(response):
     panos = []
     for pano in response[1:]:  # first object is elapsed time

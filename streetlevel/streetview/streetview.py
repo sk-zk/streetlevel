@@ -8,7 +8,7 @@ from streetlevel.geo import *
 from .panorama import StreetViewPanorama, LocalizedString, CaptureDate
 from .depth import parse as parse_depth
 from . import api
-from ..dataclasses import Size
+from ..dataclasses import Size, Tile
 from ..util import try_get, download_tiles, download_tiles_async, stitch_tiles
 from .util import is_third_party_panoid
 
@@ -309,10 +309,9 @@ def _parse_pano_message(msg):
     return pano
 
 
-def _generate_tile_list(pano, zoom):
+def _generate_tile_list(pano: StreetViewPanorama, zoom: int) -> List[Tile]:
     """
-    Generates a list of a panorama's tiles.
-    Returns a list of (x, y, tile_url) tuples.
+    Generates a list of a panorama's tiles and the URLs pointing to them.
     """
     img_size = pano.image_sizes[zoom]
     tile_width = pano.tile_size.x
@@ -320,11 +319,11 @@ def _generate_tile_list(pano, zoom):
     cols = math.ceil(img_size.x / tile_width)
     rows = math.ceil(img_size.y / tile_height)
 
-    image_url = "https://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
-    third_party_image_url = "https://lh3.ggpht.com/p/{0:}=x{1:}-y{2:}-z{3:}"
+    IMAGE_URL = "https://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
+    THIRD_PARTY_IMAGE_URL = "https://lh3.ggpht.com/p/{0:}=x{1:}-y{2:}-z{3:}"
 
-    url_to_use = third_party_image_url if is_third_party_panoid(pano.id) else image_url
+    url_to_use = THIRD_PARTY_IMAGE_URL if is_third_party_panoid(pano.id) else IMAGE_URL
 
-    coord = list(itertools.product(range(cols), range(rows)))
-    tiles = [(x, y, url_to_use.format(pano.id, x, y, zoom)) for x, y in coord]
+    coords = list(itertools.product(range(cols), range(rows)))
+    tiles = [Tile(x, y, url_to_use.format(pano.id, x, y, zoom)) for x, y in coords]
     return tiles
