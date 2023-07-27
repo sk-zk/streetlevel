@@ -25,7 +25,7 @@ class Authenticator:
 
     def authenticate_url(self, url):
         """
-        Appends an authentication key to a URL.
+        Appends authentication parameters to a URL.
 
         :param url: An unauthenticated URL.
         :return: An authenticated URL.

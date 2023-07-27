@@ -171,6 +171,7 @@ def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image.Image:
 
     :param pano: The panorama.
     :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+        Defaults to 2.
     :return: A PIL image containing the panorama.
     """
     zoom = max(0, min(zoom, pano.max_zoom))
@@ -211,6 +212,7 @@ def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: di
     :param pano: The panorama.
     :param path: Output path.
     :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. If 2 is not available, 1 will be downloaded.
+        Defaults to 2.
     :param pil_args: *(optional)* Additional arguments for PIL's
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
