@@ -47,15 +47,19 @@ async def detail_async(panoid: int):
     return response
 
 
-def getneighbours(panoid):
+def getneighbours(panoid, options=None):
+    if options is None:
+        options = {}
     response = client.call("getneighbours",
-                           args=(panoid,),
+                           args=(panoid, options),
                            headers=headers)
     return response
 
 
-async def getneighbours_async(panoid):
+async def getneighbours_async(panoid, options):
+    if options is None:
+        options = {}
     response = await async_client.call("getneighbours",
-                                       args=(panoid,),
+                                       args=(panoid, options),
                                        headers=headers)
     return response
