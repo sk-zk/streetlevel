@@ -114,9 +114,8 @@ def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4, single
     if pil_args is None:
         pil_args = {}
 
-    pano = get_panorama(pano, zoom=zoom, single_image=single_image)
-
-    _save_panorama(pano, path, single_image, pil_args)
+    output = get_panorama(pano, zoom=zoom, single_image=single_image)
+    _save_panorama(output, path, single_image, pil_args)
 
 
 async def download_panorama_async(pano: StreetsidePanorama, path: str, session: ClientSession, zoom: int = 4,
@@ -124,9 +123,8 @@ async def download_panorama_async(pano: StreetsidePanorama, path: str, session: 
     if pil_args is None:
         pil_args = {}
 
-    pano = await get_panorama_async(pano, session, zoom=zoom, single_image=single_image)
-
-    _save_panorama(pano, path, single_image, pil_args)
+    output = await get_panorama_async(pano, session, zoom=zoom, single_image=single_image)
+    _save_panorama(output, path, single_image, pil_args)
 
 
 def get_panorama(pano: StreetsidePanorama, zoom: int = 4, single_image: bool = True) \

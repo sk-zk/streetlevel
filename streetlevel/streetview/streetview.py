@@ -182,16 +182,16 @@ def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_ar
     """
     if pil_args is None:
         pil_args = {}
-    pano = get_panorama(pano, zoom=zoom)
-    pano.save(path, **pil_args)
+    image = get_panorama(pano, zoom=zoom)
+    image.save(path, **pil_args)
 
 
 async def download_panorama_async(pano: StreetViewPanorama, path: str, session: ClientSession,
                                   zoom: int = 5, pil_args: dict = None) -> None:
     if pil_args is None:
         pil_args = {}
-    pano = await get_panorama_async(pano, session, zoom=zoom)
-    pano.save(path, **pil_args)
+    image = await get_panorama_async(pano, session, zoom=zoom)
+    image.save(path, **pil_args)
 
 
 def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:

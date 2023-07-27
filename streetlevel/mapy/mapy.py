@@ -217,16 +217,16 @@ def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: di
     """
     if pil_args is None:
         pil_args = {}
-    pano = get_panorama(pano, zoom=zoom)
-    pano.save(path, **pil_args)
+    image = get_panorama(pano, zoom=zoom)
+    image.save(path, **pil_args)
 
 
 async def download_panorama_async(pano: MapyPanorama, path: str, session: ClientSession,
                                   zoom: int = 2, pil_args: dict = None) -> None:
     if pil_args is None:
         pil_args = {}
-    pano = await get_panorama_async(pano, session, zoom=zoom)
-    pano.save(path, **pil_args)
+    image = await get_panorama_async(pano, session, zoom=zoom)
+    image.save(path, **pil_args)
 
 
 def _append_historical(lat, lon, pan_info, pano):

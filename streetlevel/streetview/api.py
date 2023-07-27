@@ -10,9 +10,9 @@ def split_ietf(tag: str) -> Tuple[str, str]:
     """
     Splits an IETF language tag into its language part and country part.
     """
-    tag = tag.split("-")
-    lang = tag[0]
-    country = tag[1] if len(tag) > 1 else tag[0]
+    parts = tag.split("-")
+    lang = parts[0]
+    country = parts[1] if len(parts) > 1 else parts[0]
     return lang, country
 
 

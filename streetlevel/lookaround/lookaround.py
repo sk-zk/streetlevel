@@ -180,7 +180,7 @@ def _convert_heading(lat: float, lon: float, raw_heading: int) -> float:
     return math.radians(heading)
 
 
-def _protobuf_tile_offset_to_wgs84(x_offset: int, y_offset: int, tile_x: int, tile_y: int) -> (float, float):
+def _protobuf_tile_offset_to_wgs84(x_offset: int, y_offset: int, tile_x: int, tile_y: int) -> Tuple[float, float]:
     """
     Calculates the absolute position of a pano from the tile offsets returned by the API.
     :param x_offset: The X coordinate of the raw tile offset returned by the API.
@@ -196,7 +196,7 @@ def _protobuf_tile_offset_to_wgs84(x_offset: int, y_offset: int, tile_x: int, ti
     return lat, lon
 
 
-def _build_panorama_face_url(panoid: str, region_id: str, face: int, zoom: int, auth: Authenticator):
+def _build_panorama_face_url(panoid: str, region_id: str, face: int, zoom: int, auth: Authenticator) -> str:
     zoom = min(7, zoom)
     panoid_padded = panoid.zfill(20)
     panoid_split = [panoid_padded[i:i + 4] for i in range(0, len(panoid_padded), 4)]
