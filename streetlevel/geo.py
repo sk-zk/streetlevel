@@ -17,7 +17,7 @@ def tile_coord_to_wgs84(x, y, zoom):
     pixel_coord = (x * TILE_SIZE, y * TILE_SIZE)
     world_coord = (pixel_coord[0] / scale, pixel_coord[1] / scale)
     lat_lon = mercator_to_wgs84(world_coord[0], world_coord[1])
-    return lat_lon[1], lat_lon[0]
+    return lat_lon
     
 
 def wgs84_to_tile_coord(lat, lon, zoom):

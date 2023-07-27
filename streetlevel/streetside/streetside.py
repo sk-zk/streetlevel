@@ -2,73 +2,66 @@ import asyncio
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Optional
 
-import numpy as np
 from PIL import Image
-import requests
+from aiohttp import ClientSession
 from requests import Session
 
 from .panorama import StreetsidePanorama
 from streetlevel.geo import *
+from . import api
+from .util import to_base4
 from ..util import download_files_async
 
 TILE_SIZE = 256
 
 
-def to_base4(n: int) -> str:
-    return np.base_repr(n, 4)
+def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[StreetsidePanorama]:
+    """
+    Fetches metadata for a specific panorama.
+
+    :param panoid: The pano ID.
+    :param session: *(optional)* A requests session.
+    :return: A StreetsidePanorama object if a panorama was found, or None.
+    """
+    response = api.find_panorama_by_id_raw(panoid, session)
+    if len(response) < 2:
+        return None
+    pano = _parse_pano(response[1])
+    return pano
 
 
-def from_base4(n: str) -> int:
-    return int(n, 4)
+async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Optional[StreetsidePanorama]:
+    response = await api.find_panorama_by_id_raw_async(panoid, session)
+    if len(response) < 2:
+        return None
+    pano = _parse_pano(response[1])
+    return pano
 
 
 def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
                            limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
     """
     Retrieves panoramas within a bounding box.
+
+    :param north: lat1.
+    :param west: lon1.
+    :param south: lat2.
+    :param east: lon2.
+    :param limit: *(optional)* Maximum number of results to return. Defaults to 50.
+    :param session: *(optional)* A requests session.
+    :return: A list of StreetsidePanoramas.
     """
-    response = _find_panoramas_raw(north, west, south, east, limit, session)
-
-    panos = []
-    for pano in response[1:]:  # first object is elapsed time
-        # TODO: parse bl, ml, nbn, pbn, ad fields
-
-        # as it turns out, months/days without leading zeros
-        # don't have a cross-platform format code in strptime.
-        # wanna guess what kind of dates bing returns?
-        datestr = pano["cd"]
-        datestr = datestr.split("/")
-        datestr[0] = datestr[0].rjust(2, "0")
-        datestr[1] = datestr[1].rjust(2, "0")
-        datestr = "/".join(datestr)
-        date = datetime.strptime(datestr, "%m/%d/%Y %I:%M:%S %p")
-
-        pano_obj = StreetsidePanorama(
-            id=pano["id"],
-            lat=pano["la"],
-            lon=pano["lo"],
-            date=date,
-            next=pano["ne"] if "ne" in pano else None,
-            previous=pano["pr"] if "pr" in pano else None,
-            elevation=pano["al"] if "al" in pano else None,
-            heading=math.radians(pano["he"]) if "he" in pano else None,
-            pitch=math.radians(pano["pi"]) if "pi" in pano else None,
-            roll=math.radians(pano["ro"]) if "ro" in pano else None,
-        )
-        panos.append(pano_obj)
+    response = api.find_panoramas_raw(north, west, south, east, limit, session)
+    panos = _parse_panos(response)
     return panos
 
 
-def _find_panoramas_raw(north, west, south, east, limit=50, session=None):
-    url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/cmd/StreetSideBubbleMetaData?" \
-          f"count={limit}&north={north}&south={south}&east={east}&west={west}"
-    if session is None:
-        response = requests.get(url)
-    else:
-        response = session.get(url)
-    panos = response.json()
+async def find_panoramas_in_bbox_async(north: float, west: float, south: float, east: float,
+                                       session: ClientSession, limit: int = 50) -> List[StreetsidePanorama]:
+    response = await api.find_panoramas_raw_async(north, west, south, east, session, limit)
+    panos = _parse_panos(response)
     return panos
 
 
@@ -76,6 +69,14 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
                    limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
     """
     Retrieves panoramas within a square around a point.
+
+    :param lat: Latitude of the center point.
+    :param lon: Longitude of the center point.
+    :param radius: *(optional)* Radius of the square in meters. (Not sure if that's the correct mathematical
+      term, but you get the idea.) Defaults to 25.
+    :param limit: *(optional)* Maximum number of results to return. Defaults to 50.
+    :param session: *(optional)* A requests session.
+    :return: A list of StreetsidePanoramas.
     """
     top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
     return find_panoramas_in_bbox(
@@ -84,31 +85,108 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
         limit=limit, session=session)
 
 
-def download_panorama(panoid: int, path: str, zoom: int = 3, single_image: bool = True, pil_args: dict = None) -> None:
+async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
+                               radius: float = 25, limit: int = 50) -> List[StreetsidePanorama]:
+
+    top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
+    return await find_panoramas_in_bbox_async(
+        top_left[1], top_left[0],
+        bottom_right[1], bottom_right[0],
+        session, limit=limit)
+
+
+def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4, single_image: bool = True,
+                      pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
+
+    :param pano: The panorama.
+    :param path: Output path.
+    :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
+      downloaded.
+      (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
+    :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
+      Defaults to true.
+    :param pil_args: *(optional)* Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
     """
     if pil_args is None:
         pil_args = {}
 
-    if single_image:
-        pano = get_panorama(panoid, zoom=zoom, single_image=single_image)
-        pano.save(path, **pil_args)
-    else:
-        faces = get_panorama(panoid, zoom=zoom, single_image=single_image)
-        path = Path(path)
-        for idx, face in enumerate(faces):
-            face_path = path.parent / f"{path.stem}_{idx}{path.suffix}"
-            face.save(face_path, **pil_args)
+    output = get_panorama(pano, zoom=zoom, single_image=single_image)
+    _save_panorama(output, path, single_image, pil_args)
 
 
-def get_panorama(panoid: int, zoom: int = 3, single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
+async def download_panorama_async(pano: StreetsidePanorama, path: str, session: ClientSession, zoom: int = 4,
+                                  single_image: bool = True, pil_args: dict = None) -> None:
+    if pil_args is None:
+        pil_args = {}
+
+    output = await get_panorama_async(pano, session, zoom=zoom, single_image=single_image)
+    _save_panorama(output, path, single_image, pil_args)
+
+
+def get_panorama(pano: StreetsidePanorama, zoom: int = 4, single_image: bool = True) \
+        -> Union[List[Image.Image], Image.Image]:
     """
-    Downloads a panorama as PIL image.
+    Downloads a panorama and returns it as PIL image.
+
+    :param pano: The panorama.
+    :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
+      downloaded.
+      (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
+    :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
+      Defaults to true.
+    :return: A PIL image if ``single_image`` is true, and a list of six PIL images otherwise.
     """
-    faces = _generate_tile_list(panoid, zoom)
+    zoom = max(0, min(zoom, pano.max_zoom))
+    faces = _generate_tile_list(pano.id, zoom)
     _download_tiles(faces)
     return _stitch_panorama(faces, single_image=single_image)
+
+
+async def get_panorama_async(pano: StreetsidePanorama, session: ClientSession, zoom: int = 4,
+                             single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
+    zoom = max(0, min(zoom, pano.max_zoom))
+    faces = _generate_tile_list(pano.id, zoom)
+    await _download_tiles_async(faces, session)
+    return _stitch_panorama(faces, single_image=single_image)
+
+
+def _parse_panos(response):
+    panos = []
+    for pano in response[1:]:  # first object is elapsed time
+        pano_obj = _parse_pano(pano)
+        panos.append(pano_obj)
+    return panos
+
+
+def _parse_pano(pano):
+    # TODO: parse bl, nbn, pbn, ad fields
+    # as it turns out, months/days without leading zeros
+    # don't have a cross-platform format code in strptime.
+    # wanna guess what kind of dates bing returns?
+    datestr = pano["cd"]
+    datestr = datestr.split("/")
+    datestr[0] = datestr[0].rjust(2, "0")
+    datestr[1] = datestr[1].rjust(2, "0")
+    datestr = "/".join(datestr)
+    date = datetime.strptime(datestr, "%m/%d/%Y %I:%M:%S %p")
+    pano_obj = StreetsidePanorama(
+        id=pano["id"],
+        lat=pano["la"],
+        lon=pano["lo"],
+        date=date,
+        next=pano["ne"] if "ne" in pano else None,
+        previous=pano["pr"] if "pr" in pano else None,
+        elevation=pano["al"] if "al" in pano else None,
+        heading=math.radians(pano["he"]) if "he" in pano else None,
+        pitch=math.radians(pano["pi"]) if "pi" in pano else None,
+        roll=math.radians(pano["ro"]) if "ro" in pano else None,
+        max_zoom=int(pano["ml"])
+    )
+    return pano_obj
 
 
 def _generate_tile_list(panoid, zoom):
@@ -116,8 +194,8 @@ def _generate_tile_list(panoid, zoom):
     Generates a list of a panorama's tiles.
     Returns a list of faces and its tiles.
     """
-    if zoom > 3:
-        raise ValueError("Zoom can't be greater than 3")
+    if zoom > 4:
+        raise ValueError("Zoom can't be greater than 4")
     panoid_base4 = to_base4(panoid).rjust(16, "0")
     subdivs = pow(4, zoom)
     faces = {}
@@ -130,7 +208,8 @@ def _generate_tile_list(panoid, zoom):
             else:
                 subdiv_base4 = to_base4(subdiv).rjust(zoom, "0")
             tile_key = f"{face_id_base4}{subdiv_base4}"
-            url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/hs{panoid_base4}{tile_key}.jpg?g=0"
+            url = f"https://t.ssl.ak.tiles.virtualearth.net/tiles/hs{panoid_base4}{tile_key}.jpg?" \
+                  f"g=13716"
             face_tiles.append({"face": face_id_base4, "subdiv": subdiv, "url": url})
         faces[face_id] = face_tiles
     return faces
@@ -142,6 +221,16 @@ def _download_tiles(faces):
     """
     for face_id, face in faces.items():
         tiles = asyncio.run(download_files_async([tile["url"] for tile in face]))
+        for idx, tile in enumerate(face):
+            tile["image"] = tiles[idx]
+
+
+async def _download_tiles_async(faces, session: ClientSession):
+    """
+    Downloads the tiles of a panorama.
+    """
+    for face_id, face in faces.items():
+        tiles = await download_files_async([tile["url"] for tile in face], session)
         for idx, tile in enumerate(face):
             tile["image"] = tiles[idx]
 
@@ -159,7 +248,8 @@ def _stitch_four(face):
     return sub_tile
 
 
-split_list = lambda lst, sz: [lst[i:i+sz] for i in range(0, len(lst), sz)]
+def _split_list(list_, size):
+    return [list_[i:i + size] for i in range(0, len(list_), size)]
 
 
 def _stitch_face(face):
@@ -172,7 +262,7 @@ def _stitch_face(face):
         grid_size = int(math.sqrt(len(face)))
         stitched_tile_size = (grid_size // 2) * TILE_SIZE
         tile = Image.new('RGB', (stitched_tile_size * 2, stitched_tile_size * 2))
-        split = split_list(face, len(face) // 4)
+        split = _split_list(face, len(face) // 4)
         tile.paste(im=_stitch_face(split[0]), box=(0, 0))
         tile.paste(im=_stitch_face(split[1]), box=(stitched_tile_size, 0))
         tile.paste(im=_stitch_face(split[2]), box=(0, stitched_tile_size))
@@ -208,3 +298,13 @@ def _stitch_panorama(faces, single_image: bool = True) -> Union[List[Image.Image
         image.paste(im=stitched_faces[4], box=(1 * full_tile_size, 0))
         image.paste(im=stitched_faces[5], box=(1 * full_tile_size, 2 * full_tile_size))
         return image
+
+
+def _save_panorama(pano, path, single_image, pil_args):
+    if single_image:
+        pano.save(path, **pil_args)
+    else:
+        path = Path(path)
+        for idx, face in enumerate(pano):
+            face_path = path.parent / f"{path.stem}_{idx}{path.suffix}"
+            face.save(face_path, **pil_args)
