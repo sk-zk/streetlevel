@@ -1,4 +1,3 @@
-import pytest
 from pytest import approx
 import json
 from streetlevel import streetview
@@ -21,12 +20,12 @@ def mocked_get_coverage_tile_raw(tile_x, tile_y, session=None):
         return json.load(f)
 
 
-streetview.streetview.api.lookup_panoid_raw = mocked_lookup_panoid_raw
-streetview.streetview.api.find_panorama_raw = mocked_find_panorama_raw
-streetview.streetview.api.get_coverage_tile_raw = mocked_get_coverage_tile_raw
+streetview.api.lookup_panoid_raw = mocked_lookup_panoid_raw
+streetview.api.find_panorama_raw = mocked_find_panorama_raw
+streetview.api.get_coverage_tile_raw = mocked_get_coverage_tile_raw
 
 
-def test_is_third_party_panoid():
+def test_is_third_party_panoid(request):
     assert not streetview.is_third_party_panoid("n-Zd6bDDL_XOc_jkNgFsGg")
     assert streetview.is_third_party_panoid("AF1QipN3bwjvnpTUbfCZ18wsUMrpZ6Ul2mhVfNKl71_X")
 
