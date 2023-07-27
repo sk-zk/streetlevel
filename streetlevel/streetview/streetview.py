@@ -204,7 +204,7 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
         the highest available level will be downloaded. Defaults to 5.
     :return: A PIL image containing the panorama.
     """
-    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
+    zoom = _validate_get_panorama_params(pano, zoom)
     tile_list = _generate_tile_list(pano, zoom)
     tile_images = download_tiles(tile_list)
     stitched = stitch_tiles(tile_images,
@@ -214,13 +214,20 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
 
 
 async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image.Image:
-    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
+    zoom = _validate_get_panorama_params(pano, zoom)
     tile_list = _generate_tile_list(pano, zoom)
     tile_images = await download_tiles_async(tile_list, session)
     stitched = stitch_tiles(tile_images,
                             pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
                             pano.tile_size.x, pano.tile_size.y)
     return stitched
+
+
+def _validate_get_panorama_params(pano, zoom):
+    if not pano.image_sizes:
+        raise ValueError("pano.image_sizes is None.")
+    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
+    return zoom
 
 
 def _parse_coverage_tile_response(tile):
