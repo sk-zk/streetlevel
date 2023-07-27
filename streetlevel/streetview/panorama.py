@@ -46,7 +46,7 @@ class StreetViewPanorama:
     historical: List[StreetViewPanorama] = field(default_factory=list)
     """A list of panoramas with a different date at the same location."""
 
-    capture_date: CaptureDate = None
+    date: CaptureDate = None
     """
     The capture date. Note that, for official coverage, only month and year are available.
     For third-party coverage, the day is available also.
@@ -99,10 +99,10 @@ class StreetViewPanorama:
 
     def __repr__(self):
         output = str(self)
-        if self.capture_date is not None:
-            output += f" [{self.capture_date.year}-{self.capture_date.month:02d}"
-            if self.capture_date.day is not None:
-                output += f"-{self.capture_date.day:02d}"
+        if self.date is not None:
+            output += f" [{self.date.year}-{self.date.month:02d}"
+            if self.date.day is not None:
+                output += f"-{self.date.day:02d}"
             output += "]"
         return output
 
