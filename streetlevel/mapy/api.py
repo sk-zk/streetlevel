@@ -1,8 +1,17 @@
 from pyfrpc import FrpcClient
 from pyfrpc.asyncclient import AsyncFrpcClient
+import atexit
+import asyncio
 
 client = FrpcClient("https://pro.mapy.cz/panorpc")
 async_client = AsyncFrpcClient("https://pro.mapy.cz/panorpc")
+
+
+def exit_handler():
+    asyncio.run(async_client.close())
+
+
+atexit.register(exit_handler)
 
 headers = {
     # Cyclomedia panos (2020+) are only returned if this header is set
