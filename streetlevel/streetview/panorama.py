@@ -66,7 +66,7 @@ class StreetViewPanorama:
     | The address of the location and the languages of the names, e.g.:
     | ``[LocalizedString(value='3 Theaterpl.', language='de'), LocalizedString(value='Merano, Trentino-South Tyrol', language='en')]``.
     |
-    | This can be localized using the locale parameter on the find/lookup functions (if a localization is available). 
+    | This can be localized using the locale parameter on the `find` functions (if a localization is available). 
       For instance, requesting Italian locale (``it``) for the same location as above yields:
     | ``[LocalizedString(value='3 Piazza Teatro', language='it'), LocalizedString(value='Merano, Trentino-Alto Adige', language='it')]``.
     
