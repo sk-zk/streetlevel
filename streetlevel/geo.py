@@ -1,40 +1,26 @@
 import math
+from typing import Tuple
+
 import pyproj
 from scipy.spatial.transform import Rotation
 
-TILE_SIZE = 256
 geod = pyproj.Geod(ellps="WGS84")
 
 
-def mercator_to_wgs84(x, y):
-    lat = (2 * math.atan(math.exp((y - 128) / -(256 / (2 * math.pi)))) - math.pi / 2) / (math.pi / 180)
-    lon = (x - 128) / (256 / 360)
-    return lat, lon
-
-
-def tile_coord_to_wgs84(x, y, zoom):
+def tile_coord_to_wgs84(x: int, y: int, zoom: int) -> Tuple[float, float]:
     scale = 1 << zoom
-    pixel_coord = (x * TILE_SIZE, y * TILE_SIZE)
-    world_coord = (pixel_coord[0] / scale, pixel_coord[1] / scale)
-    lat_lon = mercator_to_wgs84(world_coord[0], world_coord[1])
-    return lat_lon
+    lon_deg = x / scale * 360.0 - 180.0
+    lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * y / scale)))
+    lat_deg = math.degrees(lat_rad)
+    return lat_deg, lon_deg
     
 
-def wgs84_to_tile_coord(lat, lon, zoom):
+def wgs84_to_tile_coord(lat: float, lon: float, zoom: int) -> Tuple[int, int]:
+    lat_rad = math.radians(lat)
     scale = 1 << zoom
-    world_coord = wgs84_to_mercator(lat, lon)
-    pixel_coord = (math.floor(world_coord[0] * scale), math.floor(world_coord[1] * scale))
-    tile_coord = (math.floor((world_coord[0] * scale) / TILE_SIZE), math.floor((world_coord[1] * scale) / TILE_SIZE))
-    return tile_coord
-
-
-def wgs84_to_mercator(lat, lon):
-    siny = math.sin((lat * math.pi) / 180.0)
-    siny = min(max(siny, -0.9999), 0.9999)
-    return (
-        TILE_SIZE * (0.5 + lon / 360.0),
-        TILE_SIZE * (0.5 - math.log((1 + siny) / (1 - siny)) / (4 * math.pi))
-    )
+    x = (lon + 180.0) / 360.0 * scale
+    y = (1.0 - math.asinh(math.tan(lat_rad)) / math.pi) / 2.0 * scale
+    return int(x), int(y)
 
 
 def create_bounding_box_around_point(lat, lon, radius):
