@@ -66,7 +66,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td align="center">✔</td>
-    <td align="center">⚫</td>
+    <td align="center">✔</td>
   </tr>
   <thead>
     <td colspan="5" style="padding-top:20px"><b>Imagery</b><br>
