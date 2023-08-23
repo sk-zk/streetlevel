@@ -29,3 +29,7 @@
 #streetlevel\.lookaround\.panorama\.LookaroundPanorama + dd .field-list {
   display:none !important;
 }
+
+#streetlevel\.yandex\.panorama\.YandexPanorama + dd .field-list {
+  display:none !important;
+}

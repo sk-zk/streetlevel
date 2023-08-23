@@ -12,6 +12,7 @@ a module for downloading panoramas and metadata from street-level imagery provid
    streetlevel.mapy
    streetlevel.streetside
    streetlevel.streetview
+   streetlevel.yandex
 
 
 Indices and tables

@@ -14,6 +14,8 @@ def try_get(accessor):
         return None
     except TypeError:
         return None
+    except KeyError:
+        return None
 
 
 async def download_files_async(urls: List[str], session: ClientSession = None) -> List[bytes]:
