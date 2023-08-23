@@ -27,8 +27,8 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
 <table>
   <thead>
     <th></th>
-    <th align="center">Google Street View</th>
-    <th align="center">Apple Look Around</th>
+    <th align="center">Google Street&nbsp;View</th>
+    <th align="center">Apple Look&nbsp;Around</th>
     <th align="center">Yandex Panorama</th>
     <th align="center">Bing Streetside</th>
     <th align="center">Mapy.cz Panorama</th>
