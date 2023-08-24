@@ -70,7 +70,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="right">Get specific panorama by ID</td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
-    <td align="center">❌</td>
+    <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
   </tr>

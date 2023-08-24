@@ -44,11 +44,38 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession) ->
     return pano
 
 
+def find_panorama_by_id(panoid: str, session: Session = None) -> Optional[YandexPanorama]:
+    """
+    Fetches metadata of a specific panorama.
+
+    :param panoid: The pano ID.
+    :param session: *(optional)* A requests session.
+    :return: A YandexPanorama object if a panorama with this ID exists, or None.
+    """
+    resp = api.find_panorama_by_id_raw(panoid, session)
+
+    if resp["status"] == "error":
+        return None
+
+    pano = _parse_panorama(resp)
+    return pano
+
+
+async def find_panorama_by_id_async(panoid: str, session: ClientSession) -> Optional[YandexPanorama]:
+    resp = await api.find_panorama_by_id_raw_async(panoid, session)
+
+    if resp["status"] == "error":
+        return None
+
+    pano = _parse_panorama(resp)
+    return pano
+
+
 def get_panorama(pano: YandexPanorama, zoom: int = 0) -> Image.Image:
     """
     Downloads a panorama and returns it as PIL image.
 
-    Note that official Yandex panoramas have their bottom part cropped out.
+    Note that most official car coverage has its bottom part cropped out.
 
     :param pano: The panorama to download.
     :param zoom: *(optional)* Image size; 0 is highest, 4 is lowest. The dimensions of a zoom level of a
