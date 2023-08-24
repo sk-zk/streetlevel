@@ -130,7 +130,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="right">Heading, pitch, roll</td>
     <td align="center">✔</td>
     <td align="center">🟡<br>(only heading is implemented; inaccurate in some locations)</td>
-    <td align="center">❌</td>
+    <td align="center">✔<br>(only heading; pitch/roll do not appear to be available)</td>
     <td align="center">✔</td>
     <td align="center">✔<br></td>
   </tr>

@@ -161,6 +161,8 @@ def _parse_panorama(raw_pano: dict) -> YandexPanorama:
         lat=float(data["Data"]["Point"]["coordinates"][1]),
         lon=float(data["Data"]["Point"]["coordinates"][0]),
 
+        heading=math.radians(float(data["Data"]["EquirectangularProjection"]["Origin"][0])),
+
         image_id=data["Data"]["Images"]["imageId"],
         tile_size=Size(int(data["Data"]["Images"]["Tiles"]["width"]),
                        int(data["Data"]["Images"]["Tiles"]["height"])),
