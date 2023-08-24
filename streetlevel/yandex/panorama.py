@@ -42,3 +42,13 @@ class YandexPanorama:
     author_avatar_url: str = None
     """URL of the uploader's avatar; only set for third-party panoramas. 
     Replace ``%s`` with ``small`` (25x25), ``normal`` (100x100) or ``big`` (500x500) to get the respective size."""
+
+    def __repr__(self):
+        output = str(self)
+        if self.date is not None:
+            output += f" [{self.date}]"
+        return output
+
+    def __str__(self):
+        return f"{self.id} ({self.lat:.6}, {self.lon:.6})"
+
