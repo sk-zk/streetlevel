@@ -142,7 +142,7 @@ def _parse_panorama(raw_pano: dict) -> YandexPanorama:
         neighbors=_parse_neighbors(data["Annotation"]["Graph"]["Nodes"]),
         historical=_parse_historical(data["Annotation"]["HistoricalPanoramas"], panoid),
 
-        date=datetime.utcfromtimestamp(data["Data"]["timestamp"]),
+        date=_get_date_from_panoid(panoid),
 
         street_name=data["Data"]["Point"]["name"],
 
@@ -150,6 +150,10 @@ def _parse_panorama(raw_pano: dict) -> YandexPanorama:
         author_avatar_url=try_get(lambda: data["Author"]["avatarUrlTemplate"]),
     )
     return pano
+
+
+def _get_date_from_panoid(panoid: str) -> datetime:
+    return datetime.utcfromtimestamp(int(panoid.split("_")[-1]))
 
 
 def _parse_image_sizes(zooms: dict) -> List[Size]:
@@ -168,7 +172,7 @@ def _parse_neighbors(nodes: List[dict]) -> List[YandexPanorama]:
             id=panoid,
             lat=float(node["lat"]),
             lon=float(node["lon"]),
-            date=datetime.utcfromtimestamp(int(panoid.split("_")[-1]))
+            date=_get_date_from_panoid(panoid)
         )
         panos.append(pano)
     return panos
@@ -184,7 +188,7 @@ def _parse_historical(historical: List[dict], parent_id: str) -> List[YandexPano
             id=panoid,
             lat=float(raw_pano["Connection"]["Point"]["coordinates"][1]),
             lon=float(raw_pano["Connection"]["Point"]["coordinates"][0]),
-            date=datetime.utcfromtimestamp(int(panoid.split("_")[-1]))
+            date=_get_date_from_panoid(panoid)
         )
         panos.append(pano)
     panos = sorted(panos, key=lambda x: x.date, reverse=True)
