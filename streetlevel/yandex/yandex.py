@@ -166,7 +166,7 @@ def _parse_panorama(raw_pano: dict) -> YandexPanorama:
                        int(data["Data"]["Images"]["Tiles"]["height"])),
         image_sizes=_parse_image_sizes(data["Data"]["Images"]["Zooms"]),
 
-        neighbors=_parse_neighbors(data["Annotation"]["Graph"]["Nodes"]),
+        neighbors=_parse_neighbors(data["Annotation"]["Graph"]["Nodes"], panoid),
         historical=_parse_historical(data["Annotation"]["HistoricalPanoramas"], panoid),
 
         date=_get_date_from_panoid(panoid),
@@ -191,10 +191,12 @@ def _parse_image_sizes(zooms: dict) -> List[Size]:
     return sizes
 
 
-def _parse_neighbors(nodes: List[dict]) -> List[YandexPanorama]:
+def _parse_neighbors(nodes: List[dict], parent_id: str) -> List[YandexPanorama]:
     panos = []
     for node in nodes:
         panoid = node["panoid"]
+        if panoid == parent_id:
+            continue
         pano = YandexPanorama(
             id=panoid,
             lat=float(node["lat"]),
