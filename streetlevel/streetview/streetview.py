@@ -95,9 +95,6 @@ def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str =
     return pano
 
 
-lookup_panoid = find_panorama_by_id
-
-
 async def find_panorama_by_id_async(panoid: str, session: ClientSession, download_depth: bool = False,
                                     locale: str = "en") -> Optional[StreetViewPanorama]:
     resp = await api.lookup_panoid_raw_async(panoid, session, download_depth=download_depth, locale=locale)
