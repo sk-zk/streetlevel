@@ -40,30 +40,18 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
   </thead>
   <tr>
     <td align="right">Find panoramas around a point</td>
-    <td align="center">✔<br>
-      (returns closest only)
-    </td>
+    <td align="center">✔<sup>1</sup></td>
     <td align="center">⚫</td>
-    <td align="center">✔<br>
-      (returns closest only)
-    </td>
+    <td align="center">✔<sup>1</sup></td>
     <td align="center">✔</td>
-    <td align="center">✔<br>
-      (returns closest only)
-    </td>
+    <td align="center">✔<sup>1</sup></td>
   </tr>
   <tr>
     <td align="right">Find panoramas by slippy map tile or bounding box</td>
-    <td align="center">✔<br>
-      (tile, z=17)
-    </td>
-    <td align="center">✔<br>
-      (tile, z=17)
-    </td>
+    <td align="center">✔<sup>2</sup></td>
+    <td align="center">✔<sup>2</sup></td>
     <td align="center">⚫</td>
-    <td align="center">✔<br>
-      (bounding box)
-    </td>
+    <td align="center">✔<sup>3</sup></td>
     <td align="center">⚫</td>
   </tr>
   <tr>
@@ -82,14 +70,14 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
   <tr>
     <td align="right">Download panoramas</td>
     <td align="center">✔</td>
-    <td align="center">✔<br>(unstitched)</td>
+    <td align="center">✔<sup>4</sup></td>
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
   </tr>
   <tr>
     <td align="right">Download depth information</td>
-    <td align="center">✔<br>(simplified)</td>
+    <td align="center">✔<sup>5</sup></td>
     <td align="center">❌</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
@@ -118,9 +106,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
   </thead>
   <tr>
     <td align="right">Capture date</td>
-    <td align="center">✔<br>
-      (month and year only for official coverage; full date for inofficial coverage)
-    </td>
+    <td align="center">✔<sup>6</sup></td>
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
@@ -129,8 +115,8 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
   <tr>
     <td align="right">Heading, pitch, roll</td>
     <td align="center">✔</td>
-    <td align="center">🟡<br>(only heading is implemented; inaccurate in some locations)</td>
-    <td align="center">✔<br>(only heading; pitch/roll do not appear to be available)</td>
+    <td align="center">🟡<sup>7</sup></td>
+    <td align="center">✔<sup>8</sup></td>
     <td align="center">✔</td>
     <td align="center">✔<br></td>
   </tr>
@@ -147,9 +133,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td align="center">✔</td>
-    <td align="center">✔<br>
-      (previous and next image in sequence)
-    </td>
+    <td align="center">✔<sup>9</sup></td>
     <td align="center">✔</td>
   </tr>
   <tr>
@@ -164,7 +148,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="right">Address</td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
-    <td align="center">✔<br>(street name only)</td>
+    <td align="center">✔<sup>10</sup></td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
   </tr>
@@ -177,3 +161,14 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
   </tr>
 </table>
+
+1: Returns closest only  
+2: Tile, z=17  
+3: Bounding box  
+4: Unstitched  
+5: Simplified  
+6: Month and year only for official coverage, full date for inofficial coverage  
+7: Only heading is implemented; inaccurate in some locations  
+8: Only heading; pitch/roll do not appear to be available  
+9: Previous and next image in sequence  
+10: Street name only
