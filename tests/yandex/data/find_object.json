@@ -1,0 +1,517 @@
+{
+  "status": "success",
+  "data": {
+    "Data": {
+      "panoramaId": "1238072810_692204477_23_1688105969",
+      "timestamp": 1686830400,
+      "Point": {
+        "type": "Point",
+        "name": "\u043f\u0440\u0430\u0441\u043f\u0435\u043a\u0442 \u041c\u0430\u0448\u044d\u0440\u0430\u0432\u0430",
+        "coordinates": [
+          27.5481284128,
+          53.917632683794565,
+          0
+        ]
+      },
+      "EquirectangularProjection": {
+        "Origin": [
+          82.05,
+          27.3811
+        ]
+      },
+      "Images": {
+        "imageId": "WhpeuZGm2FIL",
+        "Zooms": [
+          {
+            "level": 0,
+            "width": 17664,
+            "height": 6145
+          },
+          {
+            "level": 1,
+            "width": 7168,
+            "height": 2493
+          },
+          {
+            "level": 2,
+            "width": 3584,
+            "height": 1246
+          },
+          {
+            "level": 3,
+            "width": 1792,
+            "height": 623
+          },
+          {
+            "level": 4,
+            "width": 512,
+            "height": 178
+          }
+        ],
+        "Tiles": {
+          "width": 256,
+          "height": 256
+        }
+      },
+      "View": {
+        "Direction": [
+          0,
+          0
+        ],
+        "Span": [
+          130,
+          80
+        ]
+      }
+    },
+    "Annotation": {
+      "Connections": [],
+      "Thoroughfares": [
+        {
+          "Direction": [
+            82.02661351129295,
+            0
+          ],
+          "Connection": {
+            "name": "\u043f\u0440\u0430\u0441\u043f\u0435\u043a\u0442 \u041c\u0430\u0448\u044d\u0440\u0430\u0432\u0430",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238074593_692204228_23_1688105967&provider=streetview&l=stv&lang=en_US"
+          },
+          "style": "https://yandex.st/swf/streetview/2_23/style/style.xml#markerStyle"
+        },
+        {
+          "Direction": [
+            -97.95111105928305,
+            0
+          ],
+          "Connection": {
+            "name": "\u043f\u0440\u0430\u0441\u043f\u0435\u043a\u0442 \u041c\u0430\u0448\u044d\u0440\u0430\u0432\u0430",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238070046_692204863_23_1688105971&provider=streetview&l=stv&lang=en_US"
+          },
+          "style": "https://yandex.st/swf/streetview/2_23/style/style.xml#markerStyle"
+        }
+      ],
+      "Markers": [],
+      "Companies": [],
+      "HistoricalPanoramas": [
+        {
+          "timestamp": 1686830400,
+          "Connection": {
+            "oid": "1238072810_692204477_23_1688105969",
+            "name": "2023",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238072810_692204477_23_1688105969&provider=streetview&l=stv&lang=en_US&connectionsTimestamp=1686830400",
+            "Point": {
+              "type": "Point",
+              "coordinates": [
+                27.5481284128,
+                53.917632683794565,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "timestamp": 1557921600,
+          "Connection": {
+            "oid": "1238071822_692204823_23_1557670876",
+            "name": "2019",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238071822_692204823_23_1557670876&provider=streetview&l=stv&lang=en_US&connectionsTimestamp=1557921600",
+            "Point": {
+              "type": "Point",
+              "coordinates": [
+                27.547962795199997,
+                53.917598519494554,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "timestamp": 1284552000,
+          "Connection": {
+            "oid": "1238072784_692205596_23_1285494667",
+            "name": "2010",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238072784_692205596_23_1285494667&provider=streetview&l=stv&lang=en_US&connectionsTimestamp=1284552000",
+            "Point": {
+              "type": "Point",
+              "coordinates": [
+                27.548124,
+                53.91752199999456,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "timestamp": 1413374400,
+          "Connection": {
+            "oid": "1238074103_692204521_23_1412433979",
+            "name": "2014",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238074103_692204521_23_1412433979&provider=streetview&l=stv&lang=en_US&connectionsTimestamp=1413374400",
+            "Point": {
+              "type": "Point",
+              "coordinates": [
+                27.5483452131,
+                53.917628383794586,
+                0
+              ]
+            }
+          }
+        }
+      ],
+      "Graph": {
+        "Nodes": [
+          {
+            "id": 0,
+            "lon": 27.5481284128,
+            "lat": 53.917632683794565,
+            "panoid": "1238072810_692204477_23_1688105969",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238072810_692204477_23_1688105969&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 1,
+            "lon": 27.5484273498,
+            "lat": 53.917657343394545,
+            "panoid": "1238074593_692204228_23_1688105967",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238074593_692204228_23_1688105967&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 2,
+            "lon": 27.5476650475,
+            "lat": 53.91759456699456,
+            "panoid": "1238070046_692204863_23_1688105971",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238070046_692204863_23_1688105971&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 3,
+            "lon": 27.5487933041,
+            "lat": 53.91768649419454,
+            "panoid": "1238076776_692203934_23_1688105966",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238076776_692203934_23_1688105966&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 4,
+            "lon": 27.5472030682,
+            "lat": 53.91755563139458,
+            "panoid": "1238067290_692205256_23_1688105973",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238067290_692205256_23_1688105973&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 5,
+            "lon": 27.5492507165,
+            "lat": 53.91772850049456,
+            "panoid": "1238079505_692203509_23_1688105963",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238079505_692203509_23_1688105963&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 6,
+            "lon": 27.546908237199997,
+            "lat": 53.91752863059456,
+            "panoid": "1238065531_692205529_23_1688105974",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238065531_692205529_23_1688105974&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 7,
+            "lon": 27.5497064237,
+            "lat": 53.91777320629455,
+            "panoid": "1238082223_692203057_23_1688105961",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238082223_692203057_23_1688105961&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 8,
+            "lon": 27.54645048,
+            "lat": 53.91747900049455,
+            "panoid": "1238062801_692206030_23_1688105976",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238062801_692206030_23_1688105976&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 9,
+            "lon": 27.549841151699997,
+            "lat": 53.917786121894544,
+            "panoid": "1238083027_692202927_23_1688105960",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238083027_692202927_23_1688105960&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 10,
+            "lon": 27.5497070263,
+            "lat": 53.917601919694555,
+            "panoid": "1238082227_692204788_23_1688111539",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238082227_692204788_23_1688111539&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 11,
+            "lon": 27.5460030229,
+            "lat": 53.91741166069456,
+            "panoid": "1238060131_692206711_23_1688105978",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238060131_692206711_23_1688105978&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 12,
+            "lon": 27.550298778599995,
+            "lat": 53.917827502194555,
+            "panoid": "1238085757_692202509_23_1688105958",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238085757_692202509_23_1688105958&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 13,
+            "lon": 27.5492488014,
+            "lat": 53.91756472069456,
+            "panoid": "1238079493_692205164_23_1688111537",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238079493_692205164_23_1688111537&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 14,
+            "lon": 27.550164976700003,
+            "lat": 53.91763717319457,
+            "panoid": "1238084958_692204432_23_1688111541",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238084958_692204432_23_1688111541&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 15,
+            "lon": 27.5455658314,
+            "lat": 53.91732175579458,
+            "panoid": "1238057523_692207619_23_1688105980",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238057523_692207619_23_1688105980&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 16,
+            "lon": 27.5507641612,
+            "lat": 53.917866565494556,
+            "panoid": "1238088533_692202114_23_1688105956",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238088533_692202114_23_1688105956&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 17,
+            "lon": 27.548795333499996,
+            "lat": 53.91752475879456,
+            "panoid": "1238076788_692205568_23_1688111535",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238076788_692205568_23_1688111535&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 18,
+            "lon": 27.550621824399997,
+            "lat": 53.91767004959454,
+            "panoid": "1238087684_692204100_23_1688111543",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238087684_692204100_23_1688111543&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 19,
+            "lon": 27.5451436121,
+            "lat": 53.917212451594565,
+            "panoid": "1238055005_692208724_23_1688105982",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238055005_692208724_23_1688105982&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 20,
+            "lon": 27.551228949699997,
+            "lat": 53.917897920894546,
+            "panoid": "1238091305_692201797_23_1688105953",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238091305_692201797_23_1688105953&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 21,
+            "lon": 27.548345091599998,
+            "lat": 53.91748350719456,
+            "panoid": "1238074102_692205985_23_1688111533",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238074102_692205985_23_1688111533&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 22,
+            "lon": 27.550905405099996,
+            "lat": 53.91769562729457,
+            "panoid": "1238089375_692203841_23_1687093977",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238089375_692203841_23_1687093977&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 23,
+            "lon": 27.544736752799995,
+            "lat": 53.91708909149456,
+            "panoid": "1238052578_692209970_23_1688105984",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238052578_692209970_23_1688105984&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 24,
+            "lon": 27.551698279499995,
+            "lat": 53.91792052549456,
+            "panoid": "1238094105_692201569_23_1688105951",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238094105_692201569_23_1688105951&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 25,
+            "lon": 27.547891793599998,
+            "lat": 53.91744504239456,
+            "panoid": "1238071398_692206374_23_1688111531",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238071398_692206374_23_1688111531&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 26,
+            "lon": 27.550975589399997,
+            "lat": 53.91764277529456,
+            "panoid": "1238089794_692204376_23_1687093979",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238089794_692204376_23_1687093979&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 27,
+            "lon": 27.5511417648,
+            "lat": 53.91771939569456,
+            "panoid": "1238090785_692203601_23_1689046072",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238090785_692203601_23_1689046072&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 28,
+            "lon": 27.550927310899997,
+            "lat": 53.91751373059456,
+            "panoid": "1238089506_692205679_23_1687093981",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238089506_692205679_23_1687093981&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 29,
+            "lon": 27.551553606799995,
+            "lat": 53.91772375609458,
+            "panoid": "1238093242_692203557_23_1688111548",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238093242_692203557_23_1688111548&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 30,
+            "lon": 27.5510074867,
+            "lat": 53.91756243159457,
+            "panoid": "1238089984_692205187_23_1689046058",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238089984_692205187_23_1689046058&provider=streetview&l=stv&lang=en_US"
+          },
+          {
+            "id": 31,
+            "lon": 27.5508699426,
+            "lat": 53.91739377699455,
+            "panoid": "1238089164_692206892_23_1687093983",
+            "href": "https://api-maps.yandex.ru/services/panoramas/1.x?oid=1238089164_692206892_23_1687093983&provider=streetview&l=stv&lang=en_US"
+          }
+        ],
+        "Edges": [
+          {
+            "src": 0,
+            "dst": 1
+          },
+          {
+            "src": 0,
+            "dst": 2
+          },
+          {
+            "src": 1,
+            "dst": 3
+          },
+          {
+            "src": 2,
+            "dst": 4
+          },
+          {
+            "src": 3,
+            "dst": 5
+          },
+          {
+            "src": 4,
+            "dst": 6
+          },
+          {
+            "src": 5,
+            "dst": 7
+          },
+          {
+            "src": 6,
+            "dst": 8
+          },
+          {
+            "src": 7,
+            "dst": 9
+          },
+          {
+            "src": 10,
+            "dst": 7
+          },
+          {
+            "src": 8,
+            "dst": 11
+          },
+          {
+            "src": 9,
+            "dst": 12
+          },
+          {
+            "src": 13,
+            "dst": 10
+          },
+          {
+            "src": 10,
+            "dst": 14
+          },
+          {
+            "src": 11,
+            "dst": 15
+          },
+          {
+            "src": 12,
+            "dst": 16
+          },
+          {
+            "src": 17,
+            "dst": 13
+          },
+          {
+            "src": 14,
+            "dst": 18
+          },
+          {
+            "src": 15,
+            "dst": 19
+          },
+          {
+            "src": 16,
+            "dst": 20
+          },
+          {
+            "src": 21,
+            "dst": 17
+          },
+          {
+            "src": 18,
+            "dst": 22
+          },
+          {
+            "src": 19,
+            "dst": 23
+          },
+          {
+            "src": 20,
+            "dst": 24
+          },
+          {
+            "src": 21,
+            "dst": 25
+          },
+          {
+            "src": 22,
+            "dst": 26
+          },
+          {
+            "src": 22,
+            "dst": 27
+          },
+          {
+            "src": 28,
+            "dst": 26
+          },
+          {
+            "src": 27,
+            "dst": 29
+          },
+          {
+            "src": 30,
+            "dst": 27
+          },
+          {
+            "src": 31,
+            "dst": 28
+          }
+        ]
+      }
+    }
+  }
+}
