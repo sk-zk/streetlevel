@@ -30,7 +30,7 @@ def find_panorama(lat: float, lon: float, session: Session = None) -> Optional[Y
     if resp["status"] == "error":
         return None
 
-    pano = _parse_panorama(resp)
+    pano = _parse_panorama(resp["data"])
     return pano
 
 
@@ -40,7 +40,7 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession) ->
     if resp["status"] == "error":
         return None
 
-    pano = _parse_panorama(resp)
+    pano = _parse_panorama(resp["data"])
     return pano
 
 
@@ -57,7 +57,7 @@ def find_panorama_by_id(panoid: str, session: Session = None) -> Optional[Yandex
     if resp["status"] == "error":
         return None
 
-    pano = _parse_panorama(resp)
+    pano = _parse_panorama(resp["data"])
     return pano
 
 
@@ -67,7 +67,7 @@ async def find_panorama_by_id_async(panoid: str, session: ClientSession) -> Opti
     if resp["status"] == "error":
         return None
 
-    pano = _parse_panorama(resp)
+    pano = _parse_panorama(resp["data"])
     return pano
 
 
@@ -153,8 +153,7 @@ def _validate_get_panorama_params(pano: YandexPanorama, zoom: int) -> int:
     return zoom
 
 
-def _parse_panorama(raw_pano: dict) -> YandexPanorama:
-    data = raw_pano["data"]
+def _parse_panorama(data: dict) -> YandexPanorama:
     panoid = data["Data"]["panoramaId"]
     pano = YandexPanorama(
         id=panoid,
