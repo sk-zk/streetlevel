@@ -9,13 +9,24 @@ pip install streetlevel
 ```
 
 ## Example
-Downloading the closest Street View panorama to a specific location:
+Downloading the closest Street View panorama to a specific location, sync:
 
 ```python
 from streetlevel import streetview
 
 pano = streetview.find_panorama(46.8839586, 12.169002)
 streetview.download_panorama(pano, f"{pano.id}.jpg")
+```
+
+Or async:
+
+```python
+from streetlevel import streetview
+from aiohttp import ClientSession
+
+session = ClientSession()
+pano = await streetview.find_panorama_async(46.8839586, 12.169002, session)
+await streetview.download_panorama_async(pano, f"{pano.id}.jpg", session)
 ```
 
 ## Documentation
