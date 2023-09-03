@@ -4,7 +4,12 @@ from streetlevel import streetview
 from streetlevel.dataclasses import Size
 
 
-def mocked_lookup_panoid_raw(panoid, download_depth=False, locale="en", session=None):
+def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    with open("streetview/data/lookup_object.json", "r") as f:
+        return json.load(f)
+
+
+def mocked_find_panorama_by_id_raw_async(panoid, session, download_depth=False, locale="en"):
     with open("streetview/data/lookup_object.json", "r") as f:
         return json.load(f)
 
@@ -15,13 +20,20 @@ def mocked_find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="
         return json.load(f)
 
 
+async def mocked_find_panorama_raw_async(lat, lon, session, radius=50, download_depth=False, locale="en",
+                                         search_third_party=False):
+    with open("streetview/data/find_object.json", "r") as f:
+        return json.load(f)
+
+
 def mocked_get_coverage_tile_raw(tile_x, tile_y, session=None):
     with open("streetview/data/coverage_tile_object.json", "r") as f:
         return json.load(f)
 
 
-streetview.api.lookup_panoid_raw = mocked_lookup_panoid_raw
+streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
 streetview.api.find_panorama_raw = mocked_find_panorama_raw
+streetview.api.find_panorama_raw_async = mocked_find_panorama_raw_async
 streetview.api.get_coverage_tile_raw = mocked_get_coverage_tile_raw
 
 
@@ -32,7 +44,7 @@ def test_is_third_party_panoid(request):
 
 def test_find_panorama_by_id():
     panoid = "n-Zd6bDDL_XOc_jkNgFsGg"
-    pano = streetview.find_panorama_by_id(panoid, download_depth=False, locale="en", session=None)
+    pano = streetview.find_panorama_by_id(panoid, download_depth=False, session=None)
     assert pano.id == panoid
     assert pano.lat == approx(47.15048822721601, 0.001)
     assert pano.lon == approx(11.13385612403307, 0.001)
@@ -46,7 +58,14 @@ def test_find_panorama_by_id():
 
 def test_find_panorama():
     pano = streetview.find_panorama(47.15048822721601, 11.13385612403307,
-                                    radius=100, locale="en", session=None)
+                                    radius=100, session=None)
+    assert pano.id == "n-Zd6bDDL_XOc_jkNgFsGg"
+    assert pano.lat == approx(47.15048822721601, 0.001)
+    assert pano.lon == approx(11.13385612403307, 0.001)
+
+
+async def test_find_panorama_async():
+    pano = await streetview.find_panorama_async(47.15048822721601, 11.13385612403307, None, radius=100)
     assert pano.id == "n-Zd6bDDL_XOc_jkNgFsGg"
     assert pano.lat == approx(47.15048822721601, 0.001)
     assert pano.lon == approx(11.13385612403307, 0.001)

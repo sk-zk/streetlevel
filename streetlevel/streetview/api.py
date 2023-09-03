@@ -104,7 +104,7 @@ async def find_panorama_raw_async(lat, lon, session: aiohttp.ClientSession, radi
     return convert_find_panorama_response_to_json(text)
 
 
-def build_lookup_panoid_request_url(panoid, download_depth, locale):
+def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
     pano_type = 10 if is_third_party_panoid(panoid) else 2
     toggles = []
     include_resolution_info = True
@@ -170,30 +170,30 @@ def build_lookup_panoid_request_url(panoid, download_depth, locale):
     return url
 
 
-def convert_lookup_panoid_response_to_json(text):
+def convert_find_panorama_by_id_response_to_text(text):
     metadata_json = text[4:]  # skip that junk at the start
     metadata = json.loads(metadata_json)
     return metadata
 
 
-def lookup_panoid_raw(panoid, download_depth=False, locale="en", session=None):
-    url = build_lookup_panoid_request_url(panoid, download_depth, locale)
+def find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    url = build_find_panorama_by_id_request_url(panoid, download_depth, locale)
 
     if session is None:
         text = requests.get(url).text
     else:
         text = session.get(url).text
 
-    return convert_lookup_panoid_response_to_json(text)
+    return convert_find_panorama_by_id_response_to_text(text)
 
 
-async def lookup_panoid_raw_async(panoid, session, download_depth=False, locale="en"):
-    url = build_lookup_panoid_request_url(panoid, download_depth, locale)
+async def find_panorama_by_id_raw_async(panoid, session, download_depth=False, locale="en"):
+    url = build_find_panorama_by_id_request_url(panoid, download_depth, locale)
 
     async with session.get(url) as response:
         text = await response.text()
 
-    return convert_lookup_panoid_response_to_json(text)
+    return convert_find_panorama_by_id_response_to_text(text)
 
 
 def build_coverage_tile_request_url(tile_x, tile_y):

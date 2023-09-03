@@ -81,7 +81,7 @@ def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str =
     :param session: *(optional)* A requests session.
     :return: A StreetViewPanorama object if a panorama with this ID exists, or None.
     """
-    resp = api.lookup_panoid_raw(panoid, download_depth=download_depth,
+    resp = api.find_panorama_by_id_raw(panoid, download_depth=download_depth,
                                  locale=locale, session=session)
 
     response_code = resp[1][0][0][0]
@@ -97,7 +97,7 @@ def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str =
 
 async def find_panorama_by_id_async(panoid: str, session: ClientSession, download_depth: bool = False,
                                     locale: str = "en") -> Optional[StreetViewPanorama]:
-    resp = await api.lookup_panoid_raw_async(panoid, session, download_depth=download_depth, locale=locale)
+    resp = await api.find_panorama_by_id_raw_async(panoid, session, download_depth=download_depth, locale=locale)
 
     response_code = resp[1][0][0][0]
     # 1: OK
