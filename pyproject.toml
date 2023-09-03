@@ -19,7 +19,11 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Topic :: Scientific/Engineering :: GIS",
 ]
+dynamic = ["dependencies"]
 
 [project.urls]
 "Homepage" = "https://github.com/sk-zk/streetlevel"
 "Bug Tracker" = "https://github.com/sk-zk/streetlevel/issues"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
