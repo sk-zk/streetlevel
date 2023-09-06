@@ -33,3 +33,7 @@
 #streetlevel\.yandex\.panorama\.YandexPanorama + dd .field-list {
   display:none !important;
 }
+
+#streetlevel\.kakao\.panorama\.KakaoPanorama + dd .field-list {
+  display:none !important;
+}
