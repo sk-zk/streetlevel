@@ -60,4 +60,4 @@ class MapyPanorama:
         return str(self)
 
     def __str__(self):
-        return f"{self.id} ({self.lat:.6}, {self.lon:.6}) [{self.date}]"
+        return f"{self.id} ({self.lat:.5f}, {self.lon:.5f}) [{self.date}]"
