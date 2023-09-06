@@ -51,7 +51,7 @@ def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
     :param east: lon2.
     :param limit: *(optional)* Maximum number of results to return. Defaults to 50.
     :param session: *(optional)* A requests session.
-    :return: A list of StreetsidePanoramas.
+    :return: A list of StreetsidePanorama objects.
     """
     response = api.find_panoramas_raw(north, west, south, east, limit, session)
     panos = _parse_panos(response)
@@ -76,7 +76,7 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
       term, but you get the idea.) Defaults to 25.
     :param limit: *(optional)* Maximum number of results to return. Defaults to 50.
     :param session: *(optional)* A requests session.
-    :return: A list of StreetsidePanoramas.
+    :return: A list of StreetsidePanorama objects.
     """
     top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
     return find_panoramas_in_bbox(
