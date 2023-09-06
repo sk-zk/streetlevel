@@ -57,7 +57,7 @@ class MapyPanorama:
     """A list of panoramas with a different date at the same location."""
 
     def __repr__(self):
-        return str(self)
+        return str(self) + f" [{self.date}]"
 
     def __str__(self):
-        return f"{self.id} ({self.lat:.5f}, {self.lon:.5f}) [{self.date}]"
+        return f"{self.id} ({self.lat:.5f}, {self.lon:.5f})"
