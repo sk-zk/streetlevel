@@ -9,15 +9,15 @@ class CameraType(IntEnum):
     """
     The camera a panorama was captured with. Identifiers are taken directly from ``panorama.js``.
     """
-    PANOZIP = 100,
-    ROTATOR = 101,
-    CAR = 102,
-    SKY = 103,
-    NAVER_CAR = 200,
-    INSTA360 = 201,
-    INSTA_TITAN = 202,
-    SEA = 203,
-    SDMG_OFFICE = 204
+    PANOZIP = 100,  #:
+    ROTATOR = 101,  #:
+    CAR = 102,  #:
+    SKY = 103,  #:
+    NAVER_CAR = 200,  #:
+    INSTA360 = 201,  #:
+    INSTA_TITAN = 202,  #:
+    SEA = 203,  #:
+    SDMG_OFFICE = 204  #:
 
 
 @dataclass
