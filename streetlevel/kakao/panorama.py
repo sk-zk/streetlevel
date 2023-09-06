@@ -24,7 +24,7 @@ class CameraType(IntEnum):
 class KakaoPanorama:
     """Metadata of a Kakao Road View panorama."""
 
-    id: str
+    id: int
     """The pano ID."""
     lat: float
     """Latitude of the panorama's location."""
