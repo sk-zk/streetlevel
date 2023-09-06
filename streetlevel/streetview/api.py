@@ -1,9 +1,8 @@
 import aiohttp
-import json
 from typing import Tuple
-import requests
 from .protobuf import *
 from .util import is_third_party_panoid
+from ..util import get_json, get_json_async
 
 
 def split_ietf(tag: str) -> Tuple[str, str]:
@@ -14,6 +13,12 @@ def split_ietf(tag: str) -> Tuple[str, str]:
     lang = parts[0]
     country = parts[1] if len(parts) > 1 else parts[0]
     return lang, country
+
+
+def build_coverage_tile_request_url(tile_x, tile_y):
+    url = "https://www.google.com/maps/photometa/ac/v1?pb=!1m1!1smaps_sv.tactile!6m3!1i{0}!2i{1}!3i17!8b1"
+    url = url.format(tile_x, tile_y)
+    return url
 
 
 def build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party):
@@ -73,35 +78,6 @@ def build_find_panorama_request_url(lat, lon, radius, download_depth, locale, se
           + to_protobuf_url(search_message) + "&callback=_xdc_._v2mub5"
           
     return url
-
-
-def convert_find_panorama_response_to_json(text):
-    first_paren = text.index("(")
-    last_paren = text.rindex(")")
-    metadata_json = "[" + text[first_paren + 1:last_paren] + "]"
-    metadata = json.loads(metadata_json)
-    return metadata
-    
-
-def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", search_third_party=False, session=None):
-    url = build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party)
-
-    if session is None:
-        text = requests.get(url).text
-    else:
-        text = session.get(url).text
-
-    return convert_find_panorama_response_to_json(text)
-
-
-async def find_panorama_raw_async(lat, lon, session: aiohttp.ClientSession, radius=50,
-                                  download_depth=False, locale="en", search_third_party=False):
-    url = build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party)
-
-    async with session.get(url) as response:
-        text = await response.text()
-
-    return convert_find_panorama_response_to_json(text)
 
 
 def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
@@ -166,63 +142,56 @@ def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
     }
     url = f"https://www.google.com/maps/photometa/v1?authuser=0&hl={ietf_lang}&gl={ietf_country}&pb=" \
           + to_protobuf_url(pano_request_message)
-          
+
     return url
 
 
-def convert_find_panorama_by_id_response_to_text(text):
-    metadata_json = text[4:]  # skip that junk at the start
-    metadata = json.loads(metadata_json)
-    return metadata
+def repair_find_panorama_response(text):
+    first_paren = text.index("(")
+    last_paren = text.rindex(")")
+    return "[" + text[first_paren + 1:last_paren] + "]"
+
+
+def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", search_third_party=False, session=None):
+    return get_json(
+        build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party),
+        session=session,
+        preprocess_function=repair_find_panorama_response
+    )
+
+
+async def find_panorama_raw_async(lat, lon, session: aiohttp.ClientSession, radius=50,
+                                  download_depth=False, locale="en", search_third_party=False):
+    return await get_json_async(
+        build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party),
+        session,
+        preprocess_function=repair_find_panorama_response
+    )
 
 
 def find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
-    url = build_find_panorama_by_id_request_url(panoid, download_depth, locale)
-
-    if session is None:
-        text = requests.get(url).text
-    else:
-        text = session.get(url).text
-
-    return convert_find_panorama_by_id_response_to_text(text)
+    return get_json(
+        build_find_panorama_by_id_request_url(panoid, download_depth, locale),
+        session=session,
+        preprocess_function=lambda text: text[4:])
 
 
 async def find_panorama_by_id_raw_async(panoid, session, download_depth=False, locale="en"):
-    url = build_find_panorama_by_id_request_url(panoid, download_depth, locale)
-
-    async with session.get(url) as response:
-        text = await response.text()
-
-    return convert_find_panorama_by_id_response_to_text(text)
-
-
-def build_coverage_tile_request_url(tile_x, tile_y):
-    url = "https://www.google.com/maps/photometa/ac/v1?pb=!1m1!1smaps_sv.tactile!6m3!1i{0}!2i{1}!3i17!8b1"
-    url = url.format(tile_x, tile_y)
-    return url
-
-
-def convert_coverage_tile_response_to_json(response):
-    panos_json = response[4:]
-    panos = json.loads(panos_json)
-    return panos
+    return await get_json_async(
+        build_find_panorama_by_id_request_url(panoid, download_depth, locale),
+        session,
+        preprocess_function=lambda text: text[4:])
 
 
 def get_coverage_tile_raw(tile_x, tile_y, session=None):
-    url = build_coverage_tile_request_url(tile_x, tile_y)
-
-    if session is None:
-        text = requests.get(url).text
-    else:
-        text = session.get(url).text
-
-    return convert_coverage_tile_response_to_json(text)
+    return get_json(
+        build_coverage_tile_request_url(tile_x, tile_y),
+        session=session,
+        preprocess_function=lambda text: text[4:])
 
 
 async def get_coverage_tile_raw_async(tile_x, tile_y, session):
-    url = build_coverage_tile_request_url(tile_x, tile_y)
-
-    async with session.get(url) as response:
-        text = await response.text()
-
-    return convert_coverage_tile_response_to_json(text)
+    return await get_json_async(
+        build_coverage_tile_request_url(tile_x, tile_y),
+        session,
+        preprocess_function=lambda text: text[4:])

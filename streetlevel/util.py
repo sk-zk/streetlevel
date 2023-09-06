@@ -1,10 +1,54 @@
 import asyncio
+import json
 from io import BytesIO
 from typing import List, Callable
+
+import requests
 from aiohttp import ClientSession
 from PIL import Image
+from requests import Session
 
 from .dataclasses import Tile, Size
+
+
+def get_json(url: str, session: Session = None, preprocess_function: Callable = None) -> dict:
+    """
+    Fetches JSON from a URL.
+
+    :param url: The URL.
+    :param session: *(optional)* A requests session.
+    :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
+    :return: The requested document as dict.
+    """
+    requester = session if session else requests
+    response = requester.get(url)
+    if preprocess_function:
+        processed = preprocess_function(response.text)
+        return json.loads(processed)
+    else:
+        return response.json()
+
+
+async def get_json_async(url: str, session: ClientSession, json_function_parameters: dict = None,
+                         preprocess_function: Callable = None) -> dict:
+    """
+    Fetches JSON from a URL.
+
+    :param url: The URL.
+    :param session: A ClientSession.
+    :param json_function_parameters: *(optional)* Parameters to pass to the ``ClientResponse.json()`` function.
+    :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
+    :return: The requested document as dict.
+    """
+    async with session.get(url) as response:
+        if preprocess_function:
+            text = await response.text()
+            processed = preprocess_function(text)
+            return json.loads(processed)
+        else:
+            if json_function_parameters:
+                return await response.json(**json_function_parameters)
+            return await response.json()
 
 
 def get_equirectangular_panorama(width: int, height: int, tile_size: Size,
