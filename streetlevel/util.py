@@ -1,10 +1,25 @@
 import asyncio
 from io import BytesIO
-from typing import List
+from typing import List, Callable
 from aiohttp import ClientSession
 from PIL import Image
 
-from .dataclasses import Tile
+from .dataclasses import Tile, Size
+
+
+def get_equirectangular_panorama(width: int, height: int, tile_size: Size,
+                                 tile_list: List[Tile]) -> Image.Image:
+    tile_images = download_tiles(tile_list)
+    stitched = stitch_tiles(tile_images, width, height, tile_size.x, tile_size.y)
+    return stitched
+
+
+async def get_equirectangular_panorama_async(width: int, height: int, tile_size: Size,
+                                             tile_list: List[Tile],
+                                             session: ClientSession) -> Image.Image:
+    tile_images = await download_tiles_async(tile_list, session)
+    stitched = stitch_tiles(tile_images, width, height, tile_size.x, tile_size.y)
+    return stitched
 
 
 def try_get(accessor):

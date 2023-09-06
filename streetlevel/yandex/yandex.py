@@ -10,7 +10,7 @@ from requests import Session
 from . import api
 from .panorama import YandexPanorama
 from ..dataclasses import Size, Tile
-from ..util import download_tiles, stitch_tiles, download_tiles_async, try_get
+from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 
 
 def find_panorama(lat: float, lon: float, session: Session = None) -> Optional[YandexPanorama]:
@@ -84,22 +84,17 @@ def get_panorama(pano: YandexPanorama, zoom: int = 0) -> Image.Image:
     :return: A PIL image containing the panorama.
     """
     zoom = _validate_get_panorama_params(pano, zoom)
-    tile_list = _generate_tile_list(pano, zoom)
-    tile_images = download_tiles(tile_list)
-    stitched = stitch_tiles(tile_images,
-                            pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
-                            pano.tile_size.x, pano.tile_size.y)
-    return stitched
+    return get_equirectangular_panorama(
+        pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
+        pano.tile_size, _generate_tile_list(pano, zoom))
 
 
 async def get_panorama_async(pano: YandexPanorama, session: ClientSession, zoom: int = 0) -> Image.Image:
     zoom = _validate_get_panorama_params(pano, zoom)
-    tile_list = _generate_tile_list(pano, zoom)
-    tile_images = await download_tiles_async(tile_list, session)
-    stitched = stitch_tiles(tile_images,
-                            pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
-                            pano.tile_size.x, pano.tile_size.y)
-    return stitched
+    return await get_equirectangular_panorama_async(
+        pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
+        pano.tile_size, _generate_tile_list(pano, zoom),
+        session)
 
 
 def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0, pil_args: dict = None) -> None:
@@ -149,7 +144,7 @@ def _generate_tile_list(pano: YandexPanorama, zoom: int) -> List[Tile]:
 def _validate_get_panorama_params(pano: YandexPanorama, zoom: int) -> int:
     if not pano.image_sizes:
         raise ValueError("pano.image_sizes is None.")
-    zoom = min(zoom, len(pano.image_sizes) - 1)
+    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     return zoom
 
 

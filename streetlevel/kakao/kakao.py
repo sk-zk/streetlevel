@@ -11,12 +11,12 @@ from requests import Session
 
 from . import api
 from .panorama import KakaoPanorama, CameraType
-from ..dataclasses import Tile
-from ..util import try_get, download_tiles, stitch_tiles, download_tiles_async
+from ..dataclasses import Tile, Size
+from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 
 PANO_COLS = [1, 8, 16]
 PANO_ROWS = [1, 4, 8]
-PANO_TILE_SIZE = 512
+PANO_TILE_SIZE = Size(512, 512)
 PANO_TILE_URL_TEMPLATE = [
     "https://map.daumcdn.net/map_roadview{0}.jpg",
     "https://map.daumcdn.net/map_roadview{0}/{1}_{2:02d}.jpg",
@@ -77,7 +77,8 @@ def find_panorama_by_id(panoid: int, neighbors: bool = True, session: Session = 
     return pano
 
 
-async def find_panorama_by_id_async(panoid: int, session: ClientSession, neighbors: bool = True) -> Optional[KakaoPanorama]:
+async def find_panorama_by_id_async(panoid: int, session: ClientSession,
+                                    neighbors: bool = True) -> Optional[KakaoPanorama]:
     response = await api.find_panorama_by_id_raw_async(panoid, session)
 
     if response["street_view"]["cnt"] == 0:
@@ -101,34 +102,25 @@ def get_panorama(pano: KakaoPanorama, zoom: int = 2) -> Image.Image:
     if zoom == 0:
         return _get_thumbnail(pano)
 
-    # some panoramas don't have a high resolution version, but the metadata does not
-    # indicate whether this is the case, so it seems the only way to know whether
-    # it exists or not is to HEAD a tile and hope we get a 200. otherwise, fall back to 1.
-    if zoom == 2 and not _zoom_2_exists(pano):
-        zoom = 1
-
-    tile_list = _generate_tile_list(pano, zoom)
-
-    tile_images = download_tiles(tile_list)
-    stitched = stitch_tiles(tile_images,
-                            PANO_COLS[zoom] * PANO_TILE_SIZE, PANO_ROWS[zoom] * PANO_TILE_SIZE,
-                            PANO_TILE_SIZE, PANO_TILE_SIZE)
-    return stitched
+    zoom = _validate_zoom(pano, zoom)
+    return get_equirectangular_panorama(
+        PANO_COLS[zoom] * PANO_TILE_SIZE.x,
+        PANO_ROWS[zoom] * PANO_TILE_SIZE.y,
+        PANO_TILE_SIZE,
+        _generate_tile_list(pano, zoom))
 
 
 async def get_panorama_async(pano: KakaoPanorama, session: ClientSession, zoom: int = 2) -> Image.Image:
     if zoom == 0:
         return await _get_thumbnail_async(pano, session)
 
-    if zoom == 2 and not (await _zoom_2_exists_async(pano, session)):
-        zoom = 1
-
-    tile_list = _generate_tile_list(pano, zoom)
-    tile_images = await download_tiles_async(tile_list, session)
-    stitched = stitch_tiles(tile_images,
-                            PANO_COLS[zoom] * PANO_TILE_SIZE, PANO_ROWS[zoom] * PANO_TILE_SIZE,
-                            PANO_TILE_SIZE, PANO_TILE_SIZE)
-    return stitched
+    zoom = await _validate_zoom_async(pano, zoom, session)
+    return await get_equirectangular_panorama_async(
+        PANO_COLS[zoom] * PANO_TILE_SIZE.x,
+        PANO_ROWS[zoom] * PANO_TILE_SIZE.y,
+        PANO_TILE_SIZE,
+        _generate_tile_list(pano, zoom),
+        session)
 
 
 def download_panorama(pano: KakaoPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
@@ -185,7 +177,7 @@ def _generate_tile_list(pano: KakaoPanorama, zoom: int) -> List[Tile]:
     Generates a list of a panorama's tiles and the URLs pointing to them.
     """
     if not (zoom == 1 or zoom == 2):
-        raise ValueError()
+        raise ValueError("Call _get_thumbnail")
 
     coords = list(itertools.product(range(PANO_COLS[zoom]), range(PANO_ROWS[zoom])))
     tiles = [Tile(x, y, _build_tile_url(zoom, pano.image_path, x, y)) for x, y in coords]
@@ -215,13 +207,28 @@ async def _get_thumbnail_async(pano: KakaoPanorama, session: ClientSession) -> I
     return image
 
 
-def _zoom_2_exists(pano: KakaoPanorama) -> bool:
-    url = _build_tile_url(2, pano.image_path, 0, 0)
-    response = requests.head(url)
-    return response.status_code == 200
+def _validate_zoom(pano, zoom):
+    zoom = max(0, min(2, zoom))
+    if zoom == 0:
+        raise ValueError("Call _get_thumbnail")
+    elif zoom == 2:
+        # some panoramas don't have a high resolution version, but the metadata does not
+        # indicate whether this is the case, so it seems the only way to know whether
+        # it exists or not is to HEAD a tile and hope we get a 200. otherwise, fall back to 1.
+        url = _build_tile_url(2, pano.image_path, 0, 0)
+        response = requests.head(url)
+        if response.status_code != 200:
+            zoom = 1
+    return zoom
 
 
-async def _zoom_2_exists_async(pano: KakaoPanorama, session: ClientSession) -> bool:
-    url = _build_tile_url(2, pano.image_path, 0, 0)
-    response = await session.head(url)
-    return response.status == 200
+async def _validate_zoom_async(pano, zoom, session):
+    zoom = max(0, min(2, zoom))
+    if zoom == 0:
+        raise ValueError("Call _get_thumbnail")
+    elif zoom == 2:
+        url = _build_tile_url(zoom, pano.image_path, 0, 0)
+        response = await session.head(url)
+        if response.status != 200:
+            zoom = 1
+    return zoom

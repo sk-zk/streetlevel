@@ -9,7 +9,7 @@ from .panorama import StreetViewPanorama, LocalizedString, CaptureDate
 from .depth import parse as parse_depth
 from . import api
 from ..dataclasses import Size, Tile
-from ..util import try_get, download_tiles, download_tiles_async, stitch_tiles
+from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 from .util import is_third_party_panoid
 
 
@@ -82,7 +82,7 @@ def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str =
     :return: A StreetViewPanorama object if a panorama with this ID exists, or None.
     """
     resp = api.find_panorama_by_id_raw(panoid, download_depth=download_depth,
-                                 locale=locale, session=session)
+                                       locale=locale, session=session)
 
     response_code = resp[1][0][0][0]
     # 1: OK
@@ -202,22 +202,17 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
     :return: A PIL image containing the panorama.
     """
     zoom = _validate_get_panorama_params(pano, zoom)
-    tile_list = _generate_tile_list(pano, zoom)
-    tile_images = download_tiles(tile_list)
-    stitched = stitch_tiles(tile_images,
-                            pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
-                            pano.tile_size.x, pano.tile_size.y)
-    return stitched
+    return get_equirectangular_panorama(
+        pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
+        pano.tile_size, _generate_tile_list(pano, zoom))
 
 
 async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image.Image:
     zoom = _validate_get_panorama_params(pano, zoom)
-    tile_list = _generate_tile_list(pano, zoom)
-    tile_images = await download_tiles_async(tile_list, session)
-    stitched = stitch_tiles(tile_images,
-                            pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
-                            pano.tile_size.x, pano.tile_size.y)
-    return stitched
+    return await get_equirectangular_panorama_async(
+        pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
+        pano.tile_size, _generate_tile_list(pano, zoom),
+        session)
 
 
 def _validate_get_panorama_params(pano, zoom):
