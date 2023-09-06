@@ -32,7 +32,7 @@ class KakaoPanorama:
     """Longitude of the panorama's location."""
 
     heading: float = None
-    """Heading in radians, where 0° is south, 90° is west, 180° is north and 270° is east."""
+    """Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west."""
 
     image_path: str = None
     """Part of the panorama tile URL."""
