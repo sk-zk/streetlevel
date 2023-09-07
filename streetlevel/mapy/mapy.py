@@ -1,9 +1,7 @@
 import itertools
 import math
-from io import BytesIO
 from typing import List, Optional
 
-import requests
 from PIL import Image
 from aiohttp import ClientSession
 
@@ -12,7 +10,7 @@ from . import api
 from requests import Session
 from ..dataclasses import Size, Tile
 from ..geo import opk_to_rotation
-from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async
+from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
 
 
 def find_panorama(lat: float, lon: float,
@@ -300,19 +298,11 @@ def _parse_angles(pan_info: dict, pano: MapyPanorama) -> None:
 
 
 def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image.Image:
-    tile_url = _generate_tile_list(pano, 0)[0].url
-    if session is None:
-        session = requests.Session()
-    response = session.get(tile_url)
-    image = Image.open(BytesIO(response.content))
-    return image
+    return get_image(_generate_tile_list(pano, 0)[0].url, session=session)
 
 
 async def _get_zoom_0_async(pano: MapyPanorama, session: ClientSession) -> Image.Image:
-    tile_url = _generate_tile_list(pano, 0)[0].url
-    response = await session.get(tile_url)
-    image = Image.open(BytesIO(await response.read()))
-    return image
+    return await get_image_async(_generate_tile_list(pano, 0)[0].url, session)
 
 
 def _generate_tile_list(pano: MapyPanorama, zoom: int) -> List[Tile]:

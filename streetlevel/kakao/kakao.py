@@ -1,6 +1,5 @@
 import itertools
 import math
-from io import BytesIO
 from typing import List, Optional
 from datetime import datetime
 
@@ -12,7 +11,7 @@ from requests import Session
 from . import api
 from .panorama import KakaoPanorama, CameraType
 from ..dataclasses import Tile, Size
-from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
+from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
 
 PANO_COLS = [1, 8, 16]
 PANO_ROWS = [1, 4, 8]
@@ -193,18 +192,11 @@ def _build_tile_url(zoom: int, image_path: str, x: int, y: int) -> str:
 
 
 def _get_thumbnail(pano: KakaoPanorama, session: Session = None) -> Image.Image:
-    tile_url = PANO_TILE_URL_TEMPLATE[0].format(pano.image_path)
-    requester = session if session else requests
-    response = requester.get(tile_url)
-    image = Image.open(BytesIO(response.content))
-    return image
+    return get_image(PANO_TILE_URL_TEMPLATE[0].format(pano.image_path), session=session)
 
 
 async def _get_thumbnail_async(pano: KakaoPanorama, session: ClientSession) -> Image.Image:
-    tile_url = PANO_TILE_URL_TEMPLATE[0].format(pano.image_path)
-    response = await session.get(tile_url)
-    image = Image.open(BytesIO(await response.read()))
-    return image
+    return await get_image_async(PANO_TILE_URL_TEMPLATE[0].format(pano.image_path), session)
 
 
 def _validate_zoom(pano, zoom):

@@ -11,6 +11,24 @@ from requests import Session
 from .dataclasses import Tile, Size
 
 
+def get_image(url: str, session: Session = None) -> Image.Image:
+    """
+    Fetches an image from a URL.
+
+    :param url: The URL.
+    :param session: *(optional)* A requests session.
+    :return: The image as PIL Image.
+    """
+    requester = session if session else requests
+    response = requester.get(url)
+    return Image.open(BytesIO(response.content))
+
+
+async def get_image_async(url: str, session: ClientSession) -> Image.Image:
+    async with session.get(url) as response:
+        return Image.open(BytesIO(await response.read()))
+
+
 def get_json(url: str, session: Session = None, preprocess_function: Callable = None) -> dict:
     """
     Fetches JSON from a URL.
