@@ -103,7 +103,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td></td>
-    <td align="center">❌</td>
+    <td align="center">✔</td>
     <td align="center">⚫<br></td>
   </tr>
   <tr>

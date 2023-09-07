@@ -16,6 +16,10 @@ Downloading panoramas
     .. autofunction:: streetlevel.kakao.get_panorama_async
     .. autofunction:: streetlevel.kakao.download_panorama
     .. autofunction:: streetlevel.kakao.download_panorama_async
+    .. autofunction:: streetlevel.kakao.get_depthmap
+    .. autofunction:: streetlevel.kakao.get_depthmap_async
+    .. autofunction:: streetlevel.kakao.download_depthmap
+    .. autofunction:: streetlevel.kakao.download_depthmap_async
 
 
 Data classes and enums

@@ -129,6 +129,10 @@ dmypy.json
 .pyre/
 
 .idea/
+
 *.ipynb
+*.csv
+
 *.jpg
 *.heic
+*.png

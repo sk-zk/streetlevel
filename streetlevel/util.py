@@ -11,6 +11,19 @@ from requests import Session
 from .dataclasses import Tile, Size
 
 
+def download_file(url: str, path: str, session: Session = None) -> None:
+    requester = session if session else requests
+    response = requester.get(url)
+    with open(path, "wb") as f:
+        f.write(response.content)
+
+
+async def download_file_async(url: str, path: str, session: ClientSession) -> None:
+    async with session.get(url) as response:
+        with open(path, "wb") as f:
+            f.write(await response.read())
+
+
 def get_image(url: str, session: Session = None) -> Image.Image:
     """
     Fetches an image from a URL.

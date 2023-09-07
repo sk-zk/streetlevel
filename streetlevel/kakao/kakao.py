@@ -11,7 +11,8 @@ from requests import Session
 from . import api
 from .panorama import KakaoPanorama, CameraType
 from ..dataclasses import Tile, Size
-from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
+from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
+    get_image_async, download_file, download_file_async
 
 PANO_COLS = [1, 8, 16]
 PANO_ROWS = [1, 4, 8]
@@ -146,6 +147,41 @@ async def download_panorama_async(pano: KakaoPanorama, path: str, session: Clien
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
     image.save(path, **pil_args)
+
+
+def get_depthmap(pano: KakaoPanorama, session: Session = None) -> Image.Image:
+    """
+    Downloads the depth map of a panorama and returns it as PIL image.
+
+    :param pano: The panorama.
+    :param session: *(optional)* A requests session.
+    :return: The depth map as PIL Image.
+    """
+    return get_image(_build_depthmap_url(pano), session=session)
+
+
+async def get_depthmap_async(pano: KakaoPanorama, session: ClientSession) -> Image.Image:
+    return await get_image_async(_build_depthmap_url(pano), session)
+
+
+def download_depthmap(pano: KakaoPanorama, path: str, session: Session = None) -> None:
+    """
+    Downloads the depth map of a panorama to a PNG file.
+
+    :param pano: The panorama.
+    :param path: Output path.
+    :param session: *(optional)* A requests session.
+    """
+    download_file(_build_depthmap_url(pano), path, session=session)
+
+
+async def download_depthmap_async(pano: KakaoPanorama, path: str, session: ClientSession) -> None:
+    await download_file_async(_build_depthmap_url(pano), path, session)
+
+
+def _build_depthmap_url(pano):
+    return f"https://map.daumcdn.net/map_roadview/depthmap_meerkat" \
+           f"{pano.image_path}_W.png"
 
 
 def _parse_panoramas(response):
