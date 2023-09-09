@@ -27,6 +27,7 @@ from aiohttp import ClientSession
 session = ClientSession()
 pano = await streetview.find_panorama_async(46.8839586, 12.169002, session)
 await streetview.download_panorama_async(pano, f"{pano.id}.jpg", session)
+await session.close()
 ```
 
 ## Documentation
