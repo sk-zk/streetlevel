@@ -5,9 +5,10 @@ from enum import IntEnum
 from typing import List
 
 
-class CameraType(IntEnum):
+class PanoramaType(IntEnum):
     """
-    The camera a panorama was captured with. Identifiers are taken directly from ``panorama.js``.
+    The panorama type and/or the camera the panorama was taken with.
+    Identifiers are taken directly from the source.
     """
     PANOZIP = 100,  #:
     ROTATOR = 101,  #:
@@ -53,13 +54,16 @@ class KakaoPanorama:
     street_type: str = None
     """The street type (in Korean), e.g. "이면도로" (side road)."""
 
-    camera_type: CameraType = None
-    """The camera the panorama was taken with. Identifiers are taken directly from the source."""
+    panorama_type: PanoramaType = None
+    """
+    The panorama type and/or the camera the panorama was taken with. 
+    Identifiers are taken directly from the source.
+    """
 
     @property
     def is_car(self) -> bool:
         """Whether the panorama was taken by a car."""
-        return self.camera_type in [CameraType.CAR, CameraType.NAVER_CAR, CameraType.INSTA_TITAN]
+        return self.panorama_type in [PanoramaType.CAR, PanoramaType.NAVER_CAR, PanoramaType.INSTA_TITAN]
 
     def __repr__(self):
         output = str(self)

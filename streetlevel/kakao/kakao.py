@@ -9,7 +9,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from . import api
-from .panorama import KakaoPanorama, CameraType
+from .panorama import KakaoPanorama, PanoramaType
 from ..dataclasses import Tile, Size
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
     get_image_async, download_file, download_file_async
@@ -200,7 +200,7 @@ def _parse_panorama(pano_json: dict) -> KakaoPanorama:
         street_name=try_get(lambda: pano_json["st_name"]),
         address=try_get(lambda: pano_json["addr"]),
         street_type=try_get(lambda: pano_json["st_type"]),
-        camera_type=CameraType(int(pano_json["shot_tool"]))
+        panorama_type=PanoramaType(int(pano_json["shot_tool"]))
     )
     if "past" in pano_json and pano_json["past"] is not None:
         pano.historical = [_parse_panorama(past) for past in pano_json["past"]]
