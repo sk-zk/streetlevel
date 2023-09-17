@@ -120,7 +120,7 @@ def get_historical(panoid: str, session: Session = None) -> List[NaverPanorama]:
     Fetches older panoramas at the location of the given panorama.
 
     :param panoid: The pano ID. For reasons unbeknownst to mankind, only panoramas older than the given one
-        are returned, so to retrieve all available dates at this location, the ID of the most recent panorama
+        are returned, so to retrieve all available dates at a location, the ID of the most recent panorama
         must be used. This is the ``timeline_id`` returned by ``find_panorama_by_id``.
     :param session: *(optional)* A requests session.
     :return: A list of NaverPanorama objects.
