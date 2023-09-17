@@ -1,12 +1,17 @@
 import math
 from datetime import datetime
-from typing import Optional, List
+from io import BytesIO
+from typing import Optional, List, Union, Tuple
 
 from aiohttp import ClientSession
+from PIL import Image
 from requests import Session
 
 from . import api
 from .panorama import NaverPanorama, PanoramaType, Overlay, Neighbors
+from ..dataclasses import Tile
+from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
+    save_cubemap_panorama
 
 
 def find_panorama_by_id(panoid: str, language: str = "en",
@@ -149,6 +154,128 @@ async def get_neighbors_async(panoid: str, session: ClientSession) -> Neighbors:
     return _parse_neighbors(response, panoid)
 
 
+def get_panorama(pano: NaverPanorama, zoom: int = 2,
+                 stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW) \
+        -> Union[List[Image.Image], Image.Image]:
+    """
+    Downloads a panorama and returns it as PIL image.
+
+    :param pano: The panorama.
+    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. Defaults to 2. If 2 is unavailable, 1 will be
+        downloaded instead.
+    :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
+        image. Defaults to ``ROW``.
+    :return: A PIL image or a list of six PIL images depending on ``stitching_method``.
+    """
+    zoom = _validate_zoom(pano, zoom)
+    face_tiles, cols, rows = _generate_tile_list(pano.id, zoom)
+    tile_images = _download_tiles(face_tiles)
+    return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
+
+
+async def get_panorama_async(pano: NaverPanorama, session: ClientSession, zoom: int = 2,
+                             stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW) \
+        -> Union[List[Image.Image], Image.Image]:
+    zoom = _validate_zoom(pano, zoom)
+    face_tiles, cols, rows = _generate_tile_list(pano.id, zoom)
+    tile_images = await _download_tiles_async(face_tiles, session)
+    return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
+
+
+def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2,
+                      stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW,
+                      pil_args: dict = None) -> None:
+    """
+    Downloads a panorama to a file.
+
+    :param pano: The panorama.
+    :param path: Output path.
+    :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. Defaults to 2. If 2 is unavailable, 1 will be
+        downloaded instead.
+    :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
+        image. Defaults to ``ROW``.
+    :param pil_args: *(optional)* Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
+    """
+    if pil_args is None:
+        pil_args = {}
+
+    output = get_panorama(pano, zoom=zoom, stitching_method=stitching_method)
+    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+
+
+async def download_panorama_async(pano: NaverPanorama, path: str, session: ClientSession, zoom: int = 2,
+                                  stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW,
+                                  pil_args: dict = None) -> None:
+    if pil_args is None:
+        pil_args = {}
+
+    output = await get_panorama_async(pano, session, zoom=zoom, stitching_method=stitching_method)
+    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+
+
+def _validate_zoom(pano, zoom):
+    if not pano.max_zoom:
+        if zoom > 1:
+            raise ValueError("max_zoom is None; please call find_panorama_by_id to fetch this info")
+        else:
+            return max(0, zoom)
+    else:
+        return max(0, min(zoom, pano.max_zoom))
+
+
+def _generate_tile_list(panoid: str, zoom: int) -> Tuple[List[List[Tile]], int, int]:
+    if not (zoom == 1 or zoom == 2):
+        raise ValueError("Unsupported zoom level")
+
+    cols = zoom * 2
+    rows = zoom * 2
+    size_letter = "M" if zoom == 1 else "L"
+
+    tiles = []
+    for face_url_name in ["f", "r", "b", "l", "u", "d"]:
+        face_tiles = []
+        for row_idx in range(0, rows):
+            for col_idx in range(0, cols):
+                face_tiles.append(Tile(col_idx, row_idx,
+                                       f"https://panorama.pstatic.net/image/{panoid}/512/{size_letter}/"
+                                       f"{face_url_name}/{col_idx+1}/{row_idx+1}"))
+        tiles.append(face_tiles)
+    return tiles, cols, rows
+
+
+def _download_tiles(face_tiles: List[List[Tile]]) -> List[dict]:
+    faces = []
+    for face in face_tiles:
+        faces.append(download_tiles(face))
+    return faces
+
+
+async def _download_tiles_async(face_tiles: List[List[Tile]], session: ClientSession) -> List[dict]:
+    faces = []
+    for face in face_tiles:
+        faces.append(await download_tiles_async(face, session))
+    return faces
+
+
+def _stitch_panorama(tile_images: List[dict], cols: int, rows: int,
+                     stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
+    TILE_SIZE = 512
+    stitched_faces = []
+    for tiles in tile_images:
+        face = Image.new("RGB", (cols * TILE_SIZE, rows * TILE_SIZE))
+        for row_idx in range(0, rows):
+            for col_idx in range(0, cols):
+                tile = Image.open(BytesIO(tiles[(col_idx, row_idx)]))
+                face.paste(im=tile,
+                           box=(col_idx * TILE_SIZE, row_idx * TILE_SIZE))
+                del tile
+        stitched_faces.append(face)
+
+    return stitch_cubemap_faces(stitched_faces, stitched_faces[0].size[0], stitching_method)
+
+
 def _parse_neighbors(response: dict, parent_id: str) -> Neighbors:
     street = _parse_neighbor_section(response, "street", parent_id)
     other = _parse_neighbor_section(response, "air", parent_id)
@@ -201,6 +328,7 @@ def _parse_panorama(response: dict) -> NaverPanorama:
         lat=basic["latitude"],
         lon=basic["longitude"],
         heading=math.radians(basic["camera_angle"][1]),
+        max_zoom=int(basic["image"]["segment"]) // 2,
         timeline_id=basic["timeline_id"],
         date=_parse_date(basic["photodate"]),
         is_latest=basic["latest"],

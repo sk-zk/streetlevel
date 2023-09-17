@@ -1,7 +1,6 @@
 import asyncio
 from datetime import datetime
 from io import BytesIO
-from pathlib import Path
 from typing import List, Union, Optional
 
 from PIL import Image
@@ -12,7 +11,7 @@ from .panorama import StreetsidePanorama
 from streetlevel.geo import *
 from . import api
 from .util import to_base4
-from ..util import download_files_async, stitch_cubemap_faces, CubemapStitchingMethod
+from ..util import download_files_async, stitch_cubemap_faces, CubemapStitchingMethod, save_cubemap_panorama
 
 TILE_SIZE = 256
 
@@ -116,7 +115,7 @@ def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4,
         pil_args = {}
 
     output = get_panorama(pano, zoom=zoom, stitching_method=stitching_method)
-    _save_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
 
 
 async def download_panorama_async(pano: StreetsidePanorama, path: str, session: ClientSession, zoom: int = 4,
@@ -126,7 +125,7 @@ async def download_panorama_async(pano: StreetsidePanorama, path: str, session: 
         pil_args = {}
 
     output = await get_panorama_async(pano, session, zoom=zoom, stitching_method=stitching_method)
-    _save_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
 
 
 def get_panorama(pano: StreetsidePanorama, zoom: int = 4,
@@ -289,13 +288,3 @@ def _stitch_panorama(faces, stitching_method: CubemapStitchingMethod) -> Union[L
             stitched_faces.append(_stitch_face(faces[i]))
 
     return stitch_cubemap_faces(stitched_faces, full_tile_size, stitching_method=stitching_method)
-
-
-def _save_panorama(pano, path, single_image, pil_args):
-    if single_image:
-        pano.save(path, **pil_args)
-    else:
-        path = Path(path)
-        for idx, face in enumerate(pano):
-            face_path = path.parent / f"{path.stem}_{idx}{path.suffix}"
-            face.save(face_path, **pil_args)

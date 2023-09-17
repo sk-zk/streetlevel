@@ -2,6 +2,7 @@ import asyncio
 import json
 from enum import Enum
 from io import BytesIO
+from pathlib import Path
 from typing import List, Callable, Union
 
 import requests
@@ -145,7 +146,8 @@ async def download_tiles_async(tile_list: List[Tile], session: ClientSession):
     return images_dict
 
 
-def stitch_equirectangular_tiles(tile_images: dict, width: int, height: int, tile_width: int, tile_height: int) -> Image.Image:
+def stitch_equirectangular_tiles(tile_images: dict, width: int, height: int,
+                                 tile_width: int, tile_height: int) -> Image.Image:
     """
     Stitches downloaded tiles to a full image.
     """
@@ -202,3 +204,14 @@ def stitch_cubemap_faces(faces: List[Image.Image], face_size: int,
         return image
     else:
         raise ValueError("Unsupported stitching method")
+
+
+def save_cubemap_panorama(pano: Union[List[Image.Image], Image.Image], path: str,
+                          single_image: bool, pil_args: dict) -> None:
+    if single_image:
+        pano.save(path, **pil_args)
+    else:
+        path = Path(path)
+        for idx, face in enumerate(pano):
+            face_path = path.parent / f"{path.stem}_{idx}{path.suffix}"
+            face.save(face_path, **pil_args)

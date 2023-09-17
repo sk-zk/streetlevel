@@ -40,6 +40,9 @@ class NaverPanorama:
     heading: float = None
     """Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west."""
 
+    max_zoom: int = None
+    """Highest zoom level available for this panorama."""
+
     neighbors: Neighbors = None
     """A list of nearby panoramas."""
     historical: List[NaverPanorama] = None
@@ -64,9 +67,9 @@ class NaverPanorama:
     """The panorama type. Most identifiers are taken directly from the source."""
     overlay: Overlay = None
     """
-    Curiously, Naver masks out the mapping car the same way Google and Apple do, but unlike those services, Naver 
-    does not bake this mask into the panorama. Instead, they serve it as separate files which are rendered in the client 
-    at runtime.
+    Curiously, Naver masks their car twice: once with an image of a car baked into the panorama, and additionally
+    with an image of the road beneath it (like Google and Apple), which is served as a separate file and overlaid
+    on the panorama in the client. This is the URL to that secondary overlay.
     
     (Only available for car footage.)
     """
