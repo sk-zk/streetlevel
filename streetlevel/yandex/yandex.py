@@ -166,7 +166,7 @@ def _parse_panorama(data: dict) -> YandexPanorama:
         historical=_parse_historical(data["Annotation"]["HistoricalPanoramas"], panoid),
 
         date=_get_date_from_panoid(panoid),
-
+        height=int(data["Data"]["Point"]["coordinates"][2]),
         street_name=data["Data"]["Point"]["name"],
 
         author=try_get(lambda: data["Author"]["name"]),
@@ -213,6 +213,7 @@ def _parse_historical(historical: List[dict], parent_id: str) -> List[YandexPano
             id=panoid,
             lat=float(raw_pano["Connection"]["Point"]["coordinates"][1]),
             lon=float(raw_pano["Connection"]["Point"]["coordinates"][0]),
+            height=int(raw_pano["Connection"]["Point"]["coordinates"][2]),
             date=_get_date_from_panoid(panoid)
         )
         panos.append(pano)
