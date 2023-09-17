@@ -12,7 +12,7 @@ from .panorama import StreetsidePanorama
 from streetlevel.geo import *
 from . import api
 from .util import to_base4
-from ..util import download_files_async
+from ..util import download_files_async, stitch_cubemap_faces, CubemapStitchingMethod
 
 TILE_SIZE = 256
 
@@ -95,7 +95,8 @@ async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
         session, limit=limit)
 
 
-def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4, single_image: bool = True,
+def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4,
+                      stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW,
                       pil_args: dict = None) -> None:
     """
     Downloads a panorama to a file.
@@ -105,8 +106,8 @@ def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4, single
     :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
       downloaded.
       (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
-    :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
-      Defaults to true.
+    :param stitching_method: *(optional)* Whether and how the faces of the cubemap should be stitched into one
+        image. Defaults to ``ROW``.
     :param pil_args: *(optional)* Additional arguments for PIL's
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
@@ -114,20 +115,22 @@ def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4, single
     if pil_args is None:
         pil_args = {}
 
-    output = get_panorama(pano, zoom=zoom, single_image=single_image)
-    _save_panorama(output, path, single_image, pil_args)
+    output = get_panorama(pano, zoom=zoom, stitching_method=stitching_method)
+    _save_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
 
 
 async def download_panorama_async(pano: StreetsidePanorama, path: str, session: ClientSession, zoom: int = 4,
-                                  single_image: bool = True, pil_args: dict = None) -> None:
+                                  stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW,
+                                  pil_args: dict = None) -> None:
     if pil_args is None:
         pil_args = {}
 
-    output = await get_panorama_async(pano, session, zoom=zoom, single_image=single_image)
-    _save_panorama(output, path, single_image, pil_args)
+    output = await get_panorama_async(pano, session, zoom=zoom, stitching_method=stitching_method)
+    _save_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
 
 
-def get_panorama(pano: StreetsidePanorama, zoom: int = 4, single_image: bool = True) \
+def get_panorama(pano: StreetsidePanorama, zoom: int = 4,
+                 stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW) \
         -> Union[List[Image.Image], Image.Image]:
     """
     Downloads a panorama and returns it as PIL image.
@@ -136,22 +139,23 @@ def get_panorama(pano: StreetsidePanorama, zoom: int = 4, single_image: bool = T
     :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
       downloaded.
       (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
-    :param single_image: *(optional)* Whether to output a single image containing all sides or six individual images.
-      Defaults to true.
-    :return: A PIL image if ``single_image`` is true, and a list of six PIL images otherwise.
+    :param stitching_method: *(optional)* Whether and how the faces of the cubemap should be stitched into one
+        image. Defaults to ``ROW``.
+    :return: A PIL image or a list of six PIL images depending on ``stitching_method``.
     """
     zoom = max(0, min(zoom, pano.max_zoom))
     faces = _generate_tile_list(pano.id, zoom)
     _download_tiles(faces)
-    return _stitch_panorama(faces, single_image=single_image)
+    return _stitch_panorama(faces, stitching_method=stitching_method)
 
 
 async def get_panorama_async(pano: StreetsidePanorama, session: ClientSession, zoom: int = 4,
-                             single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
+                             stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW
+                             ) -> Union[List[Image.Image], Image.Image]:
     zoom = max(0, min(zoom, pano.max_zoom))
     faces = _generate_tile_list(pano.id, zoom)
     await _download_tiles_async(faces, session)
-    return _stitch_panorama(faces, single_image=single_image)
+    return _stitch_panorama(faces, stitching_method=stitching_method)
 
 
 def _parse_panos(response):
@@ -270,7 +274,7 @@ def _stitch_face(face):
         return tile
 
 
-def _stitch_panorama(faces, single_image: bool = True) -> Union[List[Image.Image], Image.Image]:
+def _stitch_panorama(faces, stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
     """
     Stitches downloaded tiles into full faces or one full image.
     """
@@ -284,20 +288,7 @@ def _stitch_panorama(faces, single_image: bool = True) -> Union[List[Image.Image
         for i in range(0, 6):
             stitched_faces.append(_stitch_face(faces[i]))
 
-    if not single_image:
-        return stitched_faces
-    else:
-        pano_width = 4 * full_tile_size
-        pano_height = 3 * full_tile_size
-        image = Image.new('RGB', (pano_width, pano_height))
-
-        image.paste(im=stitched_faces[0], box=(1 * full_tile_size, 1 * full_tile_size))
-        image.paste(im=stitched_faces[1], box=(2 * full_tile_size, 1 * full_tile_size))
-        image.paste(im=stitched_faces[2], box=(3 * full_tile_size, 1 * full_tile_size))
-        image.paste(im=stitched_faces[3], box=(0,                  1 * full_tile_size))
-        image.paste(im=stitched_faces[4], box=(1 * full_tile_size, 0))
-        image.paste(im=stitched_faces[5], box=(1 * full_tile_size, 2 * full_tile_size))
-        return image
+    return stitch_cubemap_faces(stitched_faces, full_tile_size, stitching_method=stitching_method)
 
 
 def _save_panorama(pano, path, single_image, pil_args):
