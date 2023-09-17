@@ -11,6 +11,7 @@ a module for downloading panoramas and metadata from street-level imagery provid
    streetlevel.kakao
    streetlevel.lookaround
    streetlevel.mapy
+   streetlevel.naver
    streetlevel.streetside
    streetlevel.streetview
    streetlevel.yandex

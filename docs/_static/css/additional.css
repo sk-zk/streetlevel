@@ -37,3 +37,7 @@
 #streetlevel\.kakao\.panorama\.KakaoPanorama + dd .field-list {
   display:none !important;
 }
+
+#streetlevel\.naver\.panorama\.NaverPanorama + dd .field-list {
+  display:none !important;
+}
