@@ -49,7 +49,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <th align="center">Mapy.cz Panorama</th>
   </thead>
   <thead>
-    <td colspan="8" style="padding-top:20px"><br><b>Finding panoramas</b><br>
+    <td colspan="9" style="padding-top:20px"><br><b>Finding panoramas</b><br>
       How panoramas can be retrieved through the API.
     </td>
   </thead>
@@ -87,7 +87,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
   </tr>
   <thead>
-    <td colspan="8" style="padding-top:20px"><br><b>Imagery</b><br>
+    <td colspan="9" style="padding-top:20px"><br><b>Imagery</b><br>
       The type of imagery returned by the service.
     </td>
   </thead>
@@ -136,7 +136,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">JPEG</td>
   </tr>
   <thead>
-    <td colspan="8" style="padding-top:20px"><br><b>Available metadata</b><br>
+    <td colspan="9" style="padding-top:20px"><br><b>Available metadata</b><br>
       Metadata returned by the API of the service alongside ID and location.
     </td>
   </thead>
