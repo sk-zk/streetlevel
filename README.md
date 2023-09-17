@@ -1,7 +1,9 @@
 # streetlevel
-**streetlevel** is a module for downloading panoramas and metadata from street-level imagery services including Google Street View and Apple Look Around.
+**streetlevel** is a library for downloading panoramas and metadata from street-level imagery services including Google Street View, Apple Look Around, and several others.
 
 Since it relies on calls to internal APIs, it may break unexpectedly.
+
+(Nearly) all functions are available as both a sync function using `requests` or an async function using `aiohttp`, requiring a `ClientSession`.
 
 ## Installation
 ```sh
@@ -9,12 +11,12 @@ pip install streetlevel
 ```
 
 ## Example
-Downloading the closest Street View panorama to a specific location, sync:
+Downloading the closest Google Street View panorama to a specific location, sync:
 
 ```python
 from streetlevel import streetview
 
-pano = streetview.find_panorama(46.8839586, 12.169002)
+pano = streetview.find_panorama(46.883958, 12.169002)
 streetview.download_panorama(pano, f"{pano.id}.jpg")
 ```
 
@@ -25,7 +27,7 @@ from streetlevel import streetview
 from aiohttp import ClientSession
 
 session = ClientSession()
-pano = await streetview.find_panorama_async(46.8839586, 12.169002, session)
+pano = await streetview.find_panorama_async(46.883958, 12.169002, session)
 await streetview.download_panorama_async(pano, f"{pano.id}.jpg", session)
 await session.close()
 ```
