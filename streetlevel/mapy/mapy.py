@@ -129,7 +129,7 @@ async def find_panorama_by_id_async(panoid: int,
 
 def get_neighbors(panoid: int, year: Optional[int] = None) -> List[MapyPanorama]:
     """
-    Gets neighbors of a panorama.
+    Fetches neighbors of a panorama.
 
     :param panoid: The pano ID.
     :param year: *(optional)* If given, fetches neighbors for a specific year. Otherwise, the most recent coverage
