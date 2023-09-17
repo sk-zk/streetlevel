@@ -106,7 +106,7 @@ def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4,
     :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
       downloaded.
       (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
-    :param stitching_method: *(optional)* Whether and how the faces of the cubemap should be stitched into one
+    :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
         image. Defaults to ``ROW``.
     :param pil_args: *(optional)* Additional arguments for PIL's
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
@@ -139,7 +139,7 @@ def get_panorama(pano: StreetsidePanorama, zoom: int = 4,
     :param zoom: *(optional)* Image size; 0 is lowest, 4 is highest. Defaults to 4. If 4 is not available, 3 will be
       downloaded.
       (Note that only the old Microsoft panoramas go up to 4; the TomTom-provided panoramas stop at 3.)
-    :param stitching_method: *(optional)* Whether and how the faces of the cubemap should be stitched into one
+    :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
         image. Defaults to ``ROW``.
     :return: A PIL image or a list of six PIL images depending on ``stitching_method``.
     """
