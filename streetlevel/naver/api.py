@@ -20,6 +20,10 @@ def build_around_request_url(panoid: str) -> str:
     return f"https://panorama.map.naver.com/metadata/around/{panoid}?lang=ko"
 
 
+def build_depth_request_url(panoid: str) -> str:
+    return f"https://panorama.map.naver.com/depthmap/{panoid}"
+
+
 def find_panorama(lat: float, lon: float, session: Session = None) -> dict:
     return get_json(build_find_panorama_request_url(lat, lon), session=session)
 
@@ -50,3 +54,11 @@ def get_neighbors(panoid: str, session: Session = None) -> dict:
 
 async def get_neighbors_async(panoid: str, session: ClientSession) -> dict:
     return await get_json_async(build_around_request_url(panoid), session)
+
+
+def get_depth(panoid: str, session: Session = None) -> dict:
+    return get_json(build_depth_request_url(panoid), session=session)
+
+
+async def get_depth_async(panoid: str, session: ClientSession) -> dict:
+    return await get_json_async(build_depth_request_url(panoid), session)

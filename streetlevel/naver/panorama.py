@@ -4,6 +4,8 @@ from datetime import datetime
 from enum import IntEnum
 from typing import List
 
+import numpy as np
+
 
 class PanoramaType(IntEnum):
     """
@@ -62,6 +64,9 @@ class NaverPanorama:
     """The description field, which typically contains the neighborhood and city."""
     title: str = None
     """The title field, which typically contains the street name."""
+
+    depth: List[np.ndarray] = None
+    """The depth maps of the faces."""
 
     panorama_type: PanoramaType = None
     """The panorama type. Most identifiers are taken directly from the source."""

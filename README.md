@@ -110,7 +110,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">⚫</td>
     <td></td>
     <td align="center">✔</td>
-    <td align="center">❌</td>
+    <td align="center">✔<sup>5</sup></td>
     <td align="center">⚫<br></td>
   </tr>
   <tr>
@@ -223,7 +223,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
 2: Tile, z=17  
 3: Bounding box  
 4: Unstitched  
-5: Simplified  
+5: Appears to be a synthetic depth map created from elevation data and building footprints
 6: Month and year only for official coverage, full date for inofficial coverage  
 7: Only heading is implemented; inaccurate in some locations  
 8: Only heading; pitch/roll do not appear to be available  

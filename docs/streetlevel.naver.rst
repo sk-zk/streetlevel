@@ -7,10 +7,13 @@ Finding panoramas
     .. autofunction:: streetlevel.naver.find_panorama_async
     .. autofunction:: streetlevel.naver.find_panorama_by_id
     .. autofunction:: streetlevel.naver.find_panorama_by_id_async
+    .. autofunction:: streetlevel.naver.get_depth
+    .. autofunction:: streetlevel.naver.get_depth_async
     .. autofunction:: streetlevel.naver.get_historical
     .. autofunction:: streetlevel.naver.get_historical_async
     .. autofunction:: streetlevel.naver.get_neighbors
     .. autofunction:: streetlevel.naver.get_neighbors_async
+    
 
 Downloading panoramas
 ---------------------

@@ -3,6 +3,7 @@ from datetime import datetime
 from io import BytesIO
 from typing import Optional, List, Union, Tuple
 
+import numpy as np
 from aiohttp import ClientSession
 from PIL import Image
 from requests import Session
@@ -15,7 +16,7 @@ from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces,
 
 
 def find_panorama_by_id(panoid: str, language: str = "en",
-                        neighbors: bool = True, historical: bool = True,
+                        neighbors: bool = True, historical: bool = True, depth: bool = False,
                         session: Session = None) -> Optional[NaverPanorama]:
     """
     Fetches metadata of a specific panorama.
@@ -27,6 +28,8 @@ def find_panorama_by_id(panoid: str, language: str = "en",
         Defaults to True.
     :param historical: *(optional)* Whether an additional network request is made to fetch metadata of
         historical panoramas. Defaults to True.
+    :param depth: *(optional)* Whether an additional network request is made to fetch the depth map.
+        Defaults to False.
     :param session: *(optional)* A requests session.
     :return: A NaverPanorama object if a panorama with this ID exists, or None.
     """
@@ -40,11 +43,13 @@ def find_panorama_by_id(panoid: str, language: str = "en",
         pano.neighbors = get_neighbors(pano.id, session=session)
     if historical:
         pano.historical = get_historical(pano.timeline_id, session=session)
+    if depth:
+        pano.depth = get_depth(pano.id, session=session)
     return pano
 
 
-async def find_panorama_by_id_async(panoid: str, session: ClientSession, language: str = "en",
-                                    neighbors: bool = True, historical: bool = True) -> Optional[NaverPanorama]:
+async def find_panorama_by_id_async(panoid: str, session: ClientSession, language: str = "en", neighbors: bool = True,
+                                    historical: bool = True, depth: bool = False) -> Optional[NaverPanorama]:
     response = await api.find_panorama_by_id_async(panoid, language, session)
 
     if "errors" in response:
@@ -55,10 +60,12 @@ async def find_panorama_by_id_async(panoid: str, session: ClientSession, languag
         pano.neighbors = await get_neighbors_async(pano.id, session)
     if historical:
         pano.historical = await get_historical_async(pano.timeline_id, session)
+    if depth:
+        pano.depth = await get_depth_async(pano.id, session)
     return pano
 
 
-def find_panorama(lat: float, lon: float, neighbors: bool = True, historical: bool = True,
+def find_panorama(lat: float, lon: float, neighbors: bool = True, historical: bool = True, depth: bool = False,
                   session: Session = None) -> Optional[NaverPanorama]:
     """
     Searches for a panorama near the given point.
@@ -71,6 +78,8 @@ def find_panorama(lat: float, lon: float, neighbors: bool = True, historical: bo
         Defaults to True.
     :param historical: *(optional)* Whether an additional network request is made to fetch metadata of
         historical panoramas. Defaults to True.
+    :param depth: *(optional)* Whether an additional network request is made to fetch the depth map.
+        Defaults to False.
     :param session: *(optional)* A requests session.
     :return: A NaverPanorama object if a panorama was found, or None.
     """
@@ -84,11 +93,13 @@ def find_panorama(lat: float, lon: float, neighbors: bool = True, historical: bo
         pano.neighbors = get_neighbors(pano.id, session=session)
     if historical:
         pano.historical = get_historical(pano.id, session=session)
+    if depth:
+        pano.depth = get_depth(pano.id, session=session)
     return pano
 
 
-async def find_panorama_async(lat: float, lon: float, session: ClientSession,
-                              neighbors: bool = True, historical: bool = True) -> Optional[NaverPanorama]:
+async def find_panorama_async(lat: float, lon: float, session: ClientSession, neighbors: bool = True,
+                              historical: bool = True, depth: bool = False) -> Optional[NaverPanorama]:
     response = await api.find_panorama_async(lat, lon, session)
 
     if "error" in response or len(response["features"]) == 0:
@@ -99,6 +110,8 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession,
         pano.neighbors = await get_neighbors_async(pano.id, session)
     if historical:
         pano.historical = await get_historical_async(pano.id, session)
+    if depth:
+        pano.depth = await get_depth_async(pano.id, session)
     return pano
 
 
@@ -213,6 +226,32 @@ async def download_panorama_async(pano: NaverPanorama, path: str, session: Clien
 
     output = await get_panorama_async(pano, session, zoom=zoom, stitching_method=stitching_method)
     save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+
+
+def get_depth(panoid: str, session: Session = None) -> np.ndarray:
+    """
+    Fetches the depth map of a panorama.
+
+    :param panoid: The pano ID.
+    :param session: *(optional)* A requests session.
+    :return: The depth map of the faces in the order front, right, back, left, top, bottom.
+    """
+    depth_json = api.get_depth(panoid, session=session)
+    return _parse_depth(depth_json)
+
+
+async def get_depth_async(panoid: str, session: ClientSession) -> np.ndarray:
+    depth_json = await api.get_depth_async(panoid, session)
+    return _parse_depth(depth_json)
+
+
+def _parse_depth(depth_json: dict) -> np.ndarray:
+    depth = [float(n) for n in depth_json["depthmap"].split(",")]
+    depth_faces = []
+    for i in [0, 1, 2, 3, 5, 4]:
+        # this order ^ is intentional, it reverses the top and bottom face for consistency with everything else
+        depth_faces.append(np.array(depth[i * 4225:(i + 1) * 4225]).reshape(65, 65))
+    return np.array(depth_faces)
 
 
 def _validate_zoom(pano, zoom):
