@@ -171,7 +171,7 @@ class CubemapStitchingMethod(Enum):
     """The faces are combined into one image arranged as a net of a cube."""
 
     ROW = 2
-    """The faces are combined into one image arranged in one row."""
+    """The faces are combined into one image arranged in one row in the order front, right, back, left, top, bottom."""
 
 
 def stitch_cubemap_faces(faces: List[Image.Image], face_size: int,
