@@ -6,6 +6,8 @@ Finding panoramas
 -----------------
     .. autofunction:: streetlevel.yandex.find_panorama
     .. autofunction:: streetlevel.yandex.find_panorama_async
+    .. autofunction:: streetlevel.yandex.find_panorama_by_id
+    .. autofunction:: streetlevel.yandex.find_panorama_by_id_async
 
 
 Downloading panoramas
