@@ -26,3 +26,10 @@ Data classes and Enums
       :member-order: bysource
     .. autoclass:: streetlevel.naver.panorama.NaverPanorama
       :members:
+    .. autoclass:: streetlevel.naver.panorama.Neighbors
+      :members:
+    .. autoclass:: streetlevel.naver.panorama.Overlay
+      :members:
+    .. autoclass:: streetlevel.naver.panorama.PanoramaType
+      :members:
+      :member-order: bysource
