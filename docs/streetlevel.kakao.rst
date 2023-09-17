@@ -1,14 +1,12 @@
 streetlevel.kakao: Kakao Road View
 ===================================
 
-
 Finding panoramas
 -----------------
     .. autofunction:: streetlevel.kakao.find_panoramas
     .. autofunction:: streetlevel.kakao.find_panoramas_async
     .. autofunction:: streetlevel.kakao.find_panorama_by_id
     .. autofunction:: streetlevel.kakao.find_panorama_by_id_async
-
 
 Downloading panoramas
 ---------------------
@@ -21,10 +19,9 @@ Downloading panoramas
     .. autofunction:: streetlevel.kakao.download_depthmap
     .. autofunction:: streetlevel.kakao.download_depthmap_async
 
-
 Data classes and enums
 ----------------------
-    .. autoclass:: streetlevel.kakao.panorama.CameraType
+    .. autoclass:: streetlevel.kakao.panorama.PanoramaType
       :members:
       :member-order: bysource
     .. autoclass:: streetlevel.kakao.panorama.KakaoPanorama

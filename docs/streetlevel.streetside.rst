@@ -11,8 +11,6 @@ Finding panoramas
     .. autofunction:: streetlevel.streetside.find_panorama_by_id
     .. autofunction:: streetlevel.streetside.find_panorama_by_id_async
 
-
-
 Downloading panoramas
 ---------------------
     .. autofunction:: streetlevel.streetside.get_panorama
@@ -20,8 +18,11 @@ Downloading panoramas
     .. autofunction:: streetlevel.streetside.download_panorama
     .. autofunction:: streetlevel.streetside.download_panorama_async
 
-Data classes
-------------
+Data classes and Enums
+----------------------
+    .. autoclass:: streetlevel.util.CubemapStitchingMethod
+      :members:
+      :member-order: bysource
     .. autoclass:: streetlevel.streetside.panorama.StreetsidePanorama
       :members:
 
