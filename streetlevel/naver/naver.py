@@ -12,7 +12,7 @@ from . import api
 from .panorama import NaverPanorama, PanoramaType, Overlay, Neighbors
 from ..dataclasses import Tile
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
-    save_cubemap_panorama
+    save_cubemap_panorama, get_image, get_image_async
 
 
 def find_panorama_by_id(panoid: str, language: str = "en",
@@ -181,6 +181,8 @@ def get_panorama(pano: NaverPanorama, zoom: int = 2,
     :return: A PIL image or a list of six PIL images depending on ``stitching_method``.
     """
     zoom = _validate_zoom(pano, zoom)
+    if zoom == 0:
+        return _get_zoom_0(pano, stitching_method)
     face_tiles, cols, rows = _generate_tile_list(pano.id, zoom)
     tile_images = _download_tiles(face_tiles)
     return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
@@ -190,6 +192,8 @@ async def get_panorama_async(pano: NaverPanorama, session: ClientSession, zoom: 
                              stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW) \
         -> Union[List[Image.Image], Image.Image]:
     zoom = _validate_zoom(pano, zoom)
+    if zoom == 0:
+        return await _get_zoom_0_async(pano, session, stitching_method)
     face_tiles, cols, rows = _generate_tile_list(pano.id, zoom)
     tile_images = await _download_tiles_async(face_tiles, session)
     return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
@@ -252,6 +256,21 @@ def _parse_depth(depth_json: dict) -> np.ndarray:
         # this order ^ is intentional, it reverses the top and bottom face for consistency with everything else
         depth_faces.append(np.array(depth[i * 4225:(i + 1) * 4225]).reshape(65, 65))
     return np.array(depth_faces)
+
+
+def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -> Image.Image:
+    FACE_SIZE = 256
+    image = get_image(f"https://panorama.pstatic.net/image/{pano.id}/512/P")
+    faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]
+    return stitch_cubemap_faces(faces, FACE_SIZE, stitching_method)
+
+
+async def _get_zoom_0_async(pano: NaverPanorama, session: ClientSession,
+                            stitching_method: CubemapStitchingMethod) -> Image.Image:
+    FACE_SIZE = 256
+    image = await get_image_async(f"https://panorama.pstatic.net/image/{pano.id}/512/P", session)
+    faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]
+    return stitch_cubemap_faces(faces, FACE_SIZE, stitching_method)
 
 
 def _validate_zoom(pano, zoom):
