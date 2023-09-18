@@ -1,9 +1,7 @@
 import itertools
 import math
-from io import BytesIO
 from typing import List, Optional
 
-import requests
 from PIL import Image
 from aiohttp import ClientSession
 
@@ -12,7 +10,7 @@ from . import api
 from requests import Session
 from ..dataclasses import Size, Tile
 from ..geo import opk_to_rotation
-from ..util import download_tiles, download_tiles_async, stitch_tiles
+from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
 
 
 def find_panorama(lat: float, lon: float,
@@ -131,7 +129,7 @@ async def find_panorama_by_id_async(panoid: int,
 
 def get_neighbors(panoid: int, year: Optional[int] = None) -> List[MapyPanorama]:
     """
-    Gets neighbors of a panorama.
+    Fetches neighbors of a panorama.
 
     :param panoid: The pano ID.
     :param year: *(optional)* If given, fetches neighbors for a specific year. Otherwise, the most recent coverage
@@ -178,15 +176,11 @@ def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image.Image:
 
     if zoom == 0:
         return _get_zoom_0(pano)
-    else:
-        tiles = _generate_tile_list(pano, zoom)
-        tile_images = download_tiles(tiles)
-        stitched = stitch_tiles(tile_images,
-                                pano.tile_size.x * pano.num_tiles[zoom].x,
-                                pano.tile_size.y * pano.num_tiles[zoom].y,
-                                pano.tile_size.x,
-                                pano.tile_size.y)
-        return stitched
+
+    return get_equirectangular_panorama(
+        pano.tile_size.x * pano.num_tiles[zoom].x,
+        pano.tile_size.y * pano.num_tiles[zoom].y,
+        pano.tile_size, _generate_tile_list(pano, zoom))
 
 
 async def get_panorama_async(pano: MapyPanorama, session: ClientSession, zoom: int = 2) -> Image.Image:
@@ -194,15 +188,12 @@ async def get_panorama_async(pano: MapyPanorama, session: ClientSession, zoom: i
 
     if zoom == 0:
         return await _get_zoom_0_async(pano, session)
-    else:
-        tiles = _generate_tile_list(pano, zoom)
-        tile_images = await download_tiles_async(tiles, session)
-        stitched = stitch_tiles(tile_images,
-                                pano.tile_size.x * pano.num_tiles[zoom].x,
-                                pano.tile_size.y * pano.num_tiles[zoom].y,
-                                pano.tile_size.x,
-                                pano.tile_size.y)
-        return stitched
+
+    return await get_equirectangular_panorama_async(
+        pano.tile_size.x * pano.num_tiles[zoom].x,
+        pano.tile_size.y * pano.num_tiles[zoom].y,
+        pano.tile_size, _generate_tile_list(pano, zoom),
+        session)
 
 
 def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
@@ -307,19 +298,11 @@ def _parse_angles(pan_info: dict, pano: MapyPanorama) -> None:
 
 
 def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image.Image:
-    tile_url = _generate_tile_list(pano, 0)[0].url
-    if session is None:
-        session = requests.Session()
-    response = session.get(tile_url)
-    image = Image.open(BytesIO(response.content))
-    return image
+    return get_image(_generate_tile_list(pano, 0)[0].url, session=session)
 
 
 async def _get_zoom_0_async(pano: MapyPanorama, session: ClientSession) -> Image.Image:
-    tile_url = _generate_tile_list(pano, 0)[0].url
-    response = await session.get(tile_url)
-    image = Image.open(BytesIO(await response.read()))
-    return image
+    return await get_image_async(_generate_tile_list(pano, 0)[0].url, session)
 
 
 def _generate_tile_list(pano: MapyPanorama, zoom: int) -> List[Tile]:

@@ -29,3 +29,21 @@
 #streetlevel\.lookaround\.panorama\.LookaroundPanorama + dd .field-list {
   display:none !important;
 }
+
+#streetlevel\.yandex\.panorama\.YandexPanorama + dd .field-list {
+  display:none !important;
+}
+
+#streetlevel\.kakao\.panorama\.KakaoPanorama + dd .field-list {
+  display:none !important;
+}
+
+#streetlevel\.naver\.panorama\.NaverPanorama + dd .field-list {
+  display:none !important;
+}
+#streetlevel\.naver\.panorama\.Neighbors + dd .field-list {
+  display:none !important;
+}
+#streetlevel\.naver\.panorama\.Overlay + dd .field-list {
+  display:none !important;
+}

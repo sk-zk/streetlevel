@@ -43,6 +43,7 @@ class StreetViewPanorama:
     """
 
     neighbors: List[StreetViewPanorama] = field(default_factory=list)
+    """A list of nearby panoramas."""
     historical: List[StreetViewPanorama] = field(default_factory=list)
     """A list of panoramas with a different date at the same location."""
 
@@ -66,7 +67,8 @@ class StreetViewPanorama:
     | The address of the location and the languages of the names, e.g.:
     | ``[LocalizedString(value='3 Theaterpl.', language='de'), LocalizedString(value='Merano, Trentino-South Tyrol', language='en')]``.
     |
-    | This can be localized using the locale parameter on the `find` functions (if a localization is available). 
+    | This can be localized using the locale parameter on the `find` functions (if the string is available 
+      in that language). 
       For instance, requesting Italian locale (``it``) for the same location as above yields:
     | ``[LocalizedString(value='3 Piazza Teatro', language='it'), LocalizedString(value='Merano, Trentino-Alto Adige', language='it')]``.
     
@@ -107,7 +109,7 @@ class StreetViewPanorama:
         return output
 
     def __str__(self):
-        return f"{self.id} ({self.lat:.6}, {self.lon:.6})"
+        return f"{self.id} ({self.lat:.5f}, {self.lon:.5f})"
 
 
 @dataclass

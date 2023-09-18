@@ -14,7 +14,7 @@ mapy.api.getbest = mocked_getbest
 
 
 def test_find_panorama():
-    pano = mapy.find_panorama(50.1265193, 17.3762701, 100.0)
+    pano = mapy.find_panorama(50.1265193, 17.3762701, 100.0, historical=False, neighbors=False)
     assert pano.id == 59418543
     assert pano.lat == approx(50.1265193, 0.001)
     assert pano.lon == approx(17.3762701, 0.001)
