@@ -19,11 +19,20 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Topic :: Scientific/Engineering :: GIS",
 ]
-dynamic = ["dependencies"]
+dependencies = [
+    "Pillow",
+    "aiohttp",
+    "numpy",
+    "protobuf > 4",
+    "pycryptodome",
+    "pyfrpc",
+    "pyproj",
+    "pytest",
+    "pytest-asyncio",
+    "requests",
+    "scipy",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/sk-zk/streetlevel"
 "Bug Tracker" = "https://github.com/sk-zk/streetlevel/issues"
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
