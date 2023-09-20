@@ -80,8 +80,8 @@ def get_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
     :param session: *(optional)* A requests session.
     :return: The HEIC file containing the face.
     """
-    panoid, region_id = _panoid_to_string(pano)
-    url = _build_panorama_face_url(panoid, region_id, int(face), zoom, auth)
+    panoid, batch_id = _panoid_to_string(pano)
+    url = _build_panorama_face_url(panoid, batch_id, int(face), zoom, auth)
     requester = session if session else requests
     response = requester.get(url)
 
@@ -134,16 +134,16 @@ async def download_panorama_face_async(pano: Union[LookaroundPanorama, Tuple[int
 
 def _panoid_to_string(pano):
     if isinstance(pano, LookaroundPanorama):
-        panoid, region_id = str(pano.id), str(pano.region_id)
+        panoid, batch_id = str(pano.id), str(pano.batch_id)
     else:
-        panoid, region_id = str(pano[0]), str(pano[1])
+        panoid, batch_id = str(pano[0]), str(pano[1])
 
     if len(panoid) > 20:
-        raise ValueError("panoid must not be longer than 20 digits.")
-    if len(region_id) > 10:
-        raise ValueError("region_id must not be longer than 10 digits.")
+        raise ValueError("Pano ID must not be longer than 20 digits.")
+    if len(batch_id) > 10:
+        raise ValueError("batch_id must not be longer than 10 digits.")
 
-    return panoid, region_id
+    return panoid, batch_id
 
 
 def _parse_panos(tile, tile_x, tile_y):
@@ -157,11 +157,11 @@ def _parse_panos(tile, tile_x, tile_y):
         heading = _convert_heading(lat, lon, raw_pano.location.heading)
         pano = LookaroundPanorama(
             raw_pano.panoid,
-            tile.unknown13[raw_pano.region_id_idx].region_id,
+            tile.unknown13[raw_pano.batch_id_idx].batch_id,
             lat,
             lon,
             heading,
-            CoverageType(tile.unknown13[raw_pano.region_id_idx].coverage_type),
+            CoverageType(tile.unknown13[raw_pano.batch_id_idx].coverage_type),
             datetime.utcfromtimestamp(raw_pano.timestamp / 1000.0)
         )
         panos.append(pano)
@@ -196,12 +196,12 @@ def _protobuf_tile_offset_to_wgs84(x_offset: int, y_offset: int, tile_x: int, ti
     return lat, lon
 
 
-def _build_panorama_face_url(panoid: str, region_id: str, face: int, zoom: int, auth: Authenticator) -> str:
+def _build_panorama_face_url(panoid: str, batch_id: str, face: int, zoom: int, auth: Authenticator) -> str:
     zoom = min(7, zoom)
     panoid_padded = panoid.zfill(20)
     panoid_split = [panoid_padded[i:i + 4] for i in range(0, len(panoid_padded), 4)]
     panoid_url = "/".join(panoid_split)
-    region_id_padded = region_id.zfill(10)
-    url = FACE_ENDPOINT + f"{panoid_url}/{region_id_padded}/t/{face}/{zoom}"
+    batch_id_padded = batch_id.zfill(10)
+    url = FACE_ENDPOINT + f"{panoid_url}/{batch_id_padded}/t/{face}/{zoom}"
     url = auth.authenticate_url(url)
     return url
