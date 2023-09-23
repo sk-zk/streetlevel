@@ -156,13 +156,14 @@ def _parse_panos(tile, tile_x, tile_y):
             tile_y)
         heading = _convert_heading(lat, lon, raw_pano.location.heading)
         pano = LookaroundPanorama(
-            raw_pano.panoid,
-            tile.unknown13[raw_pano.batch_id_idx].batch_id,
-            lat,
-            lon,
-            heading,
-            CoverageType(tile.unknown13[raw_pano.batch_id_idx].coverage_type),
-            datetime.utcfromtimestamp(raw_pano.timestamp / 1000.0)
+            id=raw_pano.panoid,
+            batch_id=tile.unknown13[raw_pano.batch_id_idx].batch_id,
+            lat=lat,
+            lon=lon,
+            heading=heading,
+            coverage_type=CoverageType(tile.unknown13[raw_pano.batch_id_idx].coverage_type),
+            date=datetime.utcfromtimestamp(raw_pano.timestamp / 1000.0),
+            has_blurs=tile.unknown13[raw_pano.batch_id_idx].unknown14 != 0,
         )
         panos.append(pano)
     return panos

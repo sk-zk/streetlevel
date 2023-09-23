@@ -33,13 +33,9 @@ class LookaroundPanorama:
     """
 
     lat: float
-    """
-    Latitude of the panorama's location.
-    """
+    """Latitude of the panorama's location."""
     lon: float
-    """
-    Longitude of the panorama's location.
-    """
+    """Longitude of the panorama's location."""
 
     heading: float = None
     """
@@ -52,13 +48,12 @@ class LookaroundPanorama:
     """
 
     coverage_type: CoverageType = None
-    """
-    Whether the coverage was taken by car or by backpack.
-    """
+    """Whether the coverage was taken by car or by backpack."""
     date: datetime = None
-    """
-    Capture date and time of the panorama (in UTC, not local time).
-    """
+    """Capture date and time of the panorama (in UTC, not local time)."""
+
+    has_blurs: bool = None
+    """Whether something in this panorama, typically a building, has been blurred."""
 
     def __repr__(self):
         return str(self)
