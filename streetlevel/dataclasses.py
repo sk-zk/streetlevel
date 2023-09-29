@@ -3,13 +3,15 @@ from dataclasses import dataclass
 
 @dataclass
 class Size:
+    """Represents a size."""
+
     x: int
     y: int
 
 
 @dataclass
 class Tile:
-    """Represents the coordinate and URL of one tile of a tiled panorama."""
+    """The coordinate and URL of one tile of a tiled panorama."""
 
     x: int
     """X coordinate of the tile."""
@@ -21,9 +23,8 @@ class Tile:
 
 @dataclass
 class Link:
-    """
-    A linked panorama.
-    """
+    """A linked panorama."""
+
     pano: any
     """The panorama."""
     direction: float

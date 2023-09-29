@@ -16,6 +16,10 @@ a module for downloading panoramas and metadata from street-level imagery provid
    streetlevel.streetview
    streetlevel.yandex
 
+.. toctree::
+   :maxdepth: 1
+   
+   streetlevel.dataclasses
 
 Indices and tables
 ==================

@@ -5,7 +5,13 @@
  * for dataclass constructors.
  */
 
- #streetlevel\.streetview\.dataclasses\.Link + dd .field-list {
+ #streetlevel\.dataclasses\.Link + dd .field-list {
+  display:none !important;
+}
+ #streetlevel\.dataclasses\.Size + dd .field-list {
+  display:none !important;
+}
+ #streetlevel\.dataclasses\.Tile + dd .field-list {
   display:none !important;
 }
 
