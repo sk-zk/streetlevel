@@ -10,7 +10,7 @@ from requests import Session
 
 from . import api
 from .panorama import KakaoPanorama, PanoramaType
-from ..dataclasses import Tile, Size
+from ..dataclasses import Tile, Size, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
     get_image_async, download_file, download_file_async
 
@@ -202,9 +202,28 @@ def _parse_panorama(pano_json: dict) -> KakaoPanorama:
         street_type=try_get(lambda: pano_json["st_type"]),
         panorama_type=PanoramaType(int(pano_json["shot_tool"]))
     )
+
     if "past" in pano_json and pano_json["past"] is not None:
         pano.historical = [_parse_panorama(past) for past in pano_json["past"]]
+
+    if "spot" in pano_json and pano_json["past"] is not None:
+        pano.links = _parse_links(pano_json["spot"])
+
     return pano
+
+
+def _parse_links(links_json: List[dict]) -> List[Link]:
+    links = []
+    for linked_json in links_json:
+        linked = KakaoPanorama(
+            id=linked_json["id"],
+            lat=linked_json["wgsy"],
+            lon=linked_json["wgsx"],
+            street_name=try_get(lambda: linked_json["st_name"]),
+        )
+        angle = math.radians(float(linked_json["pan"]))
+        links.append(Link(linked, angle))
+    return links
 
 
 def _generate_tile_list(pano: KakaoPanorama, zoom: int) -> List[Tile]:

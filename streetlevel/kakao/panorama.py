@@ -4,6 +4,8 @@ from datetime import datetime
 from enum import IntEnum
 from typing import List
 
+from streetlevel.dataclasses import Link
+
 
 class PanoramaType(IntEnum):
     """
@@ -23,7 +25,12 @@ class PanoramaType(IntEnum):
 
 @dataclass
 class KakaoPanorama:
-    """Metadata of a Kakao Road View panorama."""
+    """
+    Metadata of a Kakao Road View panorama.
+
+    ID, latitude and longitude are always present. The availability of other metadata depends on which function
+    was called and what was returned by the API.
+    """
 
     id: int
     """The pano ID."""
@@ -40,6 +47,8 @@ class KakaoPanorama:
 
     neighbors: List[KakaoPanorama] = None
     """A list of nearby panoramas."""
+    links: List[Link] = None
+    """The panoramas which the white arrows in the client link to."""
     historical: List[KakaoPanorama] = None
     """A list of panoramas with a different date at the same location. 
     Only available if the panorama was retrieved by ``find_panorama_by_id``."""
