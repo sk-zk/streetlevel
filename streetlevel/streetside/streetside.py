@@ -115,7 +115,7 @@ def download_panorama(pano: StreetsidePanorama, path: str, zoom: int = 4,
         pil_args = {}
 
     output = get_panorama(pano, zoom=zoom, stitching_method=stitching_method)
-    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+    save_cubemap_panorama(output, path, pil_args)
 
 
 async def download_panorama_async(pano: StreetsidePanorama, path: str, session: ClientSession, zoom: int = 4,
@@ -125,7 +125,7 @@ async def download_panorama_async(pano: StreetsidePanorama, path: str, session: 
         pil_args = {}
 
     output = await get_panorama_async(pano, session, zoom=zoom, stitching_method=stitching_method)
-    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+    save_cubemap_panorama(output, path, pil_args)
 
 
 def get_panorama(pano: StreetsidePanorama, zoom: int = 4,
