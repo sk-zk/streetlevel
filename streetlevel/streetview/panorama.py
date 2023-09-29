@@ -44,6 +44,8 @@ class StreetViewPanorama:
 
     neighbors: List[StreetViewPanorama] = field(default_factory=list)
     """A list of nearby panoramas."""
+    links: List[Link] = field(default_factory=list)
+    """The panoramas which the white arrows in the client link to."""
     historical: List[StreetViewPanorama] = field(default_factory=list)
     """A list of panoramas with a different date at the same location."""
 
@@ -147,3 +149,14 @@ class CaptureDate:
     """The month the panorama was taken."""
     day: int = None
     """The day the panorama was taken. Only available for third-party panoramas."""
+
+
+@dataclass
+class Link:
+    """
+    A linked panorama.
+    """
+    pano: StreetViewPanorama
+    """The panorama."""
+    direction: float
+    """Angle in radians."""
