@@ -1,10 +1,14 @@
 @import 'theme.css';
 
 
-/* Workaround for removing that parameter vomit which Sphinx generates 
+/* Workaround for removing that parameter vomit which Sphinx generates
  * for dataclass constructors.
  */
- 
+
+ #streetlevel\.streetview\.dataclasses\.Link + dd .field-list {
+  display:none !important;
+}
+
 #streetlevel\.streetview\.panorama\.StreetViewPanorama + dd .field-list {
   display:none !important;
 }
@@ -15,9 +19,6 @@
   display:none !important;
 }
 #streetlevel\.streetview\.panorama\.LocalizedString + dd .field-list {
-  display:none !important;
-}
-#streetlevel\.streetview\.panorama\.Link + dd .field-list {
   display:none !important;
 }
 

@@ -4,7 +4,7 @@ from typing import List
 
 from numpy import ndarray
 
-from streetlevel.dataclasses import Size
+from streetlevel.dataclasses import Size, Link
 
 
 @dataclass
@@ -149,14 +149,3 @@ class CaptureDate:
     """The month the panorama was taken."""
     day: int = None
     """The day the panorama was taken. Only available for third-party panoramas."""
-
-
-@dataclass
-class Link:
-    """
-    A linked panorama.
-    """
-    pano: StreetViewPanorama
-    """The panorama."""
-    direction: float
-    """Angle in radians."""

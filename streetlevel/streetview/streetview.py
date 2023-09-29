@@ -5,10 +5,10 @@ from aiohttp import ClientSession
 from requests import Session
 
 from streetlevel.geo import *
-from .panorama import StreetViewPanorama, LocalizedString, CaptureDate, Link
+from .panorama import StreetViewPanorama, LocalizedString, CaptureDate
 from .depth import parse as parse_depth
 from . import api
-from ..dataclasses import Size, Tile
+from ..dataclasses import Size, Tile, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 from .util import is_third_party_panoid
 

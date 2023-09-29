@@ -17,3 +17,14 @@ class Tile:
     """Y coordinate of the tile."""
     url: str
     """URL of the tile."""
+
+
+@dataclass
+class Link:
+    """
+    A linked panorama.
+    """
+    pano: any
+    """The panorama."""
+    direction: float
+    """Angle in radians."""
