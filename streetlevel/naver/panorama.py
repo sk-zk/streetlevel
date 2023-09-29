@@ -6,6 +6,8 @@ from typing import List
 
 import numpy as np
 
+from streetlevel.dataclasses import Link
+
 
 class PanoramaType(IntEnum):
     """
@@ -47,6 +49,8 @@ class NaverPanorama:
 
     neighbors: Neighbors = None
     """A list of nearby panoramas."""
+    links: List[Link] = None
+    """The panoramas which the white dots in the client link to."""
     historical: List[NaverPanorama] = None
     """A list of panoramas with a different date at the same location. 
     Only available if the panorama was retrieved by ``find_panorama_by_id``."""

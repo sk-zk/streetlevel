@@ -10,7 +10,7 @@ from requests import Session
 
 from . import api
 from .panorama import NaverPanorama, PanoramaType, Overlay, Neighbors
-from ..dataclasses import Tile
+from ..dataclasses import Tile, Link
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
     save_cubemap_panorama, get_image, get_image_async
 
@@ -394,8 +394,29 @@ def _parse_panorama(response: dict) -> NaverPanorama:
         title=basic["title"],
         panorama_type=PanoramaType(int(basic["dtl_type"]))
     )
+
     if len(basic["image"]["overlays"]) > 1:
         pano.overlay = Overlay(
             "https://panorama.map.naver.com" + basic["image"]["overlays"][1][0],
             "https://panorama.map.naver.com" + basic["image"]["overlays"][1][1])
+
+    pano.links = _parse_links(basic["links"])
+
     return pano
+
+
+def _parse_links(links_json: List) -> Optional[List[Link]]:
+    if len(links_json) < 2:
+        return None
+
+    links = []
+    for linked_json in links_json[1:]:
+        linked = NaverPanorama(
+            id=linked_json[0],
+            title=linked_json[1],
+            lat=linked_json[5],
+            lon=linked_json[4],
+        )
+        angle = math.radians(float(linked_json[2]))
+        links.append(Link(linked, angle))
+    return links
