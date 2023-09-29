@@ -8,7 +8,7 @@ from aiohttp import ClientSession
 from .panorama import MapyPanorama
 from . import api
 from requests import Session
-from ..dataclasses import Size, Tile
+from ..dataclasses import Size, Tile, Link
 from ..geo import opk_to_rotation
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
 
@@ -16,7 +16,7 @@ from ..util import get_equirectangular_panorama, get_equirectangular_panorama_as
 def find_panorama(lat: float, lon: float,
                   radius: float = 100.0,
                   year: Optional[int] = None,
-                  neighbors: bool = True,
+                  links: bool = True,
                   historical: bool = True) -> Optional[MapyPanorama]:
     """
     Searches for a panorama within a radius around a point.
@@ -25,7 +25,7 @@ def find_panorama(lat: float, lon: float,
     :param lon: Longitude of the center point.
     :param radius: *(optional)* Search radius in meters. Defaults to 100.
     :param year: *(optional)* If given, searches for a specific year. Otherwise, the most recent panorama is returned.
-    :param neighbors: *(optional)* Whether an additional network request is made to fetch nearby panoramas.
+    :param links: *(optional)* Whether an additional network request is made to fetch linked panoramas.
         Defaults to True.
     :param historical: *(optional)* Whether additional network requests are made to fetch metadata of
         panoramas from other years. Defaults to True.
@@ -44,8 +44,8 @@ def find_panorama(lat: float, lon: float,
     pan_info = response["result"]["panInfo"]
     pano = _parse_pan_info_dict(pan_info)
 
-    if neighbors:
-        pano.neighbors = get_neighbors(pano.id, year=pano.date.year)
+    if links:
+        pano.links = get_links(pano.id, year=pano.date.year)
     if historical:
         _append_historical(lat, lon, pan_info, pano)
 
@@ -55,7 +55,7 @@ def find_panorama(lat: float, lon: float,
 async def find_panorama_async(lat: float, lon: float,
                               radius: float = 100.0,
                               year: Optional[int] = None,
-                              neighbors: bool = True,
+                              links: bool = True,
                               historical: bool = True) -> Optional[MapyPanorama]:
     # TODO reduce duplication
     radius = float(radius)
@@ -71,8 +71,8 @@ async def find_panorama_async(lat: float, lon: float,
     pan_info = response["result"]["panInfo"]
     pano = _parse_pan_info_dict(pan_info)
 
-    if neighbors:
-        pano.neighbors = await get_neighbors_async(pano.id, year=pano.date.year)
+    if links:
+        pano.links = await get_links_async(pano.id, year=pano.date.year)
     if historical:
         await _append_historical_async(lat, lon, pan_info, pano)
 
@@ -80,13 +80,13 @@ async def find_panorama_async(lat: float, lon: float,
 
 
 def find_panorama_by_id(panoid: int,
-                        neighbors: bool = True,
+                        links: bool = True,
                         historical: bool = True) -> Optional[MapyPanorama]:
     """
     Fetches metadata of a specific panorama.
 
     :param panoid: The pano ID.
-    :param neighbors: *(optional)* Whether an additional network request is made to fetch nearby panoramas.
+    :param links: *(optional)* Whether an additional network request is made to fetch linked panoramas.
         Defaults to True.
     :param historical: *(optional)* Whether additional network requests are made to fetch metadata of
         panoramas from other years. Defaults to True.
@@ -100,8 +100,8 @@ def find_panorama_by_id(panoid: int,
     pan_info = response["result"]
     pano = _parse_pan_info_dict(pan_info)
 
-    if neighbors:
-        pano.neighbors = get_neighbors(pano.id, year=pano.date.year)
+    if links:
+        pano.links = get_links(pano.id, year=pano.date.year)
     if historical:
         _append_historical(pano.lat, pano.lon, pan_info, pano)
 
@@ -109,7 +109,7 @@ def find_panorama_by_id(panoid: int,
 
 
 async def find_panorama_by_id_async(panoid: int,
-                                    neighbors: bool = True,
+                                    links: bool = True,
                                     historical: bool = True) -> Optional[MapyPanorama]:
     response = await api.detail_async(panoid)
 
@@ -119,20 +119,20 @@ async def find_panorama_by_id_async(panoid: int,
     pan_info = response["result"]
     pano = _parse_pan_info_dict(pan_info)
 
-    if neighbors:
-        pano.neighbors = await get_neighbors_async(pano.id, year=pano.date.year)
+    if links:
+        pano.links = await get_links_async(pano.id, year=pano.date.year)
     if historical:
         await _append_historical_async(pano.lat, pano.lon, pan_info, pano)
 
     return pano
 
 
-def get_neighbors(panoid: int, year: Optional[int] = None) -> List[MapyPanorama]:
+def get_links(panoid: int, year: Optional[int] = None) -> List[Link]:
     """
-    Fetches neighbors of a panorama.
+    Fetches linked panoramas.
 
     :param panoid: The pano ID.
-    :param year: *(optional)* If given, fetches neighbors for a specific year. Otherwise, the most recent coverage
+    :param year: *(optional)* If given, fetches links for a specific year. Otherwise, the most recent coverage
         is returned.
     :return: A list of nearby panoramas.
     """
@@ -146,10 +146,10 @@ def get_neighbors(panoid: int, year: Optional[int] = None) -> List[MapyPanorama]
     if response["status"] != 200:
         return []
 
-    return _neighbors_response_to_list(response)
+    return _neighbors_response_to_links(response)
 
 
-async def get_neighbors_async(panoid: int, year: Optional[int] = None) -> List[MapyPanorama]:
+async def get_links_async(panoid: int, year: Optional[int] = None) -> List[Link]:
     if year is None:
         options = None
     else:
@@ -160,7 +160,7 @@ async def get_neighbors_async(panoid: int, year: Optional[int] = None) -> List[M
     if response["status"] != 200:
         return []
 
-    return _neighbors_response_to_list(response)
+    return _neighbors_response_to_links(response)
 
 
 def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image.Image:
@@ -227,7 +227,7 @@ def _append_historical(lat, lon, pan_info, pano):
         if pano.date.year == year:
             continue
         historical_pano = find_panorama(lat, lon, 50.0, year=year,
-                                        historical=False, neighbors=False)
+                                        historical=False, links=False)
         pano.historical.append(historical_pano)
 
 
@@ -236,14 +236,16 @@ async def _append_historical_async(lat, lon, pan_info, pano):
         if pano.date.year == year:
             continue
         historical_pano = await find_panorama_async(lat, lon, 50.0, year=year,
-                                                    historical=False, neighbors=False)
+                                                    historical=False, links=False)
         pano.historical.append(historical_pano)
 
 
-def _neighbors_response_to_list(response: dict) -> List[MapyPanorama]:
+def _neighbors_response_to_links(response: dict) -> List[Link]:
     panos = []
     for pan_info in response["result"]["neighbours"]:
-        panos.append(_parse_pan_info_dict(pan_info["near"]))
+        pano = _parse_pan_info_dict(pan_info["near"])
+        angle = math.radians(float(pan_info["angle"]))
+        panos.append(Link(pano, angle))
     return panos
 
 

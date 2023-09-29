@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List
 
-from streetlevel.dataclasses import Size
+from streetlevel.dataclasses import Size, Link
 
 
 @dataclass
@@ -51,8 +51,8 @@ class MapyPanorama:
     roll: float = None
     """Roll offset for upright correction of the panorama, in radians."""
 
-    neighbors: List[MapyPanorama] = field(default_factory=list)
-    """A list of nearby panoramas."""
+    links: List[Link] = field(default_factory=list)
+    """The panoramas which the arrows in the client link to."""
     historical: List[MapyPanorama] = field(default_factory=list)
     """A list of panoramas with a different date at the same location."""
 
