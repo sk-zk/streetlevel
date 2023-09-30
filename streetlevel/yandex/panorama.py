@@ -4,11 +4,17 @@ from datetime import datetime
 from typing import List
 
 
-from streetlevel.dataclasses import Size
+from streetlevel.dataclasses import Size, Link
 
 
 @dataclass
 class YandexPanorama:
+    """
+    Metadata of a Yandex panorama.
+
+    ID, latitude and longitude are always present. The availability of other metadata depends on which function
+    was called and what was returned by the API.
+    """
     id: str
     """The pano ID."""
     lat: float
@@ -31,6 +37,8 @@ class YandexPanorama:
 
     neighbors: List[YandexPanorama] = None
     """A list of nearby panoramas."""
+    links: List[Link] = None
+    """The panoramas which the white arrows in the client link to."""
     historical: List[YandexPanorama] = None
     """A list of panoramas with a different date at the same location."""
 
