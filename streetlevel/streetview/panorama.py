@@ -116,13 +116,14 @@ class StreetViewPanorama:
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
         :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 90°.
-        :param fov: *(optional)* Initial FOV of the viewport. Defaults to 75.
+        :param fov: *(optional)* Initial FOV of the viewport. Defaults to 75°.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
         :return: A Google Maps URL.
         """
         if radians:
             heading = math.degrees(heading)
             pitch = math.degrees(pitch)
+            fov = math.degrees(fov)
         return f"https://www.google.com/maps/@{self.lat},{self.lon},3a,{fov}y,{heading}h,{pitch}t" \
                f"/data=!3m4!1e1!3m2!1s{self.id}!2e{10 if self.is_third_party else 0}"
 
