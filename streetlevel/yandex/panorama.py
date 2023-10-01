@@ -44,7 +44,7 @@ class YandexPanorama:
 
     date: datetime = None
     """Capture date and time of the panorama."""
-    height: int = None
+    height: float = None
     """Height above ground (not sea level) in meters."""
     street_name: str = None
     """The name of the street the panorama is located on."""
