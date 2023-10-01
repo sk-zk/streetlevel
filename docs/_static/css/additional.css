@@ -5,55 +5,55 @@
  * for dataclass constructors.
  */
 
- #streetlevel\.dataclasses\.Link + dd .field-list {
+ #streetlevel\.dataclasses\.Link + dd > dl:first-of-type.field-list {
   display:none !important;
 }
- #streetlevel\.dataclasses\.Size + dd .field-list {
+ #streetlevel\.dataclasses\.Size + dd > dl:first-of-type.field-list {
   display:none !important;
 }
- #streetlevel\.dataclasses\.Tile + dd .field-list {
-  display:none !important;
-}
-
-#streetlevel\.streetview\.panorama\.StreetViewPanorama + dd .field-list {
-  display:none !important;
-}
-#streetlevel\.streetview\.panorama\.CaptureDate + dd .field-list {
-  display:none !important;
-}
-#streetlevel\.streetview\.panorama\.DepthMap + dd .field-list {
-  display:none !important;
-}
-#streetlevel\.streetview\.panorama\.LocalizedString + dd .field-list {
+ #streetlevel\.dataclasses\.Tile + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
-#streetlevel\.streetside\.panorama\.StreetsidePanorama + dd .field-list {
+#streetlevel\.streetview\.panorama\.StreetViewPanorama + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.streetview\.panorama\.CaptureDate + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.streetview\.panorama\.DepthMap + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.streetview\.panorama\.LocalizedString + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
-#streetlevel\.mapy\.panorama\.MapyPanorama + dd .field-list {
+#streetlevel\.streetside\.panorama\.StreetsidePanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
-#streetlevel\.lookaround\.panorama\.LookaroundPanorama + dd .field-list {
+#streetlevel\.mapy\.panorama\.MapyPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
-#streetlevel\.yandex\.panorama\.YandexPanorama + dd .field-list {
+#streetlevel\.lookaround\.panorama\.LookaroundPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
-#streetlevel\.kakao\.panorama\.KakaoPanorama + dd .field-list {
+#streetlevel\.yandex\.panorama\.YandexPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
-#streetlevel\.naver\.panorama\.NaverPanorama + dd .field-list {
+#streetlevel\.kakao\.panorama\.KakaoPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
-#streetlevel\.naver\.panorama\.Neighbors + dd .field-list {
+
+#streetlevel\.naver\.panorama\.NaverPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
-#streetlevel\.naver\.panorama\.Overlay + dd .field-list {
+#streetlevel\.naver\.panorama\.Neighbors + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.naver\.panorama\.Overlay + dd > dl:first-of-type.field-list {
   display:none !important;
 }
