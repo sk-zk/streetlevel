@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List
@@ -54,6 +56,28 @@ class YandexPanorama:
     author_avatar_url: str = None
     """URL of the uploader's avatar; only set for third-party panoramas. 
     Replace ``%s`` with ``small`` (25x25), ``normal`` (100x100) or ``big`` (500x500) to get the respective size."""
+
+    def permalink(self: YandexPanorama, heading: float = 0.0, pitch: float = 0.0,
+                  map_zoom: float = 17.0, radians: bool = True) -> str:
+        """
+        Creates a permalink to this panorama.
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0.
+        :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to True.
+        :return: A Yandex Maps URL.
+        """
+        if radians:
+            heading = math.degrees(heading)
+            pitch = math.degrees(pitch)
+        return f"https://yandex.com/maps/?" \
+               f"&ll={self.lon}%2C{self.lat}" \
+               f"&panorama%5Bdirection%5D={heading}%2C{pitch}" \
+               f"&panorama%5Bfull%5D=true" \
+               f"&panorama%5Bid%5D={self.id}" \
+               f"&panorama%5Bpoint%5D={self.lon}%2C{self.lat}" \
+               f"&z={map_zoom}"
 
     def __repr__(self):
         output = str(self)
