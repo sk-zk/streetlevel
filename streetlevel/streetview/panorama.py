@@ -1,10 +1,13 @@
 from __future__ import annotations
+
+import math
 from dataclasses import dataclass, field
 from typing import List
 
 from numpy import ndarray
 
 from streetlevel.dataclasses import Size, Link
+from .util import is_third_party_panoid
 
 
 @dataclass
@@ -100,6 +103,28 @@ class StreetViewPanorama:
     """The creator of the panorama. For official coverage, this returns "Google"."""
     uploader_icon_url: str = None
     """URL of the icon displayed next to the uploader's name on Google Maps."""
+
+    @property
+    def is_third_party(self) -> bool:
+        """Whether this panorama was uploaded by a third party rather than Google."""
+        return is_third_party_panoid(self.id)
+
+    def permalink(self: StreetViewPanorama, heading: float = 0.0, pitch: float = 90.0, fov: float = 75.0,
+                  radians: bool = False) -> str:
+        """
+        Creates a permalink to this panorama.
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 90°.
+        :param fov: *(optional)* Initial FOV of the viewport. Defaults to 75.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
+        :return: A Google Maps URL.
+        """
+        if radians:
+            heading = math.degrees(heading)
+            pitch = math.degrees(pitch)
+        return f"https://www.google.com/maps/@{self.lat},{self.lon},3a,{fov}y,{heading}h,{pitch}t" \
+               f"/data=!3m4!1e1!3m2!1s{self.id}!2e{10 if self.is_third_party else 0}"
 
     def __repr__(self):
         output = str(self)

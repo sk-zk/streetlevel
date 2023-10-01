@@ -246,13 +246,13 @@ def _parse_pano_message(msg):
 
     source = try_get(lambda: msg[6][5][2]).lower()
 
-    other_dates_raw = msg[5][0][8]
+    other_dates_raw = try_get(lambda: msg[5][0][8])
     if other_dates_raw:
         other_dates = dict([(x[0], x[1]) for x in other_dates_raw])
     else:
         other_dates = {}
 
-    links_raw = msg[5][0][6]
+    links_raw = try_get(lambda: msg[5][0][6])
     if links_raw:
         links = dict([(x[0], x[1]) for x in links_raw])
     else:
