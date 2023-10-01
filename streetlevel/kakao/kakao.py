@@ -193,6 +193,8 @@ def _parse_panorama(pano_json: dict) -> KakaoPanorama:
         id=pano_json["id"],
         lat=pano_json["wgsy"],
         lon=pano_json["wgsx"],
+        wcongx=pano_json["wcongx"],
+        wcongy=pano_json["wcongy"],
         heading=math.radians(float(pano_json["angle"])),
         image_path=pano_json["img_path"],
         # shot_date sometimes returns the time as 00:00:00, but the image url is always correct
