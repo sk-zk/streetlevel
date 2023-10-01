@@ -60,11 +60,14 @@ def find_panorama_by_id(panoid: int, neighbors: bool = True, session: Session = 
     """
     Fetches metadata of a specific panorama.
 
+    This call only appears to work for the most recent coverage at a location. IDs of older panoramas will return
+    nothing even though they exist.
+
     :param panoid: The pano ID.
     :param neighbors: *(optional)* Whether an additional network request is made to fetch nearby panoramas.
         Defaults to True.
     :param session: *(optional)* A requests session.
-    :return: A KakaoPanorama object if a panorama with this ID exists, or None.
+    :return: A KakaoPanorama object if a panorama with this ID was found, or None.
     """
     response = api.find_panorama_by_id_raw(panoid, session)
 
