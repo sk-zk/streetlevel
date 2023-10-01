@@ -83,8 +83,10 @@ class KakaoPanorama:
 
     def permalink(self: KakaoPanorama, heading: float = 0.0, pitch: float = 0.0, radians: bool = False) -> str:
         """
-        Creates a permalink to this panorama. Note that the link will only work as expected for the most
-        recent coverage at a location - it does not appear to be possible to directly link to older panoramas.
+        Creates a permalink to a panorama at this location.
+
+        That the link will only work as expected for the most recent coverage at a location -
+        it does not appear to be possible to directly link to older panoramas.
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
         :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
