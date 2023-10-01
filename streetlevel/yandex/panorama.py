@@ -62,10 +62,10 @@ class YandexPanorama:
         """
         Creates a permalink to this panorama.
 
-        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0.
-        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0.
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
         :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
-        :param radians: *(optional)* Whether angles are in radians. Defaults to True.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
         :return: A Yandex Maps URL.
         """
         if radians:
