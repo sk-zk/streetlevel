@@ -10,7 +10,7 @@ from requests import Session
 
 from . import api
 from .panorama import KakaoPanorama, PanoramaType
-from ..dataclasses import Tile, Size
+from ..dataclasses import Tile, Size, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
     get_image_async, download_file, download_file_async
 
@@ -60,11 +60,14 @@ def find_panorama_by_id(panoid: int, neighbors: bool = True, session: Session = 
     """
     Fetches metadata of a specific panorama.
 
+    This call only appears to work for the most recent coverage at a location. IDs of older panoramas will return
+    nothing even though they exist.
+
     :param panoid: The pano ID.
     :param neighbors: *(optional)* Whether an additional network request is made to fetch nearby panoramas.
         Defaults to True.
     :param session: *(optional)* A requests session.
-    :return: A KakaoPanorama object if a panorama with this ID exists, or None.
+    :return: A KakaoPanorama object if a panorama with this ID was found, or None.
     """
     response = api.find_panorama_by_id_raw(panoid, session)
 
@@ -193,6 +196,8 @@ def _parse_panorama(pano_json: dict) -> KakaoPanorama:
         id=pano_json["id"],
         lat=pano_json["wgsy"],
         lon=pano_json["wgsx"],
+        wcongx=pano_json["wcongx"],
+        wcongy=pano_json["wcongy"],
         heading=math.radians(float(pano_json["angle"])),
         image_path=pano_json["img_path"],
         # shot_date sometimes returns the time as 00:00:00, but the image url is always correct
@@ -202,9 +207,28 @@ def _parse_panorama(pano_json: dict) -> KakaoPanorama:
         street_type=try_get(lambda: pano_json["st_type"]),
         panorama_type=PanoramaType(int(pano_json["shot_tool"]))
     )
+
     if "past" in pano_json and pano_json["past"] is not None:
         pano.historical = [_parse_panorama(past) for past in pano_json["past"]]
+
+    if "spot" in pano_json and pano_json["past"] is not None:
+        pano.links = _parse_links(pano_json["spot"])
+
     return pano
+
+
+def _parse_links(links_json: List[dict]) -> List[Link]:
+    links = []
+    for linked_json in links_json:
+        linked = KakaoPanorama(
+            id=linked_json["id"],
+            lat=linked_json["wgsy"],
+            lon=linked_json["wgsx"],
+            street_name=try_get(lambda: linked_json["st_name"]),
+        )
+        angle = math.radians(float(linked_json["pan"]))
+        links.append(Link(linked, angle))
+    return links
 
 
 def _generate_tile_list(pano: KakaoPanorama, zoom: int) -> List[Tile]:

@@ -1,8 +1,12 @@
 from __future__ import annotations
+
+import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import IntEnum
 from typing import List
+
+from streetlevel.dataclasses import Link
 
 
 class PanoramaType(IntEnum):
@@ -23,7 +27,12 @@ class PanoramaType(IntEnum):
 
 @dataclass
 class KakaoPanorama:
-    """Metadata of a Kakao Road View panorama."""
+    """
+    Metadata of a Kakao Road View panorama.
+
+    ID, latitude and longitude are always present. The availability of other metadata depends on which function
+    was called and what was returned by the API.
+    """
 
     id: int
     """The pano ID."""
@@ -35,11 +44,18 @@ class KakaoPanorama:
     heading: float = None
     """Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west."""
 
+    wcongx: float = None
+    """X coordinate of the panorama's location in the WCongnamul coordinate system."""
+    wcongy: float = None
+    """Y coordinate of the panorama's location in the WCongnamul coordinate system."""
+
     image_path: str = None
     """Part of the panorama tile URL."""
 
     neighbors: List[KakaoPanorama] = None
     """A list of nearby panoramas."""
+    links: List[Link] = None
+    """The panoramas which the white arrows in the client link to."""
     historical: List[KakaoPanorama] = None
     """A list of panoramas with a different date at the same location. 
     Only available if the panorama was retrieved by ``find_panorama_by_id``."""
@@ -65,6 +81,25 @@ class KakaoPanorama:
         """Whether the panorama was taken by a car."""
         return self.panorama_type in [PanoramaType.CAR, PanoramaType.NAVER_CAR, PanoramaType.INSTA_TITAN]
 
+    def permalink(self: KakaoPanorama, heading: float = 0.0, pitch: float = 0.0, radians: bool = False) -> str:
+        """
+        Creates a permalink to a panorama at this location.
+
+        The link will only work as expected for the most recent coverage at a location -
+        it does not appear to be possible to directly link to older panoramas.
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
+        :return: A KakaoMap URL.
+        """
+        if radians:
+            heading = math.degrees(heading)
+            pitch = math.degrees(pitch)
+        return f"https://map.kakao.com/?map_type=TYPE_MAP&map_attribute=ROADVIEW" \
+               f"&panoid={self.id}&pan={heading}&tilt={pitch}&zoom=0&urlLevel=3" \
+               f"&urlX={self.wcongx}&urlY={self.wcongy}"
+
     def __repr__(self):
         output = str(self)
         if self.date is not None:
@@ -73,4 +108,3 @@ class KakaoPanorama:
 
     def __str__(self):
         return f"{self.id} ({self.lat:.5f}, {self.lon:.5f})"
-

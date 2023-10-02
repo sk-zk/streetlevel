@@ -7,7 +7,15 @@ from scipy.spatial.transform import Rotation
 geod = pyproj.Geod(ellps="WGS84")
 
 
-def tile_coord_to_wgs84(x: int, y: int, zoom: int) -> Tuple[float, float]:
+def tile_coord_to_wgs84(x: float, y: float, zoom: int) -> Tuple[float, float]:
+    """
+    Converts XYZ tile coordinates to WGS84 coordinates.
+
+    :param x: X coordinate.
+    :param y: Y coordinate.
+    :param zoom: Z coordinate.
+    :return: WGS84 coordinates.
+    """
     scale = 1 << zoom
     lon_deg = x / scale * 360.0 - 180.0
     lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * y / scale)))
@@ -16,6 +24,14 @@ def tile_coord_to_wgs84(x: int, y: int, zoom: int) -> Tuple[float, float]:
     
 
 def wgs84_to_tile_coord(lat: float, lon: float, zoom: int) -> Tuple[int, int]:
+    """
+    Converts WGS84 coordinates to XYZ coordinates.
+
+    :param lat: Latitude.
+    :param lon: Longitude.
+    :param zoom: Z coordinate.
+    :return: The X and Y coordinates.
+    """
     lat_rad = math.radians(lat)
     scale = 1 << zoom
     x = (lon + 180.0) / 360.0 * scale
@@ -24,6 +40,14 @@ def wgs84_to_tile_coord(lat: float, lon: float, zoom: int) -> Tuple[int, int]:
 
 
 def create_bounding_box_around_point(lat, lon, radius):
+    """
+    Creates a square bounding box around a point.
+
+    :param lat: Latitude of the center point.
+    :param lon: Longitude of the center point.
+    :param radius: Shortest distance from the center point to the edges of the square.
+    :return: Latitude and longitude of the NW and SE points.
+    """
     dist_to_corner = math.sqrt(2 * pow(2 * radius, 2)) / 2
     top_left = geod.fwd(lon, lat, 315, dist_to_corner)
     bottom_right = geod.fwd(lon, lat, 135, dist_to_corner)

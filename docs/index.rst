@@ -2,7 +2,9 @@ streetlevel
 ===========
 
 The documentation for `streetlevel <https://github.com/sk-zk/streetlevel>`_, 
-a module for downloading panoramas and metadata from street-level imagery providers via internal APIs.
+a library for downloading panoramas and metadata from street-level imagery providers via internal APIs.
+
+The library uses latitude/longitude order. All coordinates are WGS84 unless specified otherwise.
 
 .. toctree::
    :maxdepth: 1
@@ -16,6 +18,12 @@ a module for downloading panoramas and metadata from street-level imagery provid
    streetlevel.streetview
    streetlevel.yandex
 
+.. toctree::
+   :maxdepth: 1
+   
+   dataclasses
+   geo
+   util
 
 Indices and tables
 ==================

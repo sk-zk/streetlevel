@@ -14,6 +14,13 @@ from .dataclasses import Tile, Size
 
 
 def download_file(url: str, path: str, session: Session = None) -> None:
+    """
+    Downloads a file to disk using requests.
+
+    :param url: The URL.
+    :param path: The output path.
+    :param session: *(optional)* A requests session.
+    """
     requester = session if session else requests
     response = requester.get(url)
     with open(path, "wb") as f:
@@ -21,6 +28,13 @@ def download_file(url: str, path: str, session: Session = None) -> None:
 
 
 async def download_file_async(url: str, path: str, session: ClientSession) -> None:
+    """
+    Downloads a file to disk using aiohttp.
+
+    :param url: The URL.
+    :param path: The output path.
+    :param session: A ``ClientSession``.
+    """
     async with session.get(url) as response:
         with open(path, "wb") as f:
             f.write(await response.read())
@@ -28,7 +42,7 @@ async def download_file_async(url: str, path: str, session: ClientSession) -> No
 
 def get_image(url: str, session: Session = None) -> Image.Image:
     """
-    Fetches an image from a URL.
+    Fetches an image from a URL using requests.
 
     :param url: The URL.
     :param session: *(optional)* A requests session.
@@ -40,18 +54,25 @@ def get_image(url: str, session: Session = None) -> Image.Image:
 
 
 async def get_image_async(url: str, session: ClientSession) -> Image.Image:
+    """
+    Fetches an image from a URL using aiohttp.
+
+    :param url: The URL.
+    :param session: A ``ClientSession``.
+    :return: The image as PIL Image.
+    """
     async with session.get(url) as response:
         return Image.open(BytesIO(await response.read()))
 
 
 def get_json(url: str, session: Session = None, preprocess_function: Callable = None) -> dict:
     """
-    Fetches JSON from a URL.
+    Fetches JSON from a URL using requests.
 
     :param url: The URL.
     :param session: *(optional)* A requests session.
     :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
-    :return: The requested document as dict.
+    :return: The requested document as dictionary.
     """
     requester = session if session else requests
     response = requester.get(url)
@@ -65,13 +86,13 @@ def get_json(url: str, session: Session = None, preprocess_function: Callable = 
 async def get_json_async(url: str, session: ClientSession, json_function_parameters: dict = None,
                          preprocess_function: Callable = None) -> dict:
     """
-    Fetches JSON from a URL.
+    Fetches JSON from a URL using aiohttp.
 
     :param url: The URL.
-    :param session: A ClientSession.
-    :param json_function_parameters: *(optional)* Parameters to pass to the ``ClientResponse.json()`` function.
+    :param session: A ``ClientSession``.
+    :param json_function_parameters: *(optional)* Parameters to pass to the ``ClientResponse.json`` function.
     :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
-    :return: The requested document as dict.
+    :return: The requested document as dictionary.
     """
     async with session.get(url) as response:
         if preprocess_function:
@@ -86,6 +107,15 @@ async def get_json_async(url: str, session: ClientSession, json_function_paramet
 
 def get_equirectangular_panorama(width: int, height: int, tile_size: Size,
                                  tile_list: List[Tile]) -> Image.Image:
+    """
+    Downloads and stitches a tiled equirectangular panorama.
+
+    :param width: Width of the panorama in pixels.
+    :param height: Height of the panorama in pixels.
+    :param tile_size: Size of one tile.
+    :param tile_list: The tiles this panorama is made of.
+    :return: The stitched panorama as PIL image.
+    """
     tile_images = download_tiles(tile_list)
     stitched = stitch_equirectangular_tiles(tile_images, width, height, tile_size.x, tile_size.y)
     return stitched
@@ -94,12 +124,29 @@ def get_equirectangular_panorama(width: int, height: int, tile_size: Size,
 async def get_equirectangular_panorama_async(width: int, height: int, tile_size: Size,
                                              tile_list: List[Tile],
                                              session: ClientSession) -> Image.Image:
+    """
+    Downloads and stitches a tiled equirectangular panorama.
+
+    :param width: Width of the panorama in pixels.
+    :param height: Height of the panorama in pixels.
+    :param tile_size: Size of one tile.
+    :param tile_list: The tiles this panorama is made of.
+    :param session: A ``ClientSession``.
+    :return: The stitched panorama as PIL image.
+    """
     tile_images = await download_tiles_async(tile_list, session)
     stitched = stitch_equirectangular_tiles(tile_images, width, height, tile_size.x, tile_size.y)
     return stitched
 
 
 def try_get(accessor):
+    """
+    QoL function for accessing an element of a nested list which may or may not exist, e.g. ``foo[1][0][2][3]``.
+
+    :param accessor: A function which attempts to access the element, e.g. ``lambda: foo[1][0][2][3]``.
+    :return: The return value of the accessor, unless an IndexError, TypeError or KeyError occurred,
+     in which case the function returns None.
+    """
     try:
         return accessor()
     except IndexError:
@@ -111,6 +158,13 @@ def try_get(accessor):
 
 
 async def download_files_async(urls: List[str], session: ClientSession = None) -> List[bytes]:
+    """
+    Downloads multiple files to a list of ``bytes``.
+
+    :param urls: The URLs of the files to download.
+    :param session: *(optional)* A ``ClientSession``. If no session is passed, a new one will be created.
+    :return: The downloaded files as ``bytes``.
+    """
     close_session = session is None
     session = session if session else ClientSession()
 
@@ -127,6 +181,12 @@ async def download_files_async(urls: List[str], session: ClientSession = None) -
 
 
 def download_tiles(tile_list: List[Tile]) -> dict:
+    """
+    Downloads tiles to ``bytes``.
+
+    :param tile_list: The tiles to download.
+    :return: A dictionary containing the images as ``bytes`` with the key ``(x, y)``.
+    """
     images = asyncio.run(download_files_async([t.url for t in tile_list]))
 
     images_dict = {}
@@ -137,6 +197,14 @@ def download_tiles(tile_list: List[Tile]) -> dict:
 
 
 async def download_tiles_async(tile_list: List[Tile], session: ClientSession):
+    """
+    Downloads tiles to ``bytes``.
+
+    :param tile_list: The tiles to download.
+    :param session: A ``ClientSession``.
+    :return: A dictionary containing the images as ``bytes`` with the key ``(x, y)``.
+    """
+
     images = await download_files_async([t.url for t in tile_list], session=session)
 
     images_dict = {}
@@ -149,7 +217,14 @@ async def download_tiles_async(tile_list: List[Tile], session: ClientSession):
 def stitch_equirectangular_tiles(tile_images: dict, width: int, height: int,
                                  tile_width: int, tile_height: int) -> Image.Image:
     """
-    Stitches downloaded tiles to a full image.
+    Stitches downloaded tiles of a tiled equirectangular panorama to a full image.
+
+    :param tile_images: The downloaded tiles.
+    :param width: Width of the panorama in pixels.
+    :param height: Height of the panorama in pixels.
+    :param tile_width: Width of one tile in pixels.
+    :param tile_height: Height of one til in pixels.
+    :return: The stitched panorama as PIL image.
     """
     panorama = Image.new('RGB', (width, height))
 
@@ -206,12 +281,20 @@ def stitch_cubemap_faces(faces: List[Image.Image], face_size: int,
         raise ValueError("Unsupported stitching method")
 
 
-def save_cubemap_panorama(pano: Union[List[Image.Image], Image.Image], path: str,
-                          single_image: bool, pil_args: dict) -> None:
-    if single_image:
-        pano.save(path, **pil_args)
-    else:
-        path = Path(path)
+def save_cubemap_panorama(pano: Union[List[Image.Image], Image.Image], path: str, pil_args: dict) -> None:
+    """
+    Saves a cubemap to disk.
+
+    :param pano: A stitched cubemap, or the six faces of a cubemap.
+    :param path: The output path.
+    :param pil_args: *(optional)* Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method, e.g. ``{"quality":100}``. Defaults to ``{}``.
+    """
+    if isinstance(pano, List):
+        path_obj = Path(path)
         for idx, face in enumerate(pano):
-            face_path = path.parent / f"{path.stem}_{idx}{path.suffix}"
+            face_path = path_obj.parent / f"{path_obj.stem}_{idx}{path_obj.suffix}"
             face.save(face_path, **pil_args)
+    else:
+        pano.save(path, **pil_args)

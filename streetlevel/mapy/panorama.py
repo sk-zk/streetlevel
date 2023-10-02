@@ -1,9 +1,11 @@
 from __future__ import annotations
+
+import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List
 
-from streetlevel.dataclasses import Size
+from streetlevel.dataclasses import Size, Link
 
 
 @dataclass
@@ -51,10 +53,29 @@ class MapyPanorama:
     roll: float = None
     """Roll offset for upright correction of the panorama, in radians."""
 
-    neighbors: List[MapyPanorama] = field(default_factory=list)
-    """A list of nearby panoramas."""
+    links: List[Link] = field(default_factory=list)
+    """The panoramas which the arrows in the client link to."""
     historical: List[MapyPanorama] = field(default_factory=list)
     """A list of panoramas with a different date at the same location."""
+
+    def permalink(self: MapyPanorama, heading: float = 0.0, pitch: float = 0.0, fov: float = 72.0,
+                  map_zoom: float = 17.0, radians: bool = False) -> str:
+        """
+        Creates a permalink to this panorama.
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
+        :param fov: *(optional)* Initial FOV of the viewport. Defaults to 72°.
+        :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
+        :return: A Mapy.cz URL.
+        """
+        if not radians:
+            heading = math.radians(heading)
+            pitch = math.radians(pitch)
+            fov = math.radians(fov)
+        return f"https://en.mapy.cz/zakladni?pano=1&pid={self.id}" \
+               f"&newest=0&yaw={heading}&fov={fov}&pitch={pitch}&x={self.lon}&y={self.lat}&z={map_zoom}"
 
     def __repr__(self):
         return str(self) + f" [{self.date}]"

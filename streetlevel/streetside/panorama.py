@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -33,6 +34,24 @@ class StreetsidePanorama:
     Highest zoom level available; 
     4 for the original Microsoft panoramas, 3 for the TomTom-provided ones.
     """
+
+    def permalink(self, heading: float = 0.0, pitch: float = 0.0,
+                  map_zoom: float = 17.0, radians: bool = False) -> str:
+        """
+        Creates a permalink to a panorama at this location. (If a URL for opening a panorama by ID
+        exists, I've yet to find it.)
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
+        :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
+        :return: A Bing Maps URL.
+        """
+        if radians:
+            heading = math.degrees(heading)
+            pitch = math.degrees(pitch)
+        return f"https://www.bing.com/maps?cp={self.lat}%7E{self.lon}&lvl={map_zoom}&v=2&sV=1" \
+               f"&pi={pitch}&style=x&dir={heading}"
 
     def __repr__(self):
         output = str(self)

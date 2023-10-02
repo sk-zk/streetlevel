@@ -8,7 +8,7 @@ from streetlevel.geo import *
 from .panorama import StreetViewPanorama, LocalizedString, CaptureDate
 from .depth import parse as parse_depth
 from . import api
-from ..dataclasses import Size, Tile
+from ..dataclasses import Size, Tile, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 from .util import is_third_party_panoid
 
@@ -246,11 +246,17 @@ def _parse_pano_message(msg):
 
     source = try_get(lambda: msg[6][5][2]).lower()
 
-    try:
-        other_dates = msg[5][0][8]
-        other_dates = dict([(x[0], x[1]) for x in other_dates])
-    except (IndexError, TypeError):
+    other_dates_raw = try_get(lambda: msg[5][0][8])
+    if other_dates_raw:
+        other_dates = dict([(x[0], x[1]) for x in other_dates_raw])
+    else:
         other_dates = {}
+
+    links_raw = try_get(lambda: msg[5][0][6])
+    if links_raw:
+        links = dict([(x[0], x[1]) for x in links_raw])
+    else:
+        links = {}
 
     street_name = try_get(lambda: msg[5][0][12][0][0][0][2])
     if street_name is not None:
@@ -286,7 +292,7 @@ def _parse_pano_message(msg):
     if raw_depth:
         pano.depth = parse_depth(raw_depth)
 
-    # parse neighbors and other dates
+    # parse other dates, links and neighbors
     if others is not None and len(others) > 1:
         for idx, other in enumerate(others[1:], start=1):
             panoid = other[0][1]
@@ -297,14 +303,15 @@ def _parse_pano_message(msg):
             connected = StreetViewPanorama(panoid, lat, lon, heading=heading)
 
             if idx in other_dates:
-                connected.year = other_dates[idx][0]
-                connected.month = other_dates[idx][1]
+                connected.date = CaptureDate(other_dates[idx][1], other_dates[idx][0])
                 pano.historical.append(connected)
             else:
+                if idx in links:
+                    pano.links.append(Link(connected, math.radians(links[idx][3])))
                 pano.neighbors.append(connected)
 
             connected.street_name = try_get(lambda: other[3][2][0])
-    pano.historical = sorted(pano.historical, key=lambda x: (x.year, x.month), reverse=True)
+    pano.historical = sorted(pano.historical, key=lambda x: (x.date.year, x.date.month), reverse=True)
 
     return pano
 

@@ -24,9 +24,6 @@ Downloading panoramas
 
 Data classes and Enums
 ----------------------
-    .. autoclass:: streetlevel.util.CubemapStitchingMethod
-      :members:
-      :member-order: bysource
     .. autoclass:: streetlevel.naver.panorama.NaverPanorama
       :members:
     .. autoclass:: streetlevel.naver.panorama.Neighbors

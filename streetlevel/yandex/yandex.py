@@ -2,6 +2,7 @@ import itertools
 import math
 from datetime import datetime
 from typing import List, Optional
+import re
 
 from PIL import Image
 from aiohttp import ClientSession
@@ -9,7 +10,7 @@ from requests import Session
 
 from . import api
 from .panorama import YandexPanorama
-from ..dataclasses import Size, Tile
+from ..dataclasses import Size, Tile, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 
 
@@ -150,7 +151,7 @@ def _validate_get_panorama_params(pano: YandexPanorama, zoom: int) -> int:
 
 def _parse_panorama(data: dict) -> YandexPanorama:
     panoid = data["Data"]["panoramaId"]
-    pano = YandexPanorama(
+    return YandexPanorama(
         id=panoid,
         lat=float(data["Data"]["Point"]["coordinates"][1]),
         lon=float(data["Data"]["Point"]["coordinates"][0]),
@@ -162,7 +163,10 @@ def _parse_panorama(data: dict) -> YandexPanorama:
                        int(data["Data"]["Images"]["Tiles"]["height"])),
         image_sizes=_parse_image_sizes(data["Data"]["Images"]["Zooms"]),
 
-        neighbors=_parse_neighbors(data["Annotation"]["Graph"]["Nodes"], panoid),
+        neighbors=_parse_neighbors(data["Annotation"]["Graph"]["Nodes"],
+                                   data["Annotation"]["Connections"],
+                                   panoid),
+        links=_parse_links(data["Annotation"]["Thoroughfares"]),
         historical=_parse_historical(data["Annotation"]["HistoricalPanoramas"], panoid),
 
         date=_get_date_from_panoid(panoid),
@@ -172,7 +176,19 @@ def _parse_panorama(data: dict) -> YandexPanorama:
         author=try_get(lambda: data["Author"]["name"]),
         author_avatar_url=try_get(lambda: data["Author"]["avatarUrlTemplate"]),
     )
-    return pano
+
+
+def _parse_links(links_json):
+    links = []
+    for link_json in links_json:
+        panoid = _get_panoid_from_url(link_json["Connection"]["href"])
+        angle = math.radians(float(link_json["Direction"][0]))
+        links.append(Link(panoid, angle))
+    return links
+
+
+def _get_panoid_from_url(url: str) -> str:
+    return re.findall(r"oid=(.*?)&", url)[0]
 
 
 def _get_date_from_panoid(panoid: str) -> datetime:
@@ -187,7 +203,7 @@ def _parse_image_sizes(zooms: dict) -> List[Size]:
     return sizes
 
 
-def _parse_neighbors(nodes: List[dict], parent_id: str) -> List[YandexPanorama]:
+def _parse_neighbors(nodes: List[dict], connections: List[dict], parent_id: str) -> List[YandexPanorama]:
     panos = []
     for node in nodes:
         panoid = node["panoid"]
@@ -197,9 +213,21 @@ def _parse_neighbors(nodes: List[dict], parent_id: str) -> List[YandexPanorama]:
             id=panoid,
             lat=float(node["lat"]),
             lon=float(node["lon"]),
-            date=_get_date_from_panoid(panoid)
+            date=_get_date_from_panoid(panoid),
         )
         panos.append(pano)
+
+    for connection in connections:
+        panoid = _get_panoid_from_url(connection["href"])
+        pano = YandexPanorama(
+            id=panoid,
+            lat=connection["Point"]["coordinates"][1],
+            lon=connection["Point"]["coordinates"][0],
+            height=connection["Point"]["coordinates"][2],
+            date=_get_date_from_panoid(panoid),
+        )
+        panos.append(pano)
+
     return panos
 
 

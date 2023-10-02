@@ -1,10 +1,14 @@
 from __future__ import annotations
+
+import math
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
 from typing import List
 
 import numpy as np
+
+from streetlevel.dataclasses import Link
 
 
 class PanoramaType(IntEnum):
@@ -47,13 +51,15 @@ class NaverPanorama:
 
     neighbors: Neighbors = None
     """A list of nearby panoramas."""
+    links: List[Link] = None
+    """The panoramas which the white dots in the client link to."""
     historical: List[NaverPanorama] = None
     """A list of panoramas with a different date at the same location. 
     Only available if the panorama was retrieved by ``find_panorama_by_id``."""
     timeline_id: str = None
     """The pano ID that must be given to the API to retrieve the full list of historical panoramas, which is also
-    the ID of the most recent panorama at this location. If an earlier ID is used, only panoramas up to that date
-    are returned."""
+    the ID of the most recent panorama at this location. If an earlier ID is used, only panoramas up to that 
+    panorama's capture date are returned."""
 
     date: datetime = None
     """Capture date and time of the panorama in UTC."""
@@ -65,7 +71,7 @@ class NaverPanorama:
     title: str = None
     """The title field, which typically contains the street name."""
 
-    depth: List[np.ndarray] = None
+    depth: np.ndarray = None
     """The depth maps of the faces."""
 
     panorama_type: PanoramaType = None
@@ -78,6 +84,24 @@ class NaverPanorama:
     
     (Only available for car footage.)
     """
+
+    def permalink(self: NaverPanorama, heading: float = 0.0, pitch: float = 10.0, fov: float = 80.0,
+                  map_zoom: float = 17.0, radians: bool = False) -> str:
+        """
+        Creates a permalink to this panorama.
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 10°.
+        :param fov: *(optional)* Initial FOV of the viewport. Defaults to 80°.
+        :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
+        :return: A Naver Map URL.
+        """
+        if radians:
+            heading = math.degrees(heading)
+            pitch = math.degrees(pitch)
+            fov = math.degrees(fov)
+        return f"https://map.naver.com/p?c={map_zoom},0,0,0,adh&p={self.id},{heading},{pitch},{fov},Float"
 
     def __repr__(self):
         output = str(self)

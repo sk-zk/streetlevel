@@ -25,20 +25,17 @@ class LookaroundPanorama:
 
     id: int
     """The pano ID."""
-    region_id: int
+    batch_id: int
     """
-    An additional key which appears in image URLs. I don't know what this is, 
-    but I had to name it something, so ``region_id`` it is.
+    An additional parameter required for requesting the imagery, which I presume is an upload batch ID
+    of some sort: every time Apple publishes a bunch of panoramas, they are assigned an ID as a kind of
+    revision number.
     """
 
     lat: float
-    """
-    Latitude of the panorama's location.
-    """
+    """Latitude of the panorama's location."""
     lon: float
-    """
-    Longitude of the panorama's location.
-    """
+    """Longitude of the panorama's location."""
 
     heading: float = None
     """
@@ -51,16 +48,15 @@ class LookaroundPanorama:
     """
 
     coverage_type: CoverageType = None
-    """
-    Whether the coverage was taken by car or by backpack.
-    """
+    """Whether the coverage was taken by car or by backpack."""
     date: datetime = None
-    """
-    Capture date and time of the panorama (in UTC, not local time).
-    """
+    """Capture date and time of the panorama (in UTC, not local time)."""
+
+    has_blurs: bool = None
+    """Whether something in this panorama, typically a building, has been blurred."""
 
     def __repr__(self):
         return str(self)
 
     def __str__(self):
-        return f"{self.id}/{self.region_id} ({self.lat:.5f}, {self.lon:.5f})"
+        return f"{self.id}/{self.batch_id} ({self.lat:.5f}, {self.lon:.5f})"

@@ -10,7 +10,7 @@ from requests import Session
 
 from . import api
 from .panorama import NaverPanorama, PanoramaType, Overlay, Neighbors
-from ..dataclasses import Tile
+from ..dataclasses import Tile, Link
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
     save_cubemap_panorama, get_image, get_image_async
 
@@ -219,7 +219,7 @@ def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2,
         pil_args = {}
 
     output = get_panorama(pano, zoom=zoom, stitching_method=stitching_method)
-    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+    save_cubemap_panorama(output, path, pil_args)
 
 
 async def download_panorama_async(pano: NaverPanorama, path: str, session: ClientSession, zoom: int = 2,
@@ -229,7 +229,7 @@ async def download_panorama_async(pano: NaverPanorama, path: str, session: Clien
         pil_args = {}
 
     output = await get_panorama_async(pano, session, zoom=zoom, stitching_method=stitching_method)
-    save_cubemap_panorama(output, path, stitching_method != CubemapStitchingMethod.NONE, pil_args)
+    save_cubemap_panorama(output, path, pil_args)
 
 
 def get_depth(panoid: str, session: Session = None) -> np.ndarray:
@@ -258,7 +258,7 @@ def _parse_depth(depth_json: dict) -> np.ndarray:
     return np.array(depth_faces)
 
 
-def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -> Image.Image:
+def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
     FACE_SIZE = 256
     image = get_image(f"https://panorama.pstatic.net/image/{pano.id}/512/P")
     faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]
@@ -266,7 +266,7 @@ def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -
 
 
 async def _get_zoom_0_async(pano: NaverPanorama, session: ClientSession,
-                            stitching_method: CubemapStitchingMethod) -> Image.Image:
+                            stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
     FACE_SIZE = 256
     image = await get_image_async(f"https://panorama.pstatic.net/image/{pano.id}/512/P", session)
     faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]
@@ -394,8 +394,29 @@ def _parse_panorama(response: dict) -> NaverPanorama:
         title=basic["title"],
         panorama_type=PanoramaType(int(basic["dtl_type"]))
     )
+
     if len(basic["image"]["overlays"]) > 1:
         pano.overlay = Overlay(
             "https://panorama.map.naver.com" + basic["image"]["overlays"][1][0],
             "https://panorama.map.naver.com" + basic["image"]["overlays"][1][1])
+
+    pano.links = _parse_links(basic["links"])
+
     return pano
+
+
+def _parse_links(links_json: List) -> Optional[List[Link]]:
+    if len(links_json) < 2:
+        return None
+
+    links = []
+    for linked_json in links_json[1:]:
+        linked = NaverPanorama(
+            id=linked_json[0],
+            title=linked_json[1],
+            lat=linked_json[5],
+            lon=linked_json[4],
+        )
+        angle = math.radians(float(linked_json[2]))
+        links.append(Link(linked, angle))
+    return links

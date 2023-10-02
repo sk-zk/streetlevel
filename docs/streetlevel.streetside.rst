@@ -18,11 +18,8 @@ Downloading panoramas
     .. autofunction:: streetlevel.streetside.download_panorama
     .. autofunction:: streetlevel.streetside.download_panorama_async
 
-Data classes and Enums
-----------------------
-    .. autoclass:: streetlevel.util.CubemapStitchingMethod
-      :members:
-      :member-order: bysource
+Data classes
+------------
     .. autoclass:: streetlevel.streetside.panorama.StreetsidePanorama
       :members:
 

@@ -19,7 +19,7 @@ message MapTile {
     int64 timestamp = 5;
 
     // Index of the `Unknown13` message which holds the region id for this pano.
-    int32 region_id_idx = 7;
+    int32 batch_id_idx = 7;
 
     // Indices for the projection parameters below
     repeated int32 projection_idx = 9;
@@ -58,9 +58,9 @@ message MapTile {
   message Unknown13 {
     int32 unknown14 = 1;
 
-    // This is the param that appears in pano URLs after the pano ID.
-    // No idea what this does exactly, but I had to call it _something_.
-    int32 region_id = 3;
+    // an ID of the upload batch this panorama has been uploaded in,
+    // or something along those lines.
+    int32 batch_id = 3;
 
     int32 unknown15 = 4;
     int32 unknown16 = 5;

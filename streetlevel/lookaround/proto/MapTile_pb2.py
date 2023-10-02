@@ -13,31 +13,32 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rMapTile.proto\x12\x0bstreetlevel\"\xac\x0b\n\x07MapTile\x12\'\n\x04pano\x18\x01 \x03(\x0b\x32\x19.streetlevel.MapTile.Pano\x12\x31\n\tunknown13\x18\x04 \x03(\x0b\x32\x1e.streetlevel.MapTile.Unknown13\x12\x33\n\nprojection\x18\x05 \x03(\x0b\x32\x1f.streetlevel.MapTile.Projection\x12<\n\x0ftile_coordinate\x18\x06 \x01(\x0b\x32#.streetlevel.MapTile.TileCoordinate\x1a\xff\x02\n\x04Pano\x12\x0e\n\x06panoid\x18\x01 \x01(\x04\x12\x10\n\x08unknown1\x18\x04 \x01(\x05\x12\x11\n\ttimestamp\x18\x05 \x01(\x03\x12\x15\n\rregion_id_idx\x18\x07 \x01(\x05\x12\x16\n\x0eprojection_idx\x18\t \x03(\x05\x12\x34\n\x08location\x18\n \x01(\x0b\x32\".streetlevel.MapTile.Pano.Location\x12\x34\n\x08unknown5\x18\x0c \x01(\x0b\x32\".streetlevel.MapTile.Pano.Unknown5\x1a\x87\x01\n\x08Location\x12\x18\n\x10longitude_offset\x18\x01 \x01(\x05\x12\x17\n\x0flatitude_offset\x18\x02 \x01(\x05\x12\x11\n\televation\x18\x03 \x01(\x05\x12\x0f\n\x07heading\x18\x04 \x01(\x05\x12\x11\n\tunknown10\x18\x05 \x01(\x05\x12\x11\n\tunknown11\x18\x06 \x01(\x05\x1a\x1d\n\x08Unknown5\x12\x11\n\tunknown12\x18\x01 \x03(\x05\x1a\x94\x02\n\tUnknown13\x12\x11\n\tunknown14\x18\x01 \x01(\x05\x12\x11\n\tregion_id\x18\x03 \x01(\x05\x12\x11\n\tunknown15\x18\x04 \x01(\x05\x12\x11\n\tunknown16\x18\x05 \x01(\x05\x12\x42\n\rcoverage_type\x18\x06 \x01(\x0e\x32+.streetlevel.MapTile.Unknown13.CoverageType\x12\x11\n\tunknown18\x18\t \x01(\x05\x12\x11\n\tunknown19\x18\n \x01(\x05\x12\x11\n\tunknown20\x18\x0b \x01(\x05\x12\x11\n\tunknown21\x18\x0c \x01(\x05\"+\n\x0c\x43overageType\x12\x05\n\x01_\x10\x00\x12\x07\n\x03\x43\x41R\x10\x02\x12\x0b\n\x07TREKKER\x10\x03\x1a\x85\x04\n\nProjection\x12\x0c\n\x04\x66\x61\x63\x65\x18\x01 \x01(\x05\x12<\n\tunknown24\x18\x04 \x01(\x0b\x32).streetlevel.MapTile.Projection.Unknown24\x12<\n\tunknown25\x18\x05 \x01(\x0b\x32).streetlevel.MapTile.Projection.Unknown25\x12\x11\n\tunknown26\x18\x06 \x01(\x05\x1a\xd2\x01\n\tUnknown24\x12\x11\n\tunknown27\x18\x01 \x01(\x05\x12\x16\n\x0elongitude_size\x18\x02 \x01(\x01\x12\x15\n\rlatitude_size\x18\x03 \x01(\x01\x12\x11\n\tunknown30\x18\x04 \x01(\x01\x12\x11\n\tunknown31\x18\x05 \x01(\x01\x12\x11\n\tunknown32\x18\x06 \x01(\x01\x12\x11\n\tunknown33\x18\x07 \x01(\x01\x12\x11\n\tunknown34\x18\x08 \x01(\x01\x12\x11\n\tunknown35\x18\t \x01(\x01\x12\x11\n\tunknown36\x18\n \x01(\x01\x1a\x84\x01\n\tUnknown25\x12\x11\n\tunknown37\x18\x01 \x01(\x01\x12\x11\n\tunknown38\x18\x02 \x01(\x01\x12\x11\n\tunknown39\x18\x03 \x01(\x01\x12\x18\n\x10longitude_center\x18\x04 \x01(\x01\x12\x11\n\tunknown41\x18\x05 \x01(\x01\x12\x11\n\tunknown42\x18\x06 \x01(\x01\x1a\x31\n\x0eTileCoordinate\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\t\n\x01z\x18\x03 \x01(\x05\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rMapTile.proto\x12\x0bstreetlevel\"\xb0\x0b\n\x07MapTile\x12\'\n\x04pano\x18\x01 \x03(\x0b\x32\x19.streetlevel.MapTile.Pano\x12\x31\n\tunknown13\x18\x04 \x03(\x0b\x32\x1e.streetlevel.MapTile.Unknown13\x12\x33\n\nprojection\x18\x05 \x03(\x0b\x32\x1f.streetlevel.MapTile.Projection\x12<\n\x0ftile_coordinate\x18\x06 \x01(\x0b\x32#.streetlevel.MapTile.TileCoordinate\x1a\xfe\x02\n\x04Pano\x12\x0e\n\x06panoid\x18\x01 \x01(\x04\x12\x10\n\x08unknown1\x18\x04 \x01(\x05\x12\x11\n\ttimestamp\x18\x05 \x01(\x03\x12\x14\n\x0c\x62\x61tch_id_idx\x18\x07 \x01(\x05\x12\x16\n\x0eprojection_idx\x18\t \x03(\x05\x12\x34\n\x08location\x18\n \x01(\x0b\x32\".streetlevel.MapTile.Pano.Location\x12\x34\n\x08unknown5\x18\x0c \x01(\x0b\x32\".streetlevel.MapTile.Pano.Unknown5\x1a\x87\x01\n\x08Location\x12\x18\n\x10longitude_offset\x18\x01 \x01(\x05\x12\x17\n\x0flatitude_offset\x18\x02 \x01(\x05\x12\x11\n\televation\x18\x03 \x01(\x05\x12\x0f\n\x07heading\x18\x04 \x01(\x05\x12\x11\n\tunknown10\x18\x05 \x01(\x05\x12\x11\n\tunknown11\x18\x06 \x01(\x05\x1a\x1d\n\x08Unknown5\x12\x11\n\tunknown12\x18\x01 \x03(\x05\x1a\x99\x02\n\tUnknown13\x12\x11\n\tunknown14\x18\x01 \x01(\x05\x12\x10\n\x08\x62\x61tch_id\x18\x03 \x01(\x05\x12\x11\n\tunknown15\x18\x04 \x01(\x05\x12\x11\n\tunknown16\x18\x05 \x01(\x05\x12\x42\n\rcoverage_type\x18\x06 \x01(\x0e\x32+.streetlevel.MapTile.Unknown13.CoverageType\x12\x11\n\tunknown18\x18\t \x01(\x05\x12\x11\n\tunknown19\x18\n \x01(\x05\x12\x11\n\tunknown20\x18\x0b \x01(\x05\x12\x11\n\tunknown21\x18\x0c \x01(\x05\"1\n\x0c\x43overageType\x12\x0b\n\x07\x44\x45\x46\x41ULT\x10\x00\x12\x07\n\x03\x43\x41R\x10\x02\x12\x0b\n\x07TREKKER\x10\x03\x1a\x85\x04\n\nProjection\x12\x0c\n\x04\x66\x61\x63\x65\x18\x01 \x01(\x05\x12<\n\tunknown24\x18\x04 \x01(\x0b\x32).streetlevel.MapTile.Projection.Unknown24\x12<\n\tunknown25\x18\x05 \x01(\x0b\x32).streetlevel.MapTile.Projection.Unknown25\x12\x11\n\tunknown26\x18\x06 \x01(\x05\x1a\xd2\x01\n\tUnknown24\x12\x11\n\tunknown27\x18\x01 \x01(\x05\x12\x16\n\x0elongitude_size\x18\x02 \x01(\x01\x12\x15\n\rlatitude_size\x18\x03 \x01(\x01\x12\x11\n\tunknown30\x18\x04 \x01(\x01\x12\x11\n\tunknown31\x18\x05 \x01(\x01\x12\x11\n\tunknown32\x18\x06 \x01(\x01\x12\x11\n\tunknown33\x18\x07 \x01(\x01\x12\x11\n\tunknown34\x18\x08 \x01(\x01\x12\x11\n\tunknown35\x18\t \x01(\x01\x12\x11\n\tunknown36\x18\n \x01(\x01\x1a\x84\x01\n\tUnknown25\x12\x11\n\tunknown37\x18\x01 \x01(\x01\x12\x11\n\tunknown38\x18\x02 \x01(\x01\x12\x11\n\tunknown39\x18\x03 \x01(\x01\x12\x18\n\x10longitude_center\x18\x04 \x01(\x01\x12\x11\n\tunknown41\x18\x05 \x01(\x01\x12\x11\n\tunknown42\x18\x06 \x01(\x01\x1a\x31\n\x0eTileCoordinate\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\t\n\x01z\x18\x03 \x01(\x05\x62\x06proto3')
 
-_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'MapTile_pb2', globals())
+_globals = globals()
+_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'MapTile_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _MAPTILE._serialized_start=31
-  _MAPTILE._serialized_end=1483
-  _MAPTILE_PANO._serialized_start=250
-  _MAPTILE_PANO._serialized_end=633
-  _MAPTILE_PANO_LOCATION._serialized_start=467
-  _MAPTILE_PANO_LOCATION._serialized_end=602
-  _MAPTILE_PANO_UNKNOWN5._serialized_start=604
-  _MAPTILE_PANO_UNKNOWN5._serialized_end=633
-  _MAPTILE_UNKNOWN13._serialized_start=636
-  _MAPTILE_UNKNOWN13._serialized_end=912
-  _MAPTILE_UNKNOWN13_COVERAGETYPE._serialized_start=869
-  _MAPTILE_UNKNOWN13_COVERAGETYPE._serialized_end=912
-  _MAPTILE_PROJECTION._serialized_start=915
-  _MAPTILE_PROJECTION._serialized_end=1432
-  _MAPTILE_PROJECTION_UNKNOWN24._serialized_start=1087
-  _MAPTILE_PROJECTION_UNKNOWN24._serialized_end=1297
-  _MAPTILE_PROJECTION_UNKNOWN25._serialized_start=1300
-  _MAPTILE_PROJECTION_UNKNOWN25._serialized_end=1432
-  _MAPTILE_TILECOORDINATE._serialized_start=1434
-  _MAPTILE_TILECOORDINATE._serialized_end=1483
+  _globals['_MAPTILE']._serialized_start=31
+  _globals['_MAPTILE']._serialized_end=1487
+  _globals['_MAPTILE_PANO']._serialized_start=250
+  _globals['_MAPTILE_PANO']._serialized_end=632
+  _globals['_MAPTILE_PANO_LOCATION']._serialized_start=466
+  _globals['_MAPTILE_PANO_LOCATION']._serialized_end=601
+  _globals['_MAPTILE_PANO_UNKNOWN5']._serialized_start=603
+  _globals['_MAPTILE_PANO_UNKNOWN5']._serialized_end=632
+  _globals['_MAPTILE_UNKNOWN13']._serialized_start=635
+  _globals['_MAPTILE_UNKNOWN13']._serialized_end=916
+  _globals['_MAPTILE_UNKNOWN13_COVERAGETYPE']._serialized_start=867
+  _globals['_MAPTILE_UNKNOWN13_COVERAGETYPE']._serialized_end=916
+  _globals['_MAPTILE_PROJECTION']._serialized_start=919
+  _globals['_MAPTILE_PROJECTION']._serialized_end=1436
+  _globals['_MAPTILE_PROJECTION_UNKNOWN24']._serialized_start=1091
+  _globals['_MAPTILE_PROJECTION_UNKNOWN24']._serialized_end=1301
+  _globals['_MAPTILE_PROJECTION_UNKNOWN25']._serialized_start=1304
+  _globals['_MAPTILE_PROJECTION_UNKNOWN25']._serialized_end=1436
+  _globals['_MAPTILE_TILECOORDINATE']._serialized_start=1438
+  _globals['_MAPTILE_TILECOORDINATE']._serialized_end=1487
 # @@protoc_insertion_point(module_scope)
