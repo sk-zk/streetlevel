@@ -58,8 +58,8 @@ class NaverPanorama:
     Only available if the panorama was retrieved by ``find_panorama_by_id``."""
     timeline_id: str = None
     """The pano ID that must be given to the API to retrieve the full list of historical panoramas, which is also
-    the ID of the most recent panorama at this location. If an earlier ID is used, only panoramas up to that date
-    are returned."""
+    the ID of the most recent panorama at this location. If an earlier ID is used, only panoramas up to that 
+    panorama's capture date are returned."""
 
     date: datetime = None
     """Capture date and time of the panorama in UTC."""
@@ -71,7 +71,7 @@ class NaverPanorama:
     title: str = None
     """The title field, which typically contains the street name."""
 
-    depth: List[np.ndarray] = None
+    depth: np.ndarray = None
     """The depth maps of the faces."""
 
     panorama_type: PanoramaType = None

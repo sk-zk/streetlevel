@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -25,7 +26,7 @@ class Tile:
 class Link:
     """A linked panorama."""
 
-    pano: any
+    pano: Any
     """The panorama."""
     direction: float
     """Angle in radians."""

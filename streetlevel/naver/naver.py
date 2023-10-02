@@ -258,7 +258,7 @@ def _parse_depth(depth_json: dict) -> np.ndarray:
     return np.array(depth_faces)
 
 
-def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -> Image.Image:
+def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
     FACE_SIZE = 256
     image = get_image(f"https://panorama.pstatic.net/image/{pano.id}/512/P")
     faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]
@@ -266,7 +266,7 @@ def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -
 
 
 async def _get_zoom_0_async(pano: NaverPanorama, session: ClientSession,
-                            stitching_method: CubemapStitchingMethod) -> Image.Image:
+                            stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
     FACE_SIZE = 256
     image = await get_image_async(f"https://panorama.pstatic.net/image/{pano.id}/512/P", session)
     faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]

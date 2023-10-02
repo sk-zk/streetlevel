@@ -240,9 +240,9 @@ def save_cubemap_panorama(pano: Union[List[Image.Image], Image.Image], path: str
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
     """
     if isinstance(pano, List):
-        path = Path(path)
+        path_obj = Path(path)
         for idx, face in enumerate(pano):
-            face_path = path.parent / f"{path.stem}_{idx}{path.suffix}"
+            face_path = path_obj.parent / f"{path_obj.stem}_{idx}{path_obj.suffix}"
             face.save(face_path, **pil_args)
     else:
         pano.save(path, **pil_args)
