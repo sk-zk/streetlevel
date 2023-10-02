@@ -23,6 +23,7 @@ The library uses latitude/longitude order. All coordinates are WGS84 unless spec
    
    dataclasses
    geo
+   util
 
 Indices and tables
 ==================
