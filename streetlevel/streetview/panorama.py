@@ -57,6 +57,8 @@ class StreetViewPanorama:
     The capture date. Note that, for official coverage, only month and year are available.
     For third-party coverage, the day is available also.
     """
+    elevation: float = None
+    """Elevation at the capture location in meters."""
 
     country_code: str = None
     """Two-letter country code for the country in which the panorama is located."""

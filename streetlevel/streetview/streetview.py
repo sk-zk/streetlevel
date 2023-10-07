@@ -238,9 +238,6 @@ def _parse_coverage_tile_response(tile):
 def _parse_pano_message(msg):
     img_sizes = msg[2][3][0]
     img_sizes = list(map(lambda x: Size(x[0][1], x[0][0]), img_sizes))
-    panoid = msg[1][1]
-    lat = msg[5][0][1][0][2]
-    lon = msg[5][0][1][0][3]
     others = try_get(lambda: msg[5][0][3][0])
     date = msg[6][7]
 
@@ -267,15 +264,16 @@ def _parse_pano_message(msg):
         address = [LocalizedString(x[0], x[1]) for x in address]
 
     pano = StreetViewPanorama(
-        id=panoid,
-        lat=lat,
-        lon=lon,
+        id=msg[1][1],
+        lat=msg[5][0][1][0][2],
+        lon=msg[5][0][1][0][3],
         heading=try_get(lambda: math.radians(msg[5][0][1][2][0])),
         pitch=try_get(lambda: math.radians(90 - msg[5][0][1][2][1])),
         roll=try_get(lambda: math.radians(msg[5][0][1][2][2])),
         date=CaptureDate(date[0],
                          date[1],
                          date[2] if len(date) > 2 else None),
+        elevation=try_get(lambda: msg[5][0][1][1][0]),
         tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),
         image_sizes=img_sizes,
         source=source,
@@ -296,11 +294,13 @@ def _parse_pano_message(msg):
     if others is not None and len(others) > 1:
         for idx, other in enumerate(others[1:], start=1):
             panoid = other[0][1]
-            lat = float(other[2][0][2])
-            lon = float(other[2][0][3])
-            heading = try_get(lambda: math.radians(float(other[2][2][0])))
 
-            connected = StreetViewPanorama(panoid, lat, lon, heading=heading)
+            connected = StreetViewPanorama(
+                id=panoid,
+                lat=other[2][0][2],
+                lon=other[2][0][3],
+                elevation=try_get(lambda: other[2][1][0]),
+                heading=try_get(lambda: math.radians(other[2][2][0])))
 
             if idx in other_dates:
                 connected.date = CaptureDate(other_dates[idx][1], other_dates[idx][0])
