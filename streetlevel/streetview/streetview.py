@@ -300,7 +300,10 @@ def _parse_pano_message(msg):
                 lat=other[2][0][2],
                 lon=other[2][0][3],
                 elevation=try_get(lambda: other[2][1][0]),
-                heading=try_get(lambda: math.radians(other[2][2][0])))
+                heading=try_get(lambda: math.radians(other[2][2][0])),
+                pitch=try_get(lambda: math.radians(90 - other[2][2][1])),
+                roll=try_get(lambda: math.radians(other[2][2][2])),
+            )
 
             if idx in other_dates:
                 connected.date = CaptureDate(other_dates[idx][1], other_dates[idx][0])
