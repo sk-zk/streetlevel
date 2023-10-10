@@ -15,8 +15,11 @@ class StreetViewPanorama:
     """
     Metadata of a Street View panorama.
 
-    ID, latitude and longitude are always present. The availability of other metadata depends on which function
+    ID, latitude and longitude are always present*. The availability of other metadata depends on which function
     was called and what was returned by the API.
+
+    *) Except for rare edge cases where latitude and longitude of links are not returned by the API and therefore
+    set to None.
     """
     id: str
     """The pano ID."""
@@ -139,7 +142,10 @@ class StreetViewPanorama:
         return output
 
     def __str__(self):
-        return f"{self.id} ({self.lat:.5f}, {self.lon:.5f})"
+        output = f"{self.id}"
+        if self.lat and self.lon:
+            output += " ({self.lat:.5f}, {self.lon:.5f})"
+        return output
 
 
 @dataclass
