@@ -254,7 +254,7 @@ def _parse_pano_message(msg):
 
     links_raw = try_get(lambda: msg[5][0][6])
     if links_raw:
-        links = dict([(x[0], x[1]) for x in links_raw])
+        links = dict([(x[0], [None, None, None, 0] if len(x) == 1 else x[1]) for x in links_raw])
     else:
         links = {}
 
@@ -296,8 +296,8 @@ def _parse_pano_message(msg):
     if others is not None and len(others) > 1:
         for idx, other in enumerate(others[1:], start=1):
             panoid = other[0][1]
-            lat = float(other[2][0][2])
-            lon = float(other[2][0][3])
+            lat = try_get(lambda: float(other[2][0][2]))
+            lon = try_get(lambda: float(other[2][0][3]))
             heading = try_get(lambda: math.radians(float(other[2][2][0])))
 
             connected = StreetViewPanorama(panoid, lat, lon, heading=heading)
