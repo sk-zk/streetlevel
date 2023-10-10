@@ -291,12 +291,14 @@ def _parse_pano_message(msg):
         pano.depth = parse_depth(raw_depth)
 
     # parse other dates, links and neighbors
-    if others is not None and len(others) > 1:
-        for idx, other in enumerate(others[1:], start=1):
-            panoid = other[0][1]
+    if others is not None:
+        for idx, other in enumerate(others):
+            other_id = other[0][1]
+            if pano.id == other_id:
+                continue
 
             connected = StreetViewPanorama(
-                id=panoid,
+                id=other_id,
                 lat=try_get(lambda: float(other[2][0][2])),
                 lon=try_get(lambda: float(other[2][0][3])),
                 elevation=try_get(lambda: other[2][1][0]),
