@@ -251,7 +251,7 @@ def _parse_pano_message(msg):
 
     links_raw = try_get(lambda: msg[5][0][6])
     if links_raw:
-        links = dict([(x[0], [None, None, None, 0] if len(x) == 1 else x[1]) for x in links_raw])
+        links = dict([(x[0], try_get(lambda: x[1])) for x in links_raw])
     else:
         links = {}
 
@@ -312,7 +312,11 @@ def _parse_pano_message(msg):
                 pano.historical.append(connected)
             else:
                 if idx in links:
-                    pano.links.append(Link(connected, math.radians(links[idx][3])))
+                    if links[idx]:
+                        angle = math.radians(links[idx][3])
+                    else:
+                        angle = get_bearing(pano.lat, pano.lon, connected.lat, connected.lon)
+                    pano.links.append(Link(connected, angle))
                 pano.neighbors.append(connected)
 
             connected.street_name = try_get(lambda: other[3][2][0])
