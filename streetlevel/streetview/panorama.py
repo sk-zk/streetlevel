@@ -144,7 +144,7 @@ class StreetViewPanorama:
     def __str__(self):
         output = f"{self.id}"
         if self.lat and self.lon:
-            output += " ({self.lat:.5f}, {self.lon:.5f})"
+            output += f" ({self.lat:.5f}, {self.lon:.5f})"
         return output
 
 
