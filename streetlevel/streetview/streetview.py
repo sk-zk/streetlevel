@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from streetlevel.geo import *
-from .panorama import StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel
+from .panorama import StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, UploadDate
 from .depth import parse as parse_depth
 from . import api
 from ..dataclasses import Size, Tile, Link
@@ -255,6 +255,10 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
     if depth:
         depth = parse_depth(depth)
 
+    upload_date = try_get(lambda: msg[6][8])
+    if upload_date:
+        upload_date = UploadDate(*upload_date)
+
     pano = StreetViewPanorama(
         id=msg[1][1],
         lat=msg[5][0][1][0][2],
@@ -266,6 +270,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
         date=CaptureDate(date[0],
                          date[1],
                          date[2] if len(date) > 2 else None),
+        upload_date=upload_date,
         elevation=try_get(lambda: msg[5][0][1][1][0]),
         tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),
         image_sizes=img_sizes,

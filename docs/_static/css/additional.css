@@ -21,6 +21,9 @@
 #streetlevel\.streetview\.panorama\.CaptureDate + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+#streetlevel\.streetview\.panorama\.UploadDate + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
 #streetlevel\.streetview\.panorama\.DepthMap + dd > dl:first-of-type.field-list {
   display:none !important;
 }

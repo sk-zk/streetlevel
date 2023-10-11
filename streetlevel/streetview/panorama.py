@@ -66,8 +66,13 @@ class StreetViewPanorama:
     date: CaptureDate = None
     """
     The capture date. Note that, for official coverage, only month and year are available.
-    For third-party coverage, the day is available also.
+    For third-party panoramas, the day is available also.
     """
+    upload_date: UploadDate = None
+    """
+    The upload date. Only available for third-party panoramas.
+    """
+
     elevation: float = None
     """Elevation at the capture location in meters."""
 
@@ -195,6 +200,17 @@ class CaptureDate:
     """The month the panorama was taken."""
     day: int = None
     """The day the panorama was taken. Only available for third-party panoramas."""
+
+
+@dataclass
+class UploadDate:
+    """
+    Upload date of a third-party Street View panorama.
+    """
+    year: int
+    month: int
+    day: int
+    hour: int
 
 
 @dataclass
