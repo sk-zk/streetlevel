@@ -4,7 +4,7 @@ from streetlevel import streetside
 
 
 def mocked_find_panoramas_raw(north, west, south, east, limit=50, session=None):
-    with open("streetside/data/find_object.json", "r") as f:
+    with open("streetside/data/find.json", "r") as f:
         return json.load(f)
 
 

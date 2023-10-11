@@ -11,7 +11,7 @@ def test_is_third_party_panoid(request):
 
 def test_find_panorama_by_id():
     def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
-        with open("streetview/data/find_by_id_object.json", "r") as f:
+        with open("streetview/data/find_by_id.json", "r") as f:
             return json.load(f)
 
     streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
@@ -32,7 +32,7 @@ def test_find_panorama_by_id():
 def test_find_panorama():
     def mocked_find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en",
                                  search_third_party=False, session=None):
-        with open("streetview/data/find_object.json", "r") as f:
+        with open("streetview/data/find.json", "r") as f:
             return json.load(f)
 
     streetview.api.find_panorama_raw = mocked_find_panorama_raw
@@ -47,7 +47,7 @@ def test_find_panorama():
 async def test_find_panorama_async():
     async def mocked_find_panorama_raw_async(lat, lon, session, radius=50, download_depth=False, locale="en",
                                              search_third_party=False):
-        with open("streetview/data/find_object.json", "r") as f:
+        with open("streetview/data/find.json", "r") as f:
             return json.load(f)
 
     streetview.api.find_panorama_raw_async = mocked_find_panorama_raw_async
@@ -60,7 +60,7 @@ async def test_find_panorama_async():
 
 def test_find_get_coverage_tile_by_latlon():
     def mocked_get_coverage_tile_raw(tile_x, tile_y, session=None):
-        with open("streetview/data/coverage_tile_object.json", "r") as f:
+        with open("streetview/data/coverage_tile.json", "r") as f:
             return json.load(f)
 
     streetview.api.get_coverage_tile_raw = mocked_get_coverage_tile_raw
@@ -71,7 +71,7 @@ def test_find_get_coverage_tile_by_latlon():
 
 def test_nepal_links():
     def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
-        with open("streetview/data/nepal_links_object.json", "r") as f:
+        with open("streetview/data/nepal_links.json", "r") as f:
             return json.load(f)
 
     streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
@@ -85,7 +85,7 @@ def test_nepal_links():
 
 def test_missing_link_direction():
     def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
-        with open("streetview/data/missing_link_direction_object.json", "r") as f:
+        with open("streetview/data/missing_link_direction.json", "r") as f:
             return json.load(f)
 
     streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
