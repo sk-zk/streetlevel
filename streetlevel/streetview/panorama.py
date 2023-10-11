@@ -98,7 +98,7 @@ class StreetViewPanorama:
     
     For third-party coverage, this returns the app the panorama was uploaded with, such as:
     
-    * ``photos:street_view_android``,``photos:street_view_ios``: the now-discontinued Street View app, RIP
+    * ``photos:street_view_android``, ``photos:street_view_ios``: the now-discontinued Street View app, RIP
     * ``photos:street_view_publish_api``: the `Publish API <https://developers.google.com/streetview/publish>`_
     * ``photos:legacy_innerspace``: see above
     """
