@@ -225,7 +225,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
 2: Tile, z=17  
 3: Bounding box  
 4: Unstitched  
-5: Appears to be a synthetic depth map created from elevation data and building footprints
+5: Appears to be a synthetic depth map created from elevation data and building footprints  
 6: Month and year only for official coverage, full date for inofficial coverage  
 7: Only heading is implemented; inaccurate in some locations  
 8: Only heading; pitch/roll do not appear to be available  
