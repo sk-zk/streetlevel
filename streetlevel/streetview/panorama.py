@@ -18,7 +18,7 @@ class StreetViewPanorama:
     ID, latitude and longitude are always present*. The availability of other metadata depends on which function
     was called and what was returned by the API.
 
-    *) Except for rare edge cases where latitude and longitude of links are not returned by the API and therefore
+    \*) Except for rare edge cases where latitude and longitude of links are not returned by the API and therefore
     set to None.
     """
     id: str
@@ -207,16 +207,16 @@ class UploadDate:
     """
     Upload date of a third-party Street View panorama.
     """
-    year: int
-    month: int
-    day: int
-    hour: int
+    year: int  #:
+    month: int  #:
+    day: int  #:
+    hour: int  #:
 
 
 @dataclass
 class BuildingLevel:
     """
-    Building level of an indoor panorama.
+    Building level of an indoor tripod Street View panorama.
     """
     level: float
     """The building level, where 0 is the ground floor, positive levels are above ground, and negative levels
