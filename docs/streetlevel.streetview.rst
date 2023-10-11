@@ -22,14 +22,20 @@ Downloading panoramas
 
 Data classes
 ------------
-    .. autoclass:: streetlevel.streetview.panorama.StreetViewPanorama
+    .. autoclass:: streetlevel.streetview.panorama.BuildingLevel
        :members:
     .. autoclass:: streetlevel.streetview.panorama.CaptureDate
        :members:
+       :member-order: bysource
     .. autoclass:: streetlevel.streetview.panorama.DepthMap
        :members:
     .. autoclass:: streetlevel.streetview.panorama.LocalizedString
        :members:
+    .. autoclass:: streetlevel.streetview.panorama.StreetViewPanorama
+       :members:
+    .. autoclass:: streetlevel.streetview.panorama.UploadDate
+       :members:
+       :member-order: bysource
 
 Miscellaneous
 -------------

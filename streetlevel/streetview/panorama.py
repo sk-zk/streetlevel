@@ -15,8 +15,11 @@ class StreetViewPanorama:
     """
     Metadata of a Street View panorama.
 
-    ID, latitude and longitude are always present. The availability of other metadata depends on which function
+    ID, latitude and longitude are always present*. The availability of other metadata depends on which function
     was called and what was returned by the API.
+
+    \*) Except for rare edge cases where latitude and longitude of links are not returned by the API and therefore
+    set to None.
     """
     id: str
     """The pano ID."""
@@ -32,6 +35,7 @@ class StreetViewPanorama:
     """Pitch offset for upright correction of the panorama, in radians."""
     roll: float = None
     """Roll offset for upright correction of the panorama, in radians."""
+
     depth: DepthMap = None
     """The depth map, if it was requested. Values are in meters. -1 is used for the horizon."""
 
@@ -52,11 +56,25 @@ class StreetViewPanorama:
     historical: List[StreetViewPanorama] = field(default_factory=list)
     """A list of panoramas with a different date at the same location."""
 
+    building_level: BuildingLevel = None
+    """The level on which the panorama was taken (if the panorama is located inside a building which has been
+    covered on multiple floors and this metadata is available)."""
+    building_levels: List[StreetViewPanorama] = field(default_factory=list)
+    """One panorama per floor above or below this one (if the panorama is located inside a building which has been
+    covered on multiple floors and this metadata is available)."""
+
     date: CaptureDate = None
     """
     The capture date. Note that, for official coverage, only month and year are available.
-    For third-party coverage, the day is available also.
+    For third-party panoramas, the day is available also.
     """
+    upload_date: UploadDate = None
+    """
+    The upload date. Only available for third-party panoramas.
+    """
+
+    elevation: float = None
+    """Elevation at the capture location in meters."""
 
     country_code: str = None
     """Two-letter country code for the country in which the panorama is located."""
@@ -84,14 +102,18 @@ class StreetViewPanorama:
     """
     The source program of the imagery.
 
-    For official coverage, ``launch`` refers to car coverage and ``scout`` refers to trekker or tripod coverage.
-    (Note, however, that not all trekker coverage is marked ``scout``:
-    the sidewalk trekker in Helsinki, for example, has its blue lines snapped to roads and 
-    therefore returns ``launch``.)
+    For official coverage, common values are:
 
-    For third-party coverage, this returns the app the panorama was uploaded with,
-    such as ``photos:street_view_android`` (the now-discontinued Street View app, RIP) or 
-    ``photos:street_view_publish_api``.
+    * ``launch``: regular car coverage (and sometimes trekker coverage) whose lines are snapped to roads 
+    * ``scout``: trekker or tripod coverage (and sometimes car coverage) whose lines are not snapped to roads
+    * ``innerspace``: tripods from Google's `Business View <https://en.wikipedia.org/wiki/Street_View_Trusted>`_ program
+    * ``cultural_institute``: Some (but not all) tripods from the Arts & Culture program have this value
+    
+    For third-party coverage, this returns the app the panorama was uploaded with, such as:
+    
+    * ``photos:street_view_android``, ``photos:street_view_ios``: the now-discontinued Street View app, RIP
+    * ``photos:street_view_publish_api``: the `Publish API <https://developers.google.com/streetview/publish>`_
+    * ``photos:legacy_innerspace``: see above
     """
 
     copyright_message: str = None
@@ -137,7 +159,10 @@ class StreetViewPanorama:
         return output
 
     def __str__(self):
-        return f"{self.id} ({self.lat:.5f}, {self.lon:.5f})"
+        output = f"{self.id}"
+        if self.lat and self.lon:
+            output += f" ({self.lat:.5f}, {self.lon:.5f})"
+        return output
 
 
 @dataclass
@@ -175,3 +200,28 @@ class CaptureDate:
     """The month the panorama was taken."""
     day: int = None
     """The day the panorama was taken. Only available for third-party panoramas."""
+
+
+@dataclass
+class UploadDate:
+    """
+    Upload date of a third-party Street View panorama.
+    """
+    year: int  #:
+    month: int  #:
+    day: int  #:
+    hour: int  #:
+
+
+@dataclass
+class BuildingLevel:
+    """
+    Building level of an indoor tripod Street View panorama.
+    """
+    level: float
+    """The building level, where 0 is the ground floor, positive levels are above ground, and negative levels
+    are below ground."""
+    name: LocalizedString
+    """Name of the level."""
+    short_name: LocalizedString
+    """Short name of the level."""

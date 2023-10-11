@@ -59,3 +59,17 @@ def opk_to_rotation(omega: float, phi: float, kappa: float) -> Rotation:
     Creates a SciPy rotation object from omega/phi/kappa angles.
     """
     return Rotation.from_euler('zxy', [phi, -omega, kappa])
+
+
+def get_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """
+    Returns the bearing from point 1 to point 2.
+
+    :param lat1: Latitude of point 1.
+    :param lon1: Longitude of point 2.
+    :param lat2: Latitude of point 2.
+    :param lon2: Longitude of point 2.
+    :return: The bearing in radians.
+    """
+    fwd_azimuth, _, _ = geod.inv(lon1, lat1, lon2, lat2)
+    return math.radians(fwd_azimuth)

@@ -21,8 +21,8 @@ Downloading panoramas
 
 Data classes and enums
 ----------------------
+    .. autoclass:: streetlevel.kakao.panorama.KakaoPanorama
+      :members:
     .. autoclass:: streetlevel.kakao.panorama.PanoramaType
       :members:
       :member-order: bysource
-    .. autoclass:: streetlevel.kakao.panorama.KakaoPanorama
-      :members:

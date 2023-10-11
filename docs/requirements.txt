@@ -8,3 +8,4 @@ pyfrpc~=0.2.7
 scipy~=1.9.1
 aiohttp~=3.8.3
 pycryptodome~=3.15.0
+sphinx_rtd_theme

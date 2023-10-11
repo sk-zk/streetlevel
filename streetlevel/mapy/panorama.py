@@ -10,6 +10,10 @@ from streetlevel.dataclasses import Size, Link
 
 @dataclass
 class MapyPanorama:
+    """
+    Metadata of a Mapy.cz panorama.
+    """
+
     id: int
     """The pano ID."""
     lat: float

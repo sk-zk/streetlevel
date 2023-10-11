@@ -166,7 +166,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
   </tr>
   <tr>
     <td align="right">Elevation</td>
-    <td align="center">⚫</td>
+    <td align="center">✔</td>
     <td align="center">❌</td>
     <td align="center">⚫</td>
     <td align="center">✔</td>

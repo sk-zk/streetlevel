@@ -9,7 +9,7 @@ from streetlevel import yandex
 
 
 def mocked_find_panorama_raw(lat: float, lon: float, session: Session = None) -> dict:
-    with open("yandex/data/find_object.json", "r") as f:
+    with open("yandex/data/find.json", "r") as f:
         return json.load(f)
 
 
