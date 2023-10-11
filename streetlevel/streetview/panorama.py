@@ -89,14 +89,18 @@ class StreetViewPanorama:
     """
     The source program of the imagery.
 
-    For official coverage, ``launch`` refers to car coverage and ``scout`` refers to trekker or tripod coverage.
-    (Note, however, that not all trekker coverage is marked ``scout``:
-    the sidewalk trekker in Helsinki, for example, has its blue lines snapped to roads and 
-    therefore returns ``launch``.)
+    For official coverage, common values are:
 
-    For third-party coverage, this returns the app the panorama was uploaded with,
-    such as ``photos:street_view_android`` (the now-discontinued Street View app, RIP) or 
-    ``photos:street_view_publish_api``.
+    * ``launch``: regular car coverage (and sometimes trekker coverage) whose lines are snapped to roads 
+    * ``scout``: trekker or tripod coverage (and sometimes car coverage) whose lines are not snapped to roads
+    * ``innerspace``: tripods from Google's `Business View <https://en.wikipedia.org/wiki/Street_View_Trusted>`_ program
+    * ``cultural_institute``: Some (but not all) tripods from the Arts & Culture program have this value
+    
+    For third-party coverage, this returns the app the panorama was uploaded with, such as:
+    
+    * ``photos:street_view_android``,``photos:street_view_ios``: the now-discontinued Street View app, RIP
+    * ``photos:street_view_publish_api``: the `Publish API <https://developers.google.com/streetview/publish>`_
+    * ``photos:legacy_innerspace``: see above
     """
 
     copyright_message: str = None
