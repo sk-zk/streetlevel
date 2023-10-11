@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from streetlevel.geo import *
-from .panorama import StreetViewPanorama, LocalizedString, CaptureDate
+from .panorama import StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel
 from .depth import parse as parse_depth
 from . import api
 from ..dataclasses import Size, Tile, Link
@@ -235,25 +235,13 @@ def _parse_coverage_tile_response(tile):
     return panos
 
 
-def _parse_pano_message(msg):
+def _parse_pano_message(msg: dict) -> StreetViewPanorama:
     img_sizes = msg[2][3][0]
     img_sizes = list(map(lambda x: Size(x[0][1], x[0][0]), img_sizes))
     others = try_get(lambda: msg[5][0][3][0])
     date = msg[6][7]
 
-    source = try_get(lambda: msg[6][5][2]).lower()
-
-    other_dates_raw = try_get(lambda: msg[5][0][8])
-    if other_dates_raw:
-        other_dates = dict([(x[0], x[1]) for x in other_dates_raw])
-    else:
-        other_dates = {}
-
-    links_raw = try_get(lambda: msg[5][0][6])
-    if links_raw:
-        links = dict([(x[0], try_get(lambda: x[1])) for x in links_raw])
-    else:
-        links = {}
+    links, other_bld_levels, other_dates = _parse_other_pano_indices(msg)
 
     street_name = try_get(lambda: msg[5][0][12][0][0][0][2])
     if street_name is not None:
@@ -263,6 +251,10 @@ def _parse_pano_message(msg):
     if address is not None:
         address = [LocalizedString(x[0], x[1]) for x in address]
 
+    depth = try_get(lambda: msg[5][0][5][1][2])
+    if depth:
+        depth = parse_depth(depth)
+
     pano = StreetViewPanorama(
         id=msg[1][1],
         lat=msg[5][0][1][0][2],
@@ -270,25 +262,22 @@ def _parse_pano_message(msg):
         heading=try_get(lambda: math.radians(msg[5][0][1][2][0])),
         pitch=try_get(lambda: math.radians(90 - msg[5][0][1][2][1])),
         roll=try_get(lambda: math.radians(msg[5][0][1][2][2])),
+        depth=depth,
         date=CaptureDate(date[0],
                          date[1],
                          date[2] if len(date) > 2 else None),
         elevation=try_get(lambda: msg[5][0][1][1][0]),
         tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),
         image_sizes=img_sizes,
-        source=source,
+        source=try_get(lambda: msg[6][5][2].lower()),
         country_code=try_get(lambda: msg[5][0][1][4]),
         street_name=street_name,
         address=address,
         copyright_message=try_get(lambda: msg[4][0][0][0][0]),
         uploader=try_get(lambda: msg[4][1][0][0][0]),
         uploader_icon_url=try_get(lambda: msg[4][1][0][2]),
+        building_level=_parse_building_level_message(try_get(lambda: msg[5][0][1][3])),
     )
-
-    # depth
-    raw_depth = try_get(lambda: msg[5][0][5][1][2])
-    if raw_depth:
-        pano.depth = parse_depth(raw_depth)
 
     # parse other dates, links and neighbors
     if others is not None:
@@ -305,6 +294,7 @@ def _parse_pano_message(msg):
                 heading=try_get(lambda: math.radians(other[2][2][0])),
                 pitch=try_get(lambda: math.radians(90 - other[2][2][1])),
                 roll=try_get(lambda: math.radians(other[2][2][2])),
+                building_level=_parse_building_level_message(try_get(lambda: other[2][3])),
             )
 
             if idx in other_dates:
@@ -317,12 +307,44 @@ def _parse_pano_message(msg):
                     else:
                         angle = get_bearing(pano.lat, pano.lon, connected.lat, connected.lon)
                     pano.links.append(Link(connected, angle))
+                if idx in other_bld_levels:
+                    pano.building_levels.append(connected)
                 pano.neighbors.append(connected)
 
             connected.street_name = try_get(lambda: other[3][2][0])
     pano.historical = sorted(pano.historical, key=lambda x: (x.date.year, x.date.month), reverse=True)
 
     return pano
+
+
+def _parse_other_pano_indices(msg: dict) -> Tuple[dict, list, dict]:
+    links_raw = try_get(lambda: msg[5][0][6])
+    if links_raw:
+        links = dict([(x[0], try_get(lambda: x[1])) for x in links_raw])
+    else:
+        links = {}
+
+    other_bld_levels_raw = try_get(lambda: msg[5][0][7])
+    if other_bld_levels_raw:
+        other_bld_levels = [x[0] for x in other_bld_levels_raw]
+    else:
+        other_bld_levels = []
+
+    other_dates_raw = try_get(lambda: msg[5][0][8])
+    if other_dates_raw:
+        other_dates = dict([(x[0], x[1]) for x in other_dates_raw])
+    else:
+        other_dates = {}
+    return links, other_bld_levels, other_dates
+
+
+def _parse_building_level_message(bld_level: Optional[list]) -> Optional[BuildingLevel]:
+    if bld_level and len(bld_level) > 1:
+        return BuildingLevel(
+            bld_level[1],
+            LocalizedString(*bld_level[2]),
+            LocalizedString(*bld_level[3]))
+    return None
 
 
 def _generate_tile_list(pano: StreetViewPanorama, zoom: int) -> List[Tile]:

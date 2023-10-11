@@ -35,6 +35,7 @@ class StreetViewPanorama:
     """Pitch offset for upright correction of the panorama, in radians."""
     roll: float = None
     """Roll offset for upright correction of the panorama, in radians."""
+
     depth: DepthMap = None
     """The depth map, if it was requested. Values are in meters. -1 is used for the horizon."""
 
@@ -54,6 +55,13 @@ class StreetViewPanorama:
     """The panoramas which the white arrows in the client link to."""
     historical: List[StreetViewPanorama] = field(default_factory=list)
     """A list of panoramas with a different date at the same location."""
+
+    building_level: BuildingLevel = None
+    """The level on which the panorama was taken (if the panorama is located inside a building which has been
+    covered on multiple floors and this metadata is available)."""
+    building_levels: List[StreetViewPanorama] = field(default_factory=list)
+    """One panorama per floor above or below this one (if the panorama is located inside a building which has been
+    covered on multiple floors and this metadata is available)."""
 
     date: CaptureDate = None
     """
@@ -187,3 +195,17 @@ class CaptureDate:
     """The month the panorama was taken."""
     day: int = None
     """The day the panorama was taken. Only available for third-party panoramas."""
+
+
+@dataclass
+class BuildingLevel:
+    """
+    Building level of an indoor panorama.
+    """
+    level: float
+    """The building level, where 0 is the ground floor, positive levels are above ground, and negative levels
+    are below ground."""
+    name: LocalizedString
+    """Name of the level."""
+    short_name: LocalizedString
+    """Short name of the level."""

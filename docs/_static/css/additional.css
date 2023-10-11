@@ -27,6 +27,9 @@
 #streetlevel\.streetview\.panorama\.LocalizedString + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+#streetlevel\.streetview\.panorama\.BuildingLevel + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
 
 #streetlevel\.streetside\.panorama\.StreetsidePanorama + dd > dl:first-of-type.field-list {
   display:none !important;
