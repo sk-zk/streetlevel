@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from streetlevel.geo import *
-from .panorama import StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, UploadDate
+from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, UploadDate
 from .depth import parse as parse_depth
 from . import api
 from ..dataclasses import Size, Tile, Link
@@ -259,6 +259,10 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
     if upload_date:
         upload_date = UploadDate(*upload_date)
 
+    places = try_get(lambda: msg[5][0][9])
+    if places:
+        places = _parse_places(places)
+
     pano = StreetViewPanorama(
         id=msg[1][1],
         lat=msg[5][0][1][0][2],
@@ -282,6 +286,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
         uploader=try_get(lambda: msg[4][1][0][0][0]),
         uploader_icon_url=try_get(lambda: msg[4][1][0][2]),
         building_level=_parse_building_level_message(try_get(lambda: msg[5][0][1][3])),
+        places=places,
     )
 
     # parse other dates, links and neighbors
@@ -321,7 +326,6 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
 
     return pano
 
-
 def _parse_other_pano_indices(msg: dict) -> Tuple[dict, list, dict]:
     links_raw = try_get(lambda: msg[5][0][6])
     if links_raw:
@@ -350,6 +354,24 @@ def _parse_building_level_message(bld_level: Optional[list]) -> Optional[Buildin
             LocalizedString(*bld_level[2]),
             LocalizedString(*bld_level[3]))
     return None
+
+
+def _parse_places(places_raw: list) -> list[Place]:
+    places = []
+    for place in places_raw:
+        #There are multiple types of objects that can be returned here, only way to differentiate them is the length
+        if len(place) != 8:
+            continue
+        feature_id_parts = place[0][1]
+        feature_id = ':'.join(hex(int(part)) for part in feature_id_parts)
+        client_id = try_get(lambda: place[0][3])
+        overlay_position_x = try_get(lambda: place[1][0][0][0])
+        overlay_position_y = try_get(lambda: place[1][0][0][1])
+        name = try_get(lambda: LocalizedString(*place[2]))
+        place_type = try_get(lambda: LocalizedString(*place[3]))
+        status = place[7]
+        places.append(Place(feature_id, client_id, overlay_position_x, overlay_position_y, name, place_type, BusinessStatus(status)))
+    return places
 
 
 def _generate_tile_list(pano: StreetViewPanorama, zoom: int) -> List[Tile]:

@@ -1,8 +1,9 @@
 from __future__ import annotations
+from enum import Enum
 
 import math
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from numpy import ndarray
 
@@ -97,6 +98,12 @@ class StreetViewPanorama:
     
     Typically only set for official road coverage.
     """
+
+    places: Optional[List[Place]] = None
+    """
+    For source = "launch", this will include buildings, businesses etc that are visible in the panorama, or intersections, addresses, etc. at the panorama's location.
+    
+    For source = "scout", "innerspace", or "cultural_institute", this (usually) will have a single element, with the building or other location that the coverage is of."""
 
     source: str = None
     """
@@ -225,3 +232,29 @@ class BuildingLevel:
     """Name of the level."""
     short_name: LocalizedString
     """Short name of the level."""
+
+class BusinessStatus(Enum):
+    """
+    Status of a place.
+    """
+    Operational = 2
+    TemporarilyClosed = 3
+    PermanentlyClosed = 4
+
+@dataclass
+class Place:
+    """
+    Places associated with a panorama."
+    """
+    feature_id: str
+    client_id: str | None
+    overlay_x: Optional[float]
+    """Clickable overlay horizontal position in turns, if there is one."""
+    overlay_y: Optional[float]
+    """Clickable overlay vertical position in turns, if there is one."""
+    name: LocalizedString | None
+    """Name of this place. This can be None, e.g. in the case of type = "Geocoded address" or "Intersection"."""
+    type: LocalizedString
+    """Type of this place."""
+    status: BusinessStatus
+    """Operational status of the place. This will be BusinessStatus.Operational for locations that are not a business."""
