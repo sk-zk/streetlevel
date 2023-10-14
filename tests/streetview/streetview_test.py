@@ -92,3 +92,19 @@ def test_missing_link_direction():
 
     pano = streetview.find_panorama_by_id("VAhJEVyAlZg-QgAnUwcIRA")
     assert pano.links[0].direction == approx(0.07641416505750565)
+
+
+def test_places():
+    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+        with open("streetview/data/places.json", "r") as f:
+            return json.load(f)
+
+    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+
+    pano = streetview.find_panorama_by_id("gjDG9WfyVFri9OT0A4LaWw")
+    assert len(pano.places) == 3
+    assert pano.places[2].name.value == 'Old Parliament House'
+    assert pano.places[2].type.value == 'Museum'
+    assert pano.places[2].feature_id == '0x6b164d18e0254b09:0x4ec7b2ac1171a085'
+    assert pano.places[2].overlay_x == approx(0.759383857250214)
+    assert pano.places[2].overlay_y == approx(0.500150203704834)
