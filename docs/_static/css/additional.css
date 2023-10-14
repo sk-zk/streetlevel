@@ -15,6 +15,7 @@
   display:none !important;
 }
 
+
 #streetlevel\.streetview\.panorama\.StreetViewPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
@@ -33,26 +34,35 @@
 #streetlevel\.streetview\.panorama\.BuildingLevel + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+#streetlevel\.streetview\.panorama\.Place + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+
 
 #streetlevel\.streetside\.panorama\.StreetsidePanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
+
 #streetlevel\.mapy\.panorama\.MapyPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+
 
 #streetlevel\.lookaround\.panorama\.LookaroundPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
+
 #streetlevel\.yandex\.panorama\.YandexPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
+
 #streetlevel\.kakao\.panorama\.KakaoPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+
 
 #streetlevel\.naver\.panorama\.NaverPanorama + dd > dl:first-of-type.field-list {
   display:none !important;

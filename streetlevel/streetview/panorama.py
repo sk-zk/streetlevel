@@ -101,10 +101,10 @@ class StreetViewPanorama:
 
     places: Optional[List[Place]] = None
     """
-    For source = "launch", this will include buildings, businesses etc that are visible in the panorama, 
+    If ``source`` is ``launch``, this includes buildings, businesses etc. that are visible in the panorama, 
     or intersections, addresses, etc. at the panorama's location.
     
-    For source = "scout", "innerspace", or "cultural_institute", this (usually) will have a single element, 
+    If ``source`` is ``scout``, ``innerspace`` or ``cultural_institute``, this (usually) contains a single element, 
     with the building or other location that the coverage is of.
     """
 
@@ -241,9 +241,9 @@ class BusinessStatus(Enum):
     """
     Status of a place.
     """
-    Operational = 2
-    TemporarilyClosed = 3
-    PermanentlyClosed = 4
+    Operational = 2  #:
+    TemporarilyClosed = 3  #:
+    PermanentlyClosed = 4  #:
 
 
 @dataclass
@@ -262,11 +262,8 @@ class Place:
     marker_distance: Optional[float]
     """Presumably the distance of the marker to the camera in meters."""
     name: Optional[LocalizedString]
-    """Name of this place. This can be None, e.g. in the case of type = "Geocoded address" or "Intersection"."""
+    """Name of this place. This can be None, e.g. if type is "Geocoded address" or "Intersection"."""
     type: LocalizedString
     """Type of this place."""
     status: BusinessStatus
-    """
-    Operational status of the place. 
-    This will be BusinessStatus.Operational for locations that are not a business.
-    """
+    """Operational status of the place. This will be ``Operational`` for locations that are not a business."""
