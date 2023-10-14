@@ -209,6 +209,17 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">⚫</td>
   </tr>
   <tr>
+    <td align="right">PoIs</td>
+    <td align="center">✔</td>
+    <td align="center">❌</td>
+    <td align="center">❌</td>
+    <td align="center">⚫</td>
+    <td></td>
+    <td align="center">⚫</td>
+    <td align="center">⚫</td>
+    <td align="center">⚫</td>
+  </tr>
+  <tr>
     <td align="right">Creator</td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
