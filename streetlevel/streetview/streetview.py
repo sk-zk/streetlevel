@@ -365,14 +365,14 @@ def _parse_places(places_raw: list) -> List[Place]:
             continue
         feature_id_parts = place[0][1]
         feature_id = ':'.join(hex(int(part)) for part in feature_id_parts)
-        client_id = try_get(lambda: place[0][3])
+        # map_node_id = try_get(lambda: place[0][3])
         overlay_position_x = try_get(lambda: place[1][0][0][0])
         overlay_position_y = try_get(lambda: place[1][0][0][1])
         name = try_get(lambda: LocalizedString(*place[2]))
         place_type = try_get(lambda: LocalizedString(*place[3]))
         status = place[7]
         places.append(Place(feature_id,
-                            client_id,
+                            # map_node_id,
                             overlay_position_x,
                             overlay_position_y,
                             name,

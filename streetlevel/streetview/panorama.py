@@ -252,7 +252,7 @@ class Place:
     Places associated with a panorama.
     """
     feature_id: str
-    client_id: Optional[int]
+    # map_node_id: Optional[int]
     overlay_x: Optional[float]
     """Clickable overlay horizontal position in turns, if there is one."""
     overlay_y: Optional[float]
