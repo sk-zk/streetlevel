@@ -253,10 +253,13 @@ class Place:
     """
     feature_id: str
     # map_node_id: Optional[int]
-    overlay_x: Optional[float]
-    """Clickable overlay horizontal position in turns, if there is one."""
-    overlay_y: Optional[float]
-    """Clickable overlay vertical position in turns, if there is one."""
+    marker_yaw: Optional[float]
+    """Yaw of the marker's position in the panorama in radians, if a marker is returned for this place.
+    This value is relative to the panorama."""
+    marker_pitch: Optional[float]
+    """Pitch of the marker's position in the panorama in radians, if a marker is returned for this place."""
+    marker_distance: Optional[float]
+    """Presumably the distance of the marker to the camera in meters."""
     name: Optional[LocalizedString]
     """Name of this place. This can be None, e.g. in the case of type = "Geocoded address" or "Intersection"."""
     type: LocalizedString

@@ -106,5 +106,6 @@ def test_places():
     assert pano.places[2].name.value == 'Old Parliament House'
     assert pano.places[2].type.value == 'Museum'
     assert pano.places[2].feature_id == '0x6b164d18e0254b09:0x4ec7b2ac1171a085'
-    assert pano.places[2].overlay_x == approx(0.759383857250214)
-    assert pano.places[2].overlay_y == approx(0.500150203704834)
+    assert pano.places[2].marker_yaw == approx(1.6297568407941114)
+    assert pano.places[2].marker_pitch == approx(-0.00047187885564841503)
+    assert pano.places[2].marker_distance == approx(29.35295486450195)
