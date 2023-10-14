@@ -101,9 +101,12 @@ class StreetViewPanorama:
 
     places: Optional[List[Place]] = None
     """
-    For source = "launch", this will include buildings, businesses etc that are visible in the panorama, or intersections, addresses, etc. at the panorama's location.
+    For source = "launch", this will include buildings, businesses etc that are visible in the panorama, 
+    or intersections, addresses, etc. at the panorama's location.
     
-    For source = "scout", "innerspace", or "cultural_institute", this (usually) will have a single element, with the building or other location that the coverage is of."""
+    For source = "scout", "innerspace", or "cultural_institute", this (usually) will have a single element, 
+    with the building or other location that the coverage is of.
+    """
 
     source: str = None
     """
@@ -233,6 +236,7 @@ class BuildingLevel:
     short_name: LocalizedString
     """Short name of the level."""
 
+
 class BusinessStatus(Enum):
     """
     Status of a place.
@@ -241,10 +245,11 @@ class BusinessStatus(Enum):
     TemporarilyClosed = 3
     PermanentlyClosed = 4
 
+
 @dataclass
 class Place:
     """
-    Places associated with a panorama."
+    Places associated with a panorama.
     """
     feature_id: str
     client_id: str | None
@@ -257,4 +262,7 @@ class Place:
     type: LocalizedString
     """Type of this place."""
     status: BusinessStatus
-    """Operational status of the place. This will be BusinessStatus.Operational for locations that are not a business."""
+    """
+    Operational status of the place. 
+    This will be BusinessStatus.Operational for locations that are not a business.
+    """
