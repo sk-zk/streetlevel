@@ -252,12 +252,12 @@ class Place:
     Places associated with a panorama.
     """
     feature_id: str
-    client_id: str | None
+    client_id: Optional[int]
     overlay_x: Optional[float]
     """Clickable overlay horizontal position in turns, if there is one."""
     overlay_y: Optional[float]
     """Clickable overlay vertical position in turns, if there is one."""
-    name: LocalizedString | None
+    name: Optional[LocalizedString]
     """Name of this place. This can be None, e.g. in the case of type = "Geocoded address" or "Intersection"."""
     type: LocalizedString
     """Type of this place."""

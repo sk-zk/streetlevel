@@ -357,7 +357,7 @@ def _parse_building_level_message(bld_level: Optional[list]) -> Optional[Buildin
     return None
 
 
-def _parse_places(places_raw: list) -> list[Place]:
+def _parse_places(places_raw: list) -> List[Place]:
     places = []
     for place in places_raw:
         # There are multiple types of objects that can be returned here, only way to differentiate them is the length
