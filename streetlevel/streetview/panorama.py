@@ -117,7 +117,7 @@ class StreetViewPanorama:
     * ``launch``: regular car coverage (and sometimes trekker coverage) whose lines are snapped to roads 
     * ``scout``: trekker or tripod coverage (and sometimes car coverage) whose lines are not snapped to roads
     * ``innerspace``: tripods from Google's `Business View <https://en.wikipedia.org/wiki/Street_View_Trusted>`_ program
-    * ``cultural_institute``: Some (but not all) tripods from the Arts & Culture program have this value
+    * ``cultural_institute``: some (but not all) tripods from the Arts & Culture program have this value
     
     For third-party coverage, this returns the app the panorama was uploaded with, such as:
     
