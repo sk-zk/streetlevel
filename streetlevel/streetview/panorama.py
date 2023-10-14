@@ -255,10 +255,10 @@ class Place:
     """An ID for this place used in Google Maps URLs and internal API calls."""
     # map_node_id: Optional[int]
     marker_yaw: Optional[float]
-    """Yaw of the marker's position in the panorama in radians, if a marker is returned for this place.
+    """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
     This value is relative to the panorama."""
     marker_pitch: Optional[float]
-    """Pitch of the marker's position in the panorama in radians, if a marker is returned for this place."""
+    """Pitch of the marker's position in the panorama in radians, if a marker was returned for this place."""
     marker_distance: Optional[float]
     """Presumably the distance of the marker to the camera in meters."""
     name: Optional[LocalizedString]
