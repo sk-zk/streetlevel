@@ -223,7 +223,7 @@ def stitch_equirectangular_tiles(tile_images: dict, width: int, height: int,
     :param width: Width of the panorama in pixels.
     :param height: Height of the panorama in pixels.
     :param tile_width: Width of one tile in pixels.
-    :param tile_height: Height of one til in pixels.
+    :param tile_height: Height of one tile in pixels.
     :return: The stitched panorama as PIL image.
     """
     panorama = Image.new('RGB', (width, height))
