@@ -249,9 +249,10 @@ class BusinessStatus(Enum):
 @dataclass
 class Place:
     """
-    Places associated with a panorama.
+    A place associated with a Street View panorama.
     """
-    feature_id: str
+    id: str
+    """An ID for this place used in Google Maps URLs and internal API calls."""
     # map_node_id: Optional[int]
     marker_yaw: Optional[float]
     """Yaw of the marker's position in the panorama in radians, if a marker is returned for this place.

@@ -377,7 +377,7 @@ def _parse_places(places_raw: list) -> List[Place]:
         name = try_get(lambda: LocalizedString(*place[2]))
         place_type = try_get(lambda: LocalizedString(*place[3]))
         status = place[7]
-        places.append(Place(feature_id=feature_id,
+        places.append(Place(id=feature_id,
                             marker_yaw=marker_yaw,
                             marker_pitch=marker_pitch,
                             marker_distance=marker_distance,
