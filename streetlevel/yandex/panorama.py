@@ -51,6 +51,11 @@ class YandexPanorama:
     street_name: str = None
     """The name of the street the panorama is located on."""
 
+    companies: List[Company] = None
+    """Companies whose markers are overlaid on this panorama."""
+    addresses: List[Address] = None
+    """Addresses whose markers are overlaid on this panorama."""
+
     author: str = None
     """Name of the uploader; only set for third-party panoramas."""
     author_avatar_url: str = None
@@ -87,3 +92,31 @@ class YandexPanorama:
 
     def __str__(self):
         return f"{self.id} ({self.lat:.5f}, {self.lon:.5f})"
+
+
+@dataclass
+class Company:
+    """A company whose marker is overlaid on the panorama."""
+    id: int
+    """ID of the company."""
+    lat: float
+    """Latitude of the company's location."""
+    lon: float
+    """Longitude of the company's location."""
+    name: str
+    """Name of the company."""
+    tags: List[str]
+    """Typically has one entry specifying the business type."""
+
+
+@dataclass
+class Address:
+    """An address whose marker is overlaid on the panorama."""
+    lat: float
+    """Latitude of the address."""
+    lon: float
+    """Longitude of the address."""
+    house_number: str
+    """House number of the address."""
+    street_name_and_house_number: str
+    """Street name and house number of the address."""
