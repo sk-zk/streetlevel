@@ -268,3 +268,5 @@ class Place:
     """Type of this place."""
     status: BusinessStatus
     """Operational status of the place. This will be ``Operational`` for locations that are not a business."""
+    marker_icon_url: Optional[str]
+    """The icon which is drawn for this place."""

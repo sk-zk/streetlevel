@@ -387,6 +387,7 @@ def _parse_places(places_raw: list) -> List[Place]:
                             marker_distance=marker_distance,
                             name=try_get(lambda: LocalizedString(*place[2])),
                             type=try_get(lambda: LocalizedString(*place[3])),
+                            marker_icon_url=place[4],
                             status=BusinessStatus(place[7])))
     return places
 
