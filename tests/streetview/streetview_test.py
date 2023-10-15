@@ -103,9 +103,9 @@ def test_places():
 
     pano = streetview.find_panorama_by_id("gjDG9WfyVFri9OT0A4LaWw")
     assert len(pano.places) == 3
-    assert pano.places[2].name.value == 'Old Parliament House'
-    assert pano.places[2].type.value == 'Museum'
-    assert pano.places[2].feature_id == '0x6b164d18e0254b09:0x4ec7b2ac1171a085'
+    assert pano.places[2].name.value == "Old Parliament House"
+    assert pano.places[2].type.value == "Museum"
+    assert pano.places[2].feature_id == "0x6b164d18e0254b09:0x4ec7b2ac1171a085"
     assert pano.places[2].cid == 5676702307420577925
     assert pano.places[2].marker_yaw == approx(1.6297568407941114)
     assert pano.places[2].marker_pitch == approx(-0.00047187885564841503)
