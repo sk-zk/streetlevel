@@ -149,35 +149,37 @@ def _validate_get_panorama_params(pano: YandexPanorama, zoom: int) -> int:
     return zoom
 
 
-def _parse_panorama(data: dict) -> YandexPanorama:
-    panoid = data["Data"]["panoramaId"]
+def _parse_panorama(pano_dict: dict) -> YandexPanorama:
+    data = pano_dict["Data"]
+    annotation = pano_dict["Annotation"]
+    panoid = data["panoramaId"]
     return YandexPanorama(
         id=panoid,
-        lat=float(data["Data"]["Point"]["coordinates"][1]),
-        lon=float(data["Data"]["Point"]["coordinates"][0]),
+        lat=float(data["Point"]["coordinates"][1]),
+        lon=float(data["Point"]["coordinates"][0]),
 
-        heading=math.radians(float(data["Data"]["EquirectangularProjection"]["Origin"][0])),
+        heading=math.radians(float(data["EquirectangularProjection"]["Origin"][0])),
 
-        image_id=data["Data"]["Images"]["imageId"],
-        tile_size=Size(int(data["Data"]["Images"]["Tiles"]["width"]),
-                       int(data["Data"]["Images"]["Tiles"]["height"])),
-        image_sizes=_parse_image_sizes(data["Data"]["Images"]["Zooms"]),
+        image_id=data["Images"]["imageId"],
+        tile_size=Size(int(data["Images"]["Tiles"]["width"]),
+                       int(data["Images"]["Tiles"]["height"])),
+        image_sizes=_parse_image_sizes(data["Images"]["Zooms"]),
 
-        neighbors=_parse_neighbors(data["Annotation"]["Graph"]["Nodes"],
-                                   data["Annotation"]["Connections"],
+        neighbors=_parse_neighbors(annotation["Graph"]["Nodes"],
+                                   annotation["Connections"],
                                    panoid),
-        links=_parse_links(data["Annotation"]["Thoroughfares"]),
-        historical=_parse_historical(data["Annotation"]["HistoricalPanoramas"], panoid),
+        links=_parse_links(annotation["Thoroughfares"]),
+        historical=_parse_historical(annotation["HistoricalPanoramas"], panoid),
 
         date=_get_date_from_panoid(panoid),
-        height=int(data["Data"]["Point"]["coordinates"][2]),
-        street_name=data["Data"]["Point"]["name"],
+        height=int(data["Point"]["coordinates"][2]),
+        street_name=data["Point"]["name"],
 
-        places=_parse_companies(data["Annotation"]["Companies"]),
-        addresses=_parse_addresses(data["Annotation"]["Markers"]),
+        places=_parse_companies(annotation["Companies"]),
+        addresses=_parse_addresses(annotation["Markers"]),
 
-        author=try_get(lambda: data["Author"]["name"]),
-        author_avatar_url=try_get(lambda: data["Author"]["avatarUrlTemplate"]),
+        author=try_get(lambda: pano_dict["Author"]["name"]),
+        author_avatar_url=try_get(lambda: pano_dict["Author"]["avatarUrlTemplate"]),
     )
 
 
