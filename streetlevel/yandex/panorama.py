@@ -51,8 +51,8 @@ class YandexPanorama:
     street_name: str = None
     """The name of the street the panorama is located on."""
 
-    companies: List[Company] = None
-    """Companies whose markers are overlaid on this panorama."""
+    places: List[Place] = None
+    """Companies or landmarks whose markers are overlaid on this panorama."""
     addresses: List[Address] = None
     """Addresses whose markers are overlaid on this panorama."""
 
@@ -95,18 +95,18 @@ class YandexPanorama:
 
 
 @dataclass
-class Company:
-    """A company whose marker is overlaid on the panorama."""
+class Place:
+    """A company or landmark whose marker is overlaid on the panorama."""
     id: int
-    """ID of the company."""
+    """ID of the place."""
     lat: float
-    """Latitude of the company's location."""
+    """Latitude of the place's location."""
     lon: float
-    """Longitude of the company's location."""
+    """Longitude of the place's location."""
     name: str
-    """Name of the company."""
+    """Name of the place."""
     tags: List[str]
-    """Typically has one entry specifying the business type."""
+    """Typically has one entry specifying the type of the place."""
 
 
 @dataclass

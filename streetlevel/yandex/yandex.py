@@ -9,7 +9,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from . import api
-from .panorama import YandexPanorama, Company, Address
+from .panorama import YandexPanorama, Place, Address
 from ..dataclasses import Size, Tile, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 
@@ -173,7 +173,7 @@ def _parse_panorama(data: dict) -> YandexPanorama:
         height=int(data["Data"]["Point"]["coordinates"][2]),
         street_name=data["Data"]["Point"]["name"],
 
-        companies=_parse_companies(data["Annotation"]["Companies"]),
+        places=_parse_companies(data["Annotation"]["Companies"]),
         addresses=_parse_addresses(data["Annotation"]["Markers"]),
 
         author=try_get(lambda: data["Author"]["name"]),
@@ -181,10 +181,10 @@ def _parse_panorama(data: dict) -> YandexPanorama:
     )
 
 
-def _parse_companies(companies_json: list) -> List[Company]:
+def _parse_companies(companies_json: list) -> List[Place]:
     companies = []
     for company in companies_json:
-        companies.append(Company(
+        companies.append(Place(
             id=int(company["properties"]["id"]),
             lat=company["geometry"]["coordinates"][1],
             lon=company["geometry"]["coordinates"][0],
