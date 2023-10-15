@@ -251,9 +251,10 @@ class Place:
     """
     A place associated with a Street View panorama.
     """
-    id: str
-    """An ID for this place used in Google Maps URLs and internal API calls."""
-    # map_node_id: Optional[int]
+    feature_id: str
+    """An ID for this place used in various Google services."""
+    cid: Optional[int]
+    """An ID for a business used in various Google services."""
     marker_yaw: Optional[float]
     """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
     This value is relative to the panorama."""

@@ -364,9 +364,14 @@ def _parse_places(places_raw: list) -> List[Place]:
         # There are multiple types of objects that can be returned here, only way to differentiate them is the length
         if len(place) != 8:
             continue
+
         feature_id_parts = place[0][1]
         feature_id = ':'.join(hex(int(part)) for part in feature_id_parts)
-        # map_node_id = try_get(lambda: place[0][3])
+
+        cid = try_get(lambda: int(place[0][3]))
+        if cid is None:
+            cid = int(place[0][1][1])
+
         marker_yaw = try_get(lambda: place[1][0][0][0])
         if marker_yaw:
             marker_yaw = (marker_yaw - 0.5) * math.tau
@@ -374,16 +379,15 @@ def _parse_places(places_raw: list) -> List[Place]:
         if marker_pitch:
             marker_pitch = (0.5 - marker_pitch) * math.pi
         marker_distance = try_get(lambda: place[1][0][0][2])
-        name = try_get(lambda: LocalizedString(*place[2]))
-        place_type = try_get(lambda: LocalizedString(*place[3]))
-        status = place[7]
-        places.append(Place(id=feature_id,
+
+        places.append(Place(feature_id=feature_id,
+                            cid=cid,
                             marker_yaw=marker_yaw,
                             marker_pitch=marker_pitch,
                             marker_distance=marker_distance,
-                            name=name,
-                            type=place_type,
-                            status=BusinessStatus(status)))
+                            name=try_get(lambda: LocalizedString(*place[2])),
+                            type=try_get(lambda: LocalizedString(*place[3])),
+                            status=BusinessStatus(place[7])))
     return places
 
 
