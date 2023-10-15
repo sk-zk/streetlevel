@@ -1,17 +1,17 @@
+from aiohttp import ClientSession
 import itertools
 import math
-from typing import List, Optional
 from PIL import Image
-from aiohttp import ClientSession
 from requests import Session
+from typing import List, Optional, Tuple
 
-from streetlevel.geo import *
-from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, UploadDate
-from .depth import parse as parse_depth
 from . import api
-from ..dataclasses import Size, Tile, Link
-from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
+from .depth import parse as parse_depth
+from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, UploadDate
 from .util import is_third_party_panoid
+from ..dataclasses import Size, Tile, Link
+from ..geo import wgs84_to_tile_coord, get_bearing
+from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 
 
 def find_panorama(lat: float, lon: float, radius: int = 50, locale: str = "en",
