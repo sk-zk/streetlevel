@@ -1,7 +1,6 @@
 streetlevel.streetview: Google Street View
 ==========================================
 
-
 Finding panoramas
 -----------------
     .. autofunction:: streetlevel.streetview.find_panorama
@@ -22,6 +21,8 @@ Downloading panoramas
 
 Data classes
 ------------
+    .. autoclass:: streetlevel.streetview.panorama.Artwork
+       :members:
     .. autoclass:: streetlevel.streetview.panorama.BusinessStatus
        :members:
        :member-order: bysource

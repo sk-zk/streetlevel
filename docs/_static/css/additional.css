@@ -37,7 +37,9 @@
 #streetlevel\.streetview\.panorama\.Place + dd > dl:first-of-type.field-list {
   display:none !important;
 }
-
+#streetlevel\.streetview\.panorama\.Artwork + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
 
 #streetlevel\.streetside\.panorama\.StreetsidePanorama + dd > dl:first-of-type.field-list {
   display:none !important;
