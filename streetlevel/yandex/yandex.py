@@ -1,7 +1,7 @@
 import itertools
 import math
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import re
 
 from PIL import Image
@@ -9,7 +9,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from . import api
-from .panorama import YandexPanorama, Place, Address
+from .panorama import YandexPanorama, Place, Address, Marker
 from ..dataclasses import Size, Tile, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 
@@ -153,6 +153,9 @@ def _parse_panorama(pano_dict: dict) -> YandexPanorama:
     data = pano_dict["Data"]
     annotation = pano_dict["Annotation"]
     panoid = data["panoramaId"]
+
+    addresses, other_markers = _parse_markers(annotation["Markers"])
+
     return YandexPanorama(
         id=panoid,
         lat=float(data["Point"]["coordinates"][1]),
@@ -176,7 +179,8 @@ def _parse_panorama(pano_dict: dict) -> YandexPanorama:
         street_name=data["Point"]["name"],
 
         places=_parse_companies(annotation["Companies"]),
-        addresses=_parse_addresses(annotation["Markers"]),
+        addresses=addresses,
+        other_markers=other_markers,
 
         author=try_get(lambda: pano_dict["Author"]["name"]),
         author_avatar_url=try_get(lambda: pano_dict["Author"]["avatarUrlTemplate"]),
@@ -196,16 +200,29 @@ def _parse_companies(companies_json: list) -> List[Place]:
     return companies
 
 
-def _parse_addresses(addresses_json: list) -> List[Address]:
+def _parse_markers(markers_json: list) -> Tuple[List[Address], List[Marker]]:
     addresses = []
-    for address in addresses_json:
-        addresses.append(Address(
-            lat=address["geometry"]["coordinates"][1],
-            lon=address["geometry"]["coordinates"][0],
-            house_number=address["properties"]["name"],
-            street_name_and_house_number=address["properties"]["description"],
-        ))
-    return addresses
+    other_markers = []
+    for marker in markers_json:
+        # Address markers are displayed at a height of 7 m;
+        # all others, like metro icons, have a height of 2 m.
+        if marker["geometry"]["coordinates"][2] == 7:
+            addresses.append(Address(
+                lat=marker["geometry"]["coordinates"][1],
+                lon=marker["geometry"]["coordinates"][0],
+                house_number=marker["properties"]["name"],
+                street_name_and_house_number=marker["properties"]["description"],
+            ))
+        else:
+            other_markers.append(Marker(
+                lat=marker["geometry"]["coordinates"][1],
+                lon=marker["geometry"]["coordinates"][0],
+                name=marker["properties"]["name"],
+                description=marker["properties"]["description"],
+                style=marker["properties"]["style"],
+            ))
+
+    return addresses, other_markers
 
 
 def _parse_links(links_json):

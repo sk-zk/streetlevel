@@ -55,6 +55,8 @@ class YandexPanorama:
     """Companies or landmarks whose markers are overlaid on this panorama."""
     addresses: List[Address] = None
     """Addresses whose markers are overlaid on this panorama."""
+    other_markers: List[Marker] = None
+    """Represents other markers which are neither an address, company, nor landmark."""
 
     author: str = None
     """Name of the uploader; only set for third-party panoramas."""
@@ -120,3 +122,19 @@ class Address:
     """House number of the address."""
     street_name_and_house_number: str
     """Street name and house number of the address."""
+
+
+@dataclass
+class Marker:
+    """A marker which is neither an address, company, nor landmark."""
+    lat: float
+    """Latitude of the marker."""
+    lon: float
+    """Longitude of the marker."""
+    name: str
+    description: str
+    style: str
+    """
+    A link to an element in an XML document describing how the marker should be drawn.
+    What the marker represents can be inferred from the ID of the element.
+    """

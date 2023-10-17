@@ -23,5 +23,7 @@ Data classes
       :members:
     .. autoclass:: streetlevel.yandex.panorama.Company
       :members:
+    .. autoclass:: streetlevel.yandex.panorama.Marker
+      :members:
     .. autoclass:: streetlevel.yandex.panorama.YandexPanorama
       :members:
