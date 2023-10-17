@@ -65,7 +65,7 @@
 #streetlevel\.yandex\.panorama\.Address + dd > dl:first-of-type.field-list {
   display:none !important;
 }
-#streetlevel\.yandex\.panorama\.Yandex + dd > dl:first-of-type.field-list {
+#streetlevel\.yandex\.panorama\.Marker + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 
