@@ -218,8 +218,14 @@ class CaptureDate:
     """The year the panorama was taken."""
     month: int
     """The month the panorama was taken."""
-    day: int = None
+    day: Optional[int] = None
     """The day the panorama was taken. Only available for third-party panoramas."""
+
+    def __str__(self):
+        output = f"{self.year}-{self.month}"
+        if self.day:
+            output += f"-{self.day}"
+        return output
 
 
 @dataclass
@@ -231,6 +237,9 @@ class UploadDate:
     month: int  #:
     day: int  #:
     hour: int  #:
+
+    def __str__(self):
+        return f"{self.year}-{self.month}-{self.day} {self.hour}"
 
 
 @dataclass
