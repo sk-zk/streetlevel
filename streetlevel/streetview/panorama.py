@@ -166,10 +166,7 @@ class StreetViewPanorama:
     def __repr__(self):
         output = str(self)
         if self.date is not None:
-            output += f" [{self.date.year}-{self.date.month:02d}"
-            if self.date.day is not None:
-                output += f"-{self.date.day:02d}"
-            output += "]"
+            output += f" [{self.date}]"
         return output
 
     def __str__(self):
@@ -222,9 +219,9 @@ class CaptureDate:
     """The day the panorama was taken. Only available for third-party panoramas."""
 
     def __str__(self):
-        output = f"{self.year}-{self.month}"
+        output = f"{self.year}-{self.month:02d}"
         if self.day:
-            output += f"-{self.day}"
+            output += f"-{self.day:02d}"
         return output
 
 
@@ -239,7 +236,7 @@ class UploadDate:
     hour: int  #:
 
     def __str__(self):
-        return f"{self.year}-{self.month}-{self.day} {self.hour}"
+        return f"{self.year}-{self.month:02d}-{self.day:02d} {self.hour:02d}"
 
 
 @dataclass
