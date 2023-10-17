@@ -302,7 +302,7 @@ class Artwork:
     thumbnail: str
     """Thumbnail of the artwork."""
     url: str
-    """URL to the Arts & Culture page of the artwork."""
+    """URL of the Arts & Culture page of the artwork."""
     collection: LocalizedString
     """The collection of which the artwork is a part."""
     date_created: LocalizedString
@@ -313,13 +313,13 @@ class Artwork:
     """Type of the artwork."""
     medium: LocalizedString
     """Medium of the artwork."""
-    marker_icon_url: str
-    """The icon which is drawn for the marker of the annotation."""
-    marker_yaw: float = None
+    marker_yaw: float
     """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
     This value is relative to the panorama."""
-    marker_pitch: float = None
+    marker_pitch: float
     """Pitch of the marker's position in the panorama in radians, if a marker was returned for this place."""
+    marker_icon_url: str
+    """The icon which is drawn for the marker of the annotation."""
 
     def __str__(self):
         return f"{self.title.value} ({self.id})"
