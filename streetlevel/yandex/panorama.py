@@ -132,7 +132,9 @@ class Marker:
     lon: float
     """Longitude of the marker."""
     name: str
+    """"""
     description: str
+    """"""
     style: str
     """
     A link to an element in an XML document describing how the marker should be drawn.
