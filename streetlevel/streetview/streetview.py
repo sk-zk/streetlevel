@@ -7,7 +7,8 @@ from typing import List, Optional, Tuple
 
 from . import api
 from .depth import parse as parse_depth
-from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, UploadDate
+from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, \
+    UploadDate, Artwork
 from .util import is_third_party_panoid
 from ..dataclasses import Size, Tile, Link
 from ..geo import wgs84_to_tile_coord, get_bearing
@@ -260,9 +261,11 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
     if upload_date:
         upload_date = UploadDate(*upload_date)
 
-    places = try_get(lambda: msg[5][0][9])
-    if places:
-        places = _parse_places(places)
+    places_raw = try_get(lambda: msg[5][0][9])
+    if places_raw:
+        artworks, places = _parse_places(places_raw)
+    else:
+        artworks, places = None, None
 
     pano = StreetViewPanorama(
         id=msg[1][1],
@@ -287,6 +290,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
         uploader=try_get(lambda: msg[4][1][0][0][0]),
         uploader_icon_url=try_get(lambda: msg[4][1][0][2]),
         building_level=_parse_building_level_message(try_get(lambda: msg[5][0][1][3])),
+        artworks=artworks,
         places=places,
     )
 
@@ -358,38 +362,71 @@ def _parse_building_level_message(bld_level: Optional[list]) -> Optional[Buildin
     return None
 
 
-def _parse_places(places_raw: list) -> List[Place]:
+def _parse_places(places_raw: list) -> Tuple[List[Artwork], List[Place]]:
+    artworks = []
     places = []
     for place in places_raw:
         # There are multiple types of objects that can be returned here, only way to differentiate them is the length
-        if len(place) != 8:
-            continue
+        if len(place) == 6:
+            artwork = _parse_artwork(place)
+            artworks.append(artwork)
+        elif len(place) == 8:
+            places.append(_parse_place(place))
+    return artworks, places
 
-        feature_id_parts = place[0][1]
-        feature_id = ':'.join(hex(int(part)) for part in feature_id_parts)
 
-        cid = try_get(lambda: int(place[0][3]))
-        if cid is None:
-            cid = int(place[0][1][1])
+def _parse_artwork(place: dict) -> Artwork:
+    artwork = Artwork(
+        id=place[0][2][0],
+        title=LocalizedString(*place[5][0]),
+        description=LocalizedString(*place[5][1]),
+        thumbnail=place[5][3],
+        creator=LocalizedString(*place[5][6]),
+        url=place[5][7][1][0],
+        collection=LocalizedString(*place[5][2][0][1]),
+        date_created=LocalizedString(*place[5][2][2][1]),
+        dimensions=LocalizedString(*place[5][2][3][1]),
+        type=LocalizedString(*place[5][2][4][1]),
+        medium=LocalizedString(*place[5][2][5][1]),
+        marker_icon_url=place[4],
+        marker_yaw=_marker_yaw_to_rad(place[1][0][0][0]),
+        marker_pitch=_marker_pitch_to_rad(place[1][0][0][1]),
+    )
+    return artwork
 
-        marker_yaw = try_get(lambda: place[1][0][0][0])
-        if marker_yaw:
-            marker_yaw = (marker_yaw - 0.5) * math.tau
-        marker_pitch = try_get(lambda: place[1][0][0][1])
-        if marker_pitch:
-            marker_pitch = (0.5 - marker_pitch) * math.pi
-        marker_distance = try_get(lambda: place[1][0][0][2])
 
-        places.append(Place(feature_id=feature_id,
-                            cid=cid,
-                            marker_yaw=marker_yaw,
-                            marker_pitch=marker_pitch,
-                            marker_distance=marker_distance,
-                            name=try_get(lambda: LocalizedString(*place[2])),
-                            type=try_get(lambda: LocalizedString(*place[3])),
-                            marker_icon_url=place[4],
-                            status=BusinessStatus(place[7])))
-    return places
+def _parse_place(place: dict) -> Place:
+    feature_id_parts = place[0][1]
+    feature_id = ':'.join(hex(int(part)) for part in feature_id_parts)
+    cid = try_get(lambda: int(place[0][3]))
+    if cid is None:
+        cid = int(place[0][1][1])
+
+    marker_yaw = try_get(lambda: place[1][0][0][0])
+    if marker_yaw:
+        marker_yaw = _marker_yaw_to_rad(marker_yaw)
+    marker_pitch = try_get(lambda: place[1][0][0][1])
+    if marker_pitch:
+        marker_pitch = _marker_pitch_to_rad(marker_pitch)
+    marker_distance = try_get(lambda: place[1][0][0][2])
+
+    return Place(feature_id=feature_id,
+                 cid=cid,
+                 marker_yaw=marker_yaw,
+                 marker_pitch=marker_pitch,
+                 marker_distance=marker_distance,
+                 name=try_get(lambda: LocalizedString(*place[2])),
+                 type=try_get(lambda: LocalizedString(*place[3])),
+                 marker_icon_url=place[4],
+                 status=BusinessStatus(place[7]))
+
+
+def _marker_yaw_to_rad(marker_yaw: float) -> float:
+    return (marker_yaw - 0.5) * math.tau
+
+
+def _marker_pitch_to_rad(marker_pitch: float) -> float:
+    return (0.5 - marker_pitch) * math.pi
 
 
 def _generate_tile_list(pano: StreetViewPanorama, zoom: int) -> List[Tile]:

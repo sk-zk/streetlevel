@@ -107,6 +107,10 @@ class StreetViewPanorama:
     If ``source`` is ``scout``, ``innerspace`` or ``cultural_institute``, this (usually) contains a single element, 
     with the building or other location that the coverage is of.
     """
+    artworks: Optional[List[Artwork]] = None
+    """
+    For Arts & Culture coverage, this field contains the artwork annotations, if they exist.
+    """
 
     source: str = None
     """
@@ -184,6 +188,12 @@ class LocalizedString:
     """The string."""
     language: str
     """The language code."""
+
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return f"{self.language}:'{self.value}'"
 
 
 @dataclass
@@ -270,3 +280,43 @@ class Place:
     """Operational status of the place. This will be ``Operational`` for locations that are not a business."""
     marker_icon_url: Optional[str]
     """The icon which is drawn for this place."""
+
+
+@dataclass
+class Artwork:
+    """An artwork annotation shown on Arts & Culture panoramas."""
+    id: str
+    """The Arts & Culture asset ID of this artwork."""
+    title: LocalizedString
+    """Title of the artwork."""
+    creator: LocalizedString
+    """Creator of the artwork."""
+    description: LocalizedString
+    """Description of the artwork. Descriptions which exceed 1000 characters are cut off."""
+    thumbnail: str
+    """Thumbnail of the artwork."""
+    url: str
+    """URL to the Arts & Culture page of the artwork."""
+    collection: LocalizedString
+    """The collection of which the artwork is a part."""
+    date_created: LocalizedString
+    """The creation date of the artwork."""
+    dimensions: LocalizedString
+    """Physical dimensions of the artwork."""
+    type: LocalizedString
+    """Type of the artwork."""
+    medium: LocalizedString
+    """Medium of the artwork."""
+    marker_icon_url: str
+    """The icon which is drawn for the marker of the annotation."""
+    marker_yaw: float = None
+    """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
+    This value is relative to the panorama."""
+    marker_pitch: float = None
+    """Pitch of the marker's position in the panorama in radians, if a marker was returned for this place."""
+
+    def __str__(self):
+        return f"{self.title.value} ({self.id})"
+
+    def __repr__(self):
+        return str(self)
