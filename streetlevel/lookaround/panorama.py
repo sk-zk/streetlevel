@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+import base64
+import math
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+
+from streetlevel.lookaround.proto import MuninViewState_pb2
 
 
 class CoverageType(Enum):
@@ -54,6 +60,27 @@ class LookaroundPanorama:
 
     has_blurs: bool = None
     """Whether something in this panorama, typically a building, has been blurred."""
+
+    def permalink(self: LookaroundPanorama, heading: float = 0.0, pitch: float = 0.0, radians: bool = False) -> str:
+        """
+        Creates a link which will open this panorama in Apple Maps.
+        (On non-Apple devices, the link will redirect to Google Maps.)
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
+        :return: An Apple Maps URL.
+        """
+        if radians:
+            heading = math.degrees(heading)
+            pitch = math.degrees(pitch)
+        mvs = MuninViewState_pb2.MuninViewState()
+        mvs.viewState.latitude = self.lat
+        mvs.viewState.longitude = self.lon
+        mvs.viewState.yaw = heading
+        mvs.viewState.pitch = -pitch
+        mvs_base64 = base64.b64encode(mvs.SerializeToString())
+        return f"https://maps.apple.com/?ll={self.lat},{self.lon}&_mvs={mvs_base64.decode()}"
 
     def __repr__(self):
         return str(self)
