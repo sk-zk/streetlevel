@@ -19,5 +19,11 @@ Downloading panoramas
 
 Data classes
 ------------
+    .. autoclass:: streetlevel.yandex.panorama.Address
+      :members:
+    .. autoclass:: streetlevel.yandex.panorama.Company
+      :members:
+    .. autoclass:: streetlevel.yandex.panorama.Marker
+      :members:
     .. autoclass:: streetlevel.yandex.panorama.YandexPanorama
       :members:

@@ -1,7 +1,7 @@
 import itertools
 import math
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import re
 
 from PIL import Image
@@ -9,7 +9,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from . import api
-from .panorama import YandexPanorama
+from .panorama import YandexPanorama, Place, Address, Marker
 from ..dataclasses import Size, Tile, Link
 from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async
 
@@ -149,33 +149,80 @@ def _validate_get_panorama_params(pano: YandexPanorama, zoom: int) -> int:
     return zoom
 
 
-def _parse_panorama(data: dict) -> YandexPanorama:
-    panoid = data["Data"]["panoramaId"]
+def _parse_panorama(pano_dict: dict) -> YandexPanorama:
+    data = pano_dict["Data"]
+    annotation = pano_dict["Annotation"]
+    panoid = data["panoramaId"]
+
+    addresses, other_markers = _parse_markers(annotation["Markers"])
+
     return YandexPanorama(
         id=panoid,
-        lat=float(data["Data"]["Point"]["coordinates"][1]),
-        lon=float(data["Data"]["Point"]["coordinates"][0]),
+        lat=float(data["Point"]["coordinates"][1]),
+        lon=float(data["Point"]["coordinates"][0]),
 
-        heading=math.radians(float(data["Data"]["EquirectangularProjection"]["Origin"][0])),
+        heading=math.radians(float(data["EquirectangularProjection"]["Origin"][0])),
 
-        image_id=data["Data"]["Images"]["imageId"],
-        tile_size=Size(int(data["Data"]["Images"]["Tiles"]["width"]),
-                       int(data["Data"]["Images"]["Tiles"]["height"])),
-        image_sizes=_parse_image_sizes(data["Data"]["Images"]["Zooms"]),
+        image_id=data["Images"]["imageId"],
+        tile_size=Size(int(data["Images"]["Tiles"]["width"]),
+                       int(data["Images"]["Tiles"]["height"])),
+        image_sizes=_parse_image_sizes(data["Images"]["Zooms"]),
 
-        neighbors=_parse_neighbors(data["Annotation"]["Graph"]["Nodes"],
-                                   data["Annotation"]["Connections"],
+        neighbors=_parse_neighbors(annotation["Graph"]["Nodes"],
+                                   annotation["Connections"],
                                    panoid),
-        links=_parse_links(data["Annotation"]["Thoroughfares"]),
-        historical=_parse_historical(data["Annotation"]["HistoricalPanoramas"], panoid),
+        links=_parse_links(annotation["Thoroughfares"]),
+        historical=_parse_historical(annotation["HistoricalPanoramas"], panoid),
 
         date=_get_date_from_panoid(panoid),
-        height=int(data["Data"]["Point"]["coordinates"][2]),
-        street_name=data["Data"]["Point"]["name"],
+        height=int(data["Point"]["coordinates"][2]),
+        street_name=data["Point"]["name"],
 
-        author=try_get(lambda: data["Author"]["name"]),
-        author_avatar_url=try_get(lambda: data["Author"]["avatarUrlTemplate"]),
+        places=_parse_companies(annotation["Companies"]),
+        addresses=addresses,
+        other_markers=other_markers,
+
+        author=try_get(lambda: pano_dict["Author"]["name"]),
+        author_avatar_url=try_get(lambda: pano_dict["Author"]["avatarUrlTemplate"]),
     )
+
+
+def _parse_companies(companies_json: list) -> List[Place]:
+    companies = []
+    for company in companies_json:
+        companies.append(Place(
+            id=int(company["properties"]["id"]),
+            lat=company["geometry"]["coordinates"][1],
+            lon=company["geometry"]["coordinates"][0],
+            name=company["properties"]["name"],
+            tags=company["properties"]["tags"],
+        ))
+    return companies
+
+
+def _parse_markers(markers_json: list) -> Tuple[List[Address], List[Marker]]:
+    addresses = []
+    other_markers = []
+    for marker in markers_json:
+        # Address markers are displayed at a height of 7 m;
+        # all others, like metro icons, have a height of 2 m.
+        if marker["geometry"]["coordinates"][2] == 7:
+            addresses.append(Address(
+                lat=marker["geometry"]["coordinates"][1],
+                lon=marker["geometry"]["coordinates"][0],
+                house_number=marker["properties"]["name"],
+                street_name_and_house_number=marker["properties"]["description"],
+            ))
+        else:
+            other_markers.append(Marker(
+                lat=marker["geometry"]["coordinates"][1],
+                lon=marker["geometry"]["coordinates"][0],
+                name=marker["properties"]["name"],
+                description=marker["properties"]["description"],
+                style=marker["properties"]["style"],
+            ))
+
+    return addresses, other_markers
 
 
 def _parse_links(links_json):

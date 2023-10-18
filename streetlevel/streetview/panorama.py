@@ -1,8 +1,9 @@
 from __future__ import annotations
+from enum import Enum
 
 import math
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from numpy import ndarray
 
@@ -98,6 +99,19 @@ class StreetViewPanorama:
     Typically only set for official road coverage.
     """
 
+    places: Optional[List[Place]] = None
+    """
+    If ``source`` is ``launch``, this includes buildings, businesses etc. that are visible in the panorama, 
+    or intersections, addresses, etc. at the panorama's location.
+    
+    If ``source`` is ``scout``, ``innerspace`` or ``cultural_institute``, this (usually) contains a single element, 
+    with the building or other location that the coverage is of.
+    """
+    artworks: Optional[List[Artwork]] = None
+    """
+    For Arts & Culture coverage, this field contains the artwork annotations, if they exist.
+    """
+
     source: str = None
     """
     The source program of the imagery.
@@ -107,7 +121,7 @@ class StreetViewPanorama:
     * ``launch``: regular car coverage (and sometimes trekker coverage) whose lines are snapped to roads 
     * ``scout``: trekker or tripod coverage (and sometimes car coverage) whose lines are not snapped to roads
     * ``innerspace``: tripods from Google's `Business View <https://en.wikipedia.org/wiki/Street_View_Trusted>`_ program
-    * ``cultural_institute``: Some (but not all) tripods from the Arts & Culture program have this value
+    * ``cultural_institute``: some (but not all) tripods from the Arts & Culture program have this value
     
     For third-party coverage, this returns the app the panorama was uploaded with, such as:
     
@@ -152,10 +166,7 @@ class StreetViewPanorama:
     def __repr__(self):
         output = str(self)
         if self.date is not None:
-            output += f" [{self.date.year}-{self.date.month:02d}"
-            if self.date.day is not None:
-                output += f"-{self.date.day:02d}"
-            output += "]"
+            output += f" [{self.date}]"
         return output
 
     def __str__(self):
@@ -174,6 +185,12 @@ class LocalizedString:
     """The string."""
     language: str
     """The language code."""
+
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return f"{self.language}:'{self.value}'"
 
 
 @dataclass
@@ -198,8 +215,14 @@ class CaptureDate:
     """The year the panorama was taken."""
     month: int
     """The month the panorama was taken."""
-    day: int = None
+    day: Optional[int] = None
     """The day the panorama was taken. Only available for third-party panoramas."""
+
+    def __str__(self):
+        output = f"{self.year}-{self.month:02d}"
+        if self.day:
+            output += f"-{self.day:02d}"
+        return output
 
 
 @dataclass
@@ -211,6 +234,9 @@ class UploadDate:
     month: int  #:
     day: int  #:
     hour: int  #:
+
+    def __str__(self):
+        return f"{self.year}-{self.month:02d}-{self.day:02d} {self.hour:02d}"
 
 
 @dataclass
@@ -225,3 +251,78 @@ class BuildingLevel:
     """Name of the level."""
     short_name: LocalizedString
     """Short name of the level."""
+
+
+class BusinessStatus(Enum):
+    """
+    Status of a place.
+    """
+    Operational = 2  #:
+    TemporarilyClosed = 3  #:
+    PermanentlyClosed = 4  #:
+
+
+@dataclass
+class Place:
+    """
+    A place associated with a Street View panorama.
+    """
+    feature_id: str
+    """An ID for this place used in various Google services."""
+    cid: Optional[int]
+    """An ID for a business used in various Google services."""
+    marker_yaw: Optional[float]
+    """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
+    This value is relative to the panorama."""
+    marker_pitch: Optional[float]
+    """Pitch of the marker's position in the panorama in radians, if a marker was returned for this place."""
+    marker_distance: Optional[float]
+    """Presumably the distance of the marker to the camera in meters."""
+    name: Optional[LocalizedString]
+    """Name of this place. This can be None, e.g. if type is "Geocoded address" or "Intersection"."""
+    type: LocalizedString
+    """Type of this place."""
+    status: BusinessStatus
+    """Operational status of the place. This will be ``Operational`` for locations that are not a business."""
+    marker_icon_url: Optional[str]
+    """The icon which is drawn for this place."""
+
+
+@dataclass
+class Artwork:
+    """An artwork annotation shown on Arts & Culture panoramas."""
+    id: str
+    """The Arts & Culture asset ID of this artwork."""
+    title: LocalizedString
+    """Title of the artwork."""
+    creator: LocalizedString
+    """Creator of the artwork."""
+    description: LocalizedString
+    """Description of the artwork. Descriptions which exceed 1000 characters are cut off."""
+    thumbnail: str
+    """Thumbnail of the artwork."""
+    url: str
+    """URL of the Arts & Culture page of the artwork."""
+    collection: LocalizedString
+    """The collection of which the artwork is a part."""
+    date_created: LocalizedString
+    """The creation date of the artwork."""
+    dimensions: LocalizedString
+    """Physical dimensions of the artwork."""
+    type: LocalizedString
+    """Type of the artwork."""
+    medium: LocalizedString
+    """Medium of the artwork."""
+    marker_yaw: float
+    """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
+    This value is relative to the panorama."""
+    marker_pitch: float
+    """Pitch of the marker's position in the panorama in radians, if a marker was returned for this place."""
+    marker_icon_url: str
+    """The icon which is drawn for the marker of the annotation."""
+
+    def __str__(self):
+        return f"{self.title.value} ({self.id})"
+
+    def __repr__(self):
+        return str(self)

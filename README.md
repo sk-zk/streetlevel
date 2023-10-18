@@ -201,11 +201,22 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="right">Address</td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
-    <td align="center">✔<sup>10</sup></td>
+    <td align="center">✔</td>
     <td align="center">⚫</td>
     <td></td>
     <td align="center">✔</td>
     <td align="center">✔</td>
+    <td align="center">⚫</td>
+  </tr>
+  <tr>
+    <td align="right">PoIs</td>
+    <td align="center">✔</td>
+    <td align="center">❌</td>
+    <td align="center">✔</td>
+    <td align="center">⚫</td>
+    <td></td>
+    <td align="center">⚫</td>
+    <td align="center">⚫</td>
     <td align="center">⚫</td>
   </tr>
   <tr>
@@ -230,4 +241,3 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
 7: Only heading is implemented; inaccurate in some locations  
 8: Only heading; pitch/roll do not appear to be available  
 9: Previous and next image in sequence  
-10: Street name only
