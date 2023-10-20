@@ -1,0 +1,116 @@
+syntax = "proto3";
+package streetlevel;
+
+message GroundMetadataTile {
+  repeated PhotoPosition pano = 1;
+  repeated GroundDataBuild build_table = 4;
+  repeated CameraMetadata camera_metadata = 5;
+  TileCoordinate tile_coordinate = 6;
+  
+  message PhotoPosition {
+    // the pano id, a number with up to 20 digits
+    uint64 panoid = 1;
+    
+    int32 revision = 4;
+    
+    // capture date and time of the pano as unix timestamp (in milliseconds)
+    int64 timestamp = 5;
+    
+    int32 build_table_idx = 7;
+    
+    repeated int32 camera_metadata_idx = 9;
+    
+    OrientedTilePosition tile_position = 10;
+    
+    RigMetrics rig_metrics = 12;
+    
+    message OrientedTilePosition {
+      // the tile coordinates of the pano, from which the lat/lon is calculated.
+      int32 x = 1;
+      int32 y = 2;
+      
+      // this encodes the altitude in some way I don't fully understand -
+      // probably the height above some geoid, and then encoded in some specific way,
+      // but the details are still beyond my understanding.
+      int32 altitude = 3;
+      
+      // heading of the car; north is 0 and it goes around CCW from there.
+      // for some reason this has an offset based on the current longitude applied to it.
+      // see convert_heading() in geo.py for the formula.
+      int32 yaw = 4;
+      int32 pitch = 5;
+      int32 roll = 6;
+    }
+    
+    message RigMetrics {
+      repeated int32 occlusion_score = 1;
+    }
+  }
+  
+  message GroundDataBuild {
+    // don't know what exactly this is for, but values >0 indicate
+    // that the panos in this build have blurs added to them
+    int32 index = 1;
+    
+    int32 build_id = 3;
+    int32 unknown15 = 4;
+    int32 data_format_version = 5;
+    
+    // whether the coverage was taken by car or backpack
+    CoverageType coverage_type = 6;
+
+    int32 bucket_id = 9;
+    int32 lod_with_textures = 10;
+    int32 metrics_version = 11;
+    int32 data_output_version = 12;
+    
+    enum CoverageType {
+      DEFAULT = 0;
+      CAR = 2;
+      BACKPACK = 3;
+    }
+  }
+  
+  message CameraMetadata {
+    int32 camera_number = 1;
+    LensProjection lens_projection = 4;
+    OrientedPosition position = 5;
+    int32 texture_id = 6;
+
+    message LensProjection {
+      int32 type = 1;
+      
+      double fov_s = 2;
+      double fov_h = 3;
+      
+      // lens distortion?
+      double k2 = 4;
+      double k3 = 5;
+      double k4 = 6;
+      
+      // principal point?
+      double cx = 7;
+      double cy = 8;
+      
+      // ???
+      double lx = 9;
+      double ly = 10;
+    }
+
+    message OrientedPosition {
+      double x = 1;
+      double y = 2;
+      double z = 3;
+      double yaw = 4;
+      double pitch = 5;
+      double roll = 6;
+    }
+  }
+
+  // The tile's coordinates in the slippy map standard.
+  message TileCoordinate {
+    int32 x = 1;
+    int32 y = 2;
+    int32 z = 3;
+  }
+}

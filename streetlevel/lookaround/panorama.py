@@ -31,11 +31,10 @@ class LookaroundPanorama:
 
     id: int
     """The pano ID."""
-    batch_id: int
+    build_id: int
     """
-    An additional parameter required for requesting the imagery, which I presume is an upload batch ID
-    of some sort: every time Apple publishes a bunch of panoramas, they are assigned an ID as a kind of
-    revision number.
+    An additional parameter required for requesting the imagery. Every time Apple publishes or updates 
+    a bunch of panoramas, they are assigned a build ID to act as a revision number.
     """
 
     lat: float
@@ -86,4 +85,4 @@ class LookaroundPanorama:
         return str(self)
 
     def __str__(self):
-        return f"{self.id}/{self.batch_id} ({self.lat:.5f}, {self.lon:.5f})"
+        return f"{self.id}/{self.build_id} ({self.lat:.5f}, {self.lon:.5f})"
