@@ -2,9 +2,12 @@ import math
 from typing import Tuple
 
 import pyproj
+from pyproj import Transformer
 from scipy.spatial.transform import Rotation
 
+pyproj.network.set_network_enabled(active=True)
 geod = pyproj.Geod(ellps="WGS84")
+tf_wgs84_to_wgs84_egm2008 = Transformer.from_crs(4979, 9518)
 
 
 def tile_coord_to_wgs84(x: float, y: float, zoom: int) -> Tuple[float, float]:
@@ -73,3 +76,15 @@ def get_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """
     fwd_azimuth, _, _ = geod.inv(lon1, lat1, lon2, lat2)
     return math.radians(fwd_azimuth)
+
+
+def get_geoid_height(lat: float, lon: float) -> float:
+    """
+    Returns the EGM2008 geoid height at a WGS84 coordinate.
+
+    :param lat: Latitude.
+    :param lon: Longitude.
+    :return: Geoid height in meters.
+    """
+    _, _, geoid_height = tf_wgs84_to_wgs84_egm2008.transform(lat, lon, 0)
+    return -geoid_height

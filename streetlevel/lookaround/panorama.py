@@ -57,6 +57,9 @@ class LookaroundPanorama:
     date: datetime = None
     """Capture date and time of the panorama (in UTC, not local time)."""
 
+    elevation: float = None
+    """Elevation at the capture location in meters."""
+
     has_blurs: bool = None
     """Whether something in this panorama, typically a building, has been blurred."""
 
