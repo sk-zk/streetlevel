@@ -280,7 +280,7 @@ class Place:
     marker_distance: Optional[float]
     """Presumably the distance of the marker to the camera in meters."""
     name: Optional[LocalizedString]
-    """Name of this place. This can be None, e.g. if type is "Geocoded address" or "Intersection"."""
+    """Name of this place. This can be None, e.g. if ``type`` is "Geocoded address" or "Intersection"."""
     type: LocalizedString
     """Type of this place."""
     status: BusinessStatus
