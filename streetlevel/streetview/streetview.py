@@ -313,7 +313,8 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
             )
 
             if idx in other_dates:
-                connected.date = CaptureDate(other_dates[idx][0], other_dates[idx][1])
+                if other_dates[idx]:
+                    connected.date = CaptureDate(other_dates[idx][0], other_dates[idx][1])
                 pano.historical.append(connected)
             else:
                 if idx in links:
@@ -327,7 +328,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
                 pano.neighbors.append(connected)
 
             connected.street_name = try_get(lambda: other[3][2][0])
-    pano.historical = sorted(pano.historical, key=lambda x: (x.date.year, x.date.month), reverse=True)
+    pano.historical = sorted(pano.historical, key=lambda x: (x.date.year, x.date.month) if x.date else None, reverse=True)
 
     return pano
 
