@@ -248,9 +248,9 @@ class BuildingLevel:
     level: float
     """The building level, where 0 is the ground floor, positive levels are above ground, and negative levels
     are below ground."""
-    name: LocalizedString
+    name: Optional[LocalizedString]
     """Name of the level."""
-    short_name: LocalizedString
+    short_name: Optional[LocalizedString]
     """Short name of the level."""
 
 

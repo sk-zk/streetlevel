@@ -357,8 +357,8 @@ def _parse_building_level_message(bld_level: Optional[list]) -> Optional[Buildin
     if bld_level and len(bld_level) > 1:
         return BuildingLevel(
             bld_level[1],
-            LocalizedString(*bld_level[2]),
-            LocalizedString(*bld_level[3]))
+            try_get(lambda: LocalizedString(*bld_level[2])),
+            try_get(lambda: LocalizedString(*bld_level[3])))
     return None
 
 
