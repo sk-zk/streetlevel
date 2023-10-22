@@ -29,9 +29,7 @@ message GroundMetadataTile {
       int32 x = 1;
       int32 y = 2;
       
-      // this encodes the altitude in some way I don't fully understand -
-      // probably the height above some geoid, and then encoded in some specific way,
-      // but the details are still beyond my understanding.
+      // raw altitude; see geo.convert_altitude().
       int32 altitude = 3;
       
       // heading of the car; north is 0 and it goes around CCW from there.
