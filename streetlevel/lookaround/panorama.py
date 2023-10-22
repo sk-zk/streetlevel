@@ -65,8 +65,10 @@ class LookaroundPanorama:
 
     def permalink(self: LookaroundPanorama, heading: float = 0.0, pitch: float = 0.0, radians: bool = False) -> str:
         """
-        Creates a link which will open this panorama in Apple Maps.
-        (On non-Apple devices, the link will redirect to Google Maps.)
+        Creates a link which will open a panorama at this location in Apple Maps. Linking to a specific panorama
+        by its ID does not appear to be possible.
+
+        On non-Apple devices, the link will redirect to Google Maps.
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
         :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
