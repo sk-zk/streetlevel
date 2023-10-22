@@ -305,17 +305,34 @@ class Artwork:
     url: Optional[str]
     """URL of the Arts & Culture page of the artwork."""
     attributes: Dict[str, LocalizedString]
-    """Any attributes of the artwork that are available, such as: creator, date, physical dimensions, etc. Not all attributes will be available for all artworks."""
+    """
+    Any attributes of the artwork that are available, such as: creator, date, physical dimensions, etc. 
+    Not all attributes will be available for all artworks.
+    """
     marker_yaw: float
     """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
     This value is relative to the panorama."""
     marker_pitch: float
     """Pitch of the marker's position in the panorama in radians, if a marker was returned for this place."""
-    marker_icon_url: str
+    marker_icon_url: Optional[str]
     """The icon which is drawn for the marker of the annotation."""
+    link: Optional[ArtworkLink]
+    """If set, a panorama this annotation links to."""
 
     def __str__(self):
-        return f"{self.title.value} ({self.id})"
+        output = f"{self.title.value}"
+        if self.id:
+            output += f" ({self.id})"
+        return output
 
     def __repr__(self):
         return str(self)
+
+
+@dataclass
+class ArtworkLink:
+    """A clickable link within an annotation popup, leading to another panorama."""
+    panoid: str
+    """The pano ID which the annotation links to."""
+    link_text: LocalizedString
+    """The link text."""

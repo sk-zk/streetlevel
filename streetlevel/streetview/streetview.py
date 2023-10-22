@@ -8,7 +8,7 @@ from typing import List, Optional, Tuple
 from . import api
 from .depth import parse as parse_depth
 from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, \
-    UploadDate, Artwork
+    UploadDate, Artwork, ArtworkLink
 from .util import is_third_party_panoid
 from ..dataclasses import Size, Tile, Link
 from ..geo import wgs84_to_tile_coord, get_bearing
@@ -384,6 +384,11 @@ def _parse_artwork(place: dict) -> Artwork:
     if marker_pitch:
         marker_pitch = _marker_pitch_to_rad(marker_pitch)
 
+    if len(place[5]) > 9:
+        link = ArtworkLink(place[5][9][0][1], LocalizedString(*place[5][9][1]))
+    else:
+        link = None
+
     artwork = Artwork(
         id=try_get(lambda: place[0][2][0]),
         title=LocalizedString(*place[5][0]),
@@ -395,6 +400,7 @@ def _parse_artwork(place: dict) -> Artwork:
         marker_icon_url=place[4],
         marker_yaw=marker_yaw,
         marker_pitch=marker_pitch,
+        link=link
     )
     return artwork
 
