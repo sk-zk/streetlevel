@@ -143,7 +143,7 @@ def test_missing_historical_date():
 
     streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
 
-    pano = streetview.find_panorama_by_id("_RqEb7FskACC8WVKWHQ66w")
+    pano = streetview.find_panorama_by_id("_Bhrz-OIcZ8AAAQ4hFiG7A")
     assert pano.date.year == 2017
     assert pano.date.month == 7
     assert len(pano.historical) == 1
