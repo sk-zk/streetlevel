@@ -241,7 +241,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
     img_sizes = msg[2][3][0]
     img_sizes = list(map(lambda x: Size(x[0][1], x[0][0]), img_sizes))
     others = try_get(lambda: msg[5][0][3][0])
-    date = msg[6][7]
+    date = try_get(lambda: msg[6][7])
 
     links, other_bld_levels, other_dates = _parse_other_pano_indices(msg)
 

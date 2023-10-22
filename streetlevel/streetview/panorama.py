@@ -64,10 +64,11 @@ class StreetViewPanorama:
     """One panorama per floor above or below this one (if the panorama is located inside a building which has been
     covered on multiple floors and this metadata is available)."""
 
-    date: CaptureDate = None
+    date: Optional[CaptureDate] = None
     """
     The capture date. Note that, for official coverage, only month and year are available.
     For third-party panoramas, the day is available also.
+    This may be unavailable in some rare cases.
     """
     upload_date: UploadDate = None
     """
