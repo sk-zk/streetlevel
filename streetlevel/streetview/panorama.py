@@ -3,7 +3,7 @@ from enum import Enum
 
 import math
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from numpy import ndarray
 
@@ -292,28 +292,20 @@ class Place:
 @dataclass
 class Artwork:
     """An artwork annotation shown on Arts & Culture panoramas."""
-    id: str
+    id: Optional[str]
     """The Arts & Culture asset ID of this artwork."""
     title: LocalizedString
     """Title of the artwork."""
-    creator: LocalizedString
+    creator: Optional[LocalizedString]
     """Creator of the artwork."""
-    description: LocalizedString
+    description: Optional[LocalizedString]
     """Description of the artwork. Descriptions which exceed 1000 characters are cut off."""
     thumbnail: str
     """Thumbnail of the artwork."""
-    url: str
+    url: Optional[str]
     """URL of the Arts & Culture page of the artwork."""
-    collection: LocalizedString
-    """The collection of which the artwork is a part."""
-    date_created: LocalizedString
-    """The creation date of the artwork."""
-    dimensions: LocalizedString
-    """Physical dimensions of the artwork."""
-    type: LocalizedString
-    """Type of the artwork."""
-    medium: LocalizedString
-    """Medium of the artwork."""
+    attributes: Dict[str, LocalizedString]
+    """Any attributes of the artwork that are available, such as: creator, date, physical dimensions, etc. Not all attributes will be available for all artworks."""
     marker_yaw: float
     """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
     This value is relative to the panorama."""

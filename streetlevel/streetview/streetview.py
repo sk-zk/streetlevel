@@ -376,21 +376,24 @@ def _parse_places(places_raw: list) -> Tuple[List[Artwork], List[Place]]:
 
 
 def _parse_artwork(place: dict) -> Artwork:
+    marker_yaw = try_get(lambda: place[1][0][0][0])
+    if marker_yaw:
+        marker_yaw = _marker_yaw_to_rad(marker_yaw)
+    marker_pitch = try_get(lambda: place[1][0][0][1])
+    if marker_pitch:
+        marker_pitch = _marker_pitch_to_rad(marker_pitch)
+
     artwork = Artwork(
-        id=place[0][2][0],
+        id=try_get(lambda: place[0][2][0]),
         title=LocalizedString(*place[5][0]),
-        description=LocalizedString(*place[5][1]),
+        description=try_get(lambda: LocalizedString(*place[5][1])),
         thumbnail=place[5][3],
-        creator=LocalizedString(*place[5][6]),
-        url=place[5][7][1][0],
-        collection=LocalizedString(*place[5][2][0][1]),
-        date_created=LocalizedString(*place[5][2][2][1]),
-        dimensions=LocalizedString(*place[5][2][3][1]),
-        type=LocalizedString(*place[5][2][4][1]),
-        medium=LocalizedString(*place[5][2][5][1]),
+        creator=try_get(lambda: LocalizedString(*place[5][6])),
+        url=try_get(lambda: place[5][7][1][0]),
+        attributes={prop[0][0]: LocalizedString(*prop[1]) for prop in place[5][2]} if place[5][2] else {},
         marker_icon_url=place[4],
-        marker_yaw=_marker_yaw_to_rad(place[1][0][0][0]),
-        marker_pitch=_marker_pitch_to_rad(place[1][0][0][1]),
+        marker_yaw=marker_yaw,
+        marker_pitch=marker_pitch,
     )
     return artwork
 
