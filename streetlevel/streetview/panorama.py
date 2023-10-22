@@ -306,8 +306,10 @@ class Artwork:
     """URL of the Arts & Culture page of the artwork."""
     attributes: Dict[str, LocalizedString]
     """
-    Any attributes of the artwork that are available, such as: creator, date, physical dimensions, etc. 
+    Any attributes of the artwork that are available, such as its creator, date, physical dimensions, etc. 
     Not all attributes will be available for all artworks.
+    
+    Note that the keys of the dictionary are localized according to the locale you specified.
     """
     marker_yaw: float
     """Yaw of the marker's position in the panorama in radians, if a marker was returned for this place.
