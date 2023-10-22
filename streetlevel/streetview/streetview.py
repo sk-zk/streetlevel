@@ -277,7 +277,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
         depth=depth,
         date=CaptureDate(date[0],
                          date[1],
-                         date[2] if len(date) > 2 else None),
+                         date[2] if len(date) > 2 else None) if date else None,
         upload_date=upload_date,
         elevation=try_get(lambda: msg[5][0][1][1][0]),
         tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),

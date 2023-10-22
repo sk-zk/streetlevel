@@ -124,3 +124,14 @@ def test_missing_level_name():
     assert pano.building_level.name is None
     assert pano.building_level.short_name is None
     
+
+def test_missing_level_name():
+    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+        with open("streetview/data/missing_date.json", "r") as f:
+            return json.load(f)
+
+    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+
+    pano = streetview.find_panorama_by_id("_RqEb7FskACC8WVKWHQ66w")
+    assert pano.date is None
+    
