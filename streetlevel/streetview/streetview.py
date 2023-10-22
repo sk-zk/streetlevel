@@ -313,7 +313,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
             )
 
             if idx in other_dates:
-                connected.date = CaptureDate(other_dates[idx][1], other_dates[idx][0])
+                connected.date = CaptureDate(other_dates[idx][0], other_dates[idx][1])
                 pano.historical.append(connected)
             else:
                 if idx in links:
