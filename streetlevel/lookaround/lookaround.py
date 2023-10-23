@@ -5,14 +5,18 @@ from typing import List, Union, Tuple
 
 import requests
 from aiohttp import ClientSession
+from pyproj import Transformer
 from requests import Session
 
 from . import api
 from .auth import Authenticator
-import streetlevel.geo as geo
 from .panorama import LookaroundPanorama, CoverageType
+from .proto import GroundMetadataTile_pb2
+from .. import geo
+
 
 FACE_ENDPOINT = "https://gspe72-ssl.ls.apple.com/mnn_us/"
+tf_web_mercator_to_ecef = Transformer.from_crs(3857, 4978)
 
 
 class Face(IntEnum):
@@ -80,8 +84,8 @@ def get_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
     :param session: *(optional)* A requests session.
     :return: The HEIC file containing the face.
     """
-    panoid, batch_id = _panoid_to_string(pano)
-    url = _build_panorama_face_url(panoid, batch_id, int(face), zoom, auth)
+    panoid, build_id = _panoid_to_string(pano)
+    url = _build_panorama_face_url(panoid, build_id, int(face), zoom, auth)
     requester = session if session else requests
     response = requester.get(url)
 
@@ -132,38 +136,39 @@ async def download_panorama_face_async(pano: Union[LookaroundPanorama, Tuple[int
 """
 
 
-def _panoid_to_string(pano):
+def _panoid_to_string(pano: Union[LookaroundPanorama, Tuple[int, int]]) -> Tuple[str, str]:
     if isinstance(pano, LookaroundPanorama):
-        panoid, batch_id = str(pano.id), str(pano.batch_id)
+        panoid, build_id = str(pano.id), str(pano.build_id)
     else:
-        panoid, batch_id = str(pano[0]), str(pano[1])
+        panoid, build_id = str(pano[0]), str(pano[1])
 
     if len(panoid) > 20:
         raise ValueError("Pano ID must not be longer than 20 digits.")
-    if len(batch_id) > 10:
-        raise ValueError("batch_id must not be longer than 10 digits.")
+    if len(build_id) > 10:
+        raise ValueError("build_id must not be longer than 10 digits.")
 
-    return panoid, batch_id
+    return panoid, build_id
 
 
-def _parse_panos(tile, tile_x, tile_y):
+def _parse_panos(tile: GroundMetadataTile_pb2.GroundMetadataTile, tile_x: int, tile_y: int) -> List[LookaroundPanorama]:
     panos = []
-    for raw_pano in tile.pano:
+    for pano_pb in tile.pano:
         lat, lon = _protobuf_tile_offset_to_wgs84(
-            raw_pano.location.longitude_offset,
-            raw_pano.location.latitude_offset,
+            pano_pb.tile_position.x,
+            pano_pb.tile_position.y,
             tile_x,
             tile_y)
-        heading = _convert_heading(lat, lon, raw_pano.location.heading)
+        heading = _convert_heading(lat, lon, pano_pb.tile_position.yaw)
         pano = LookaroundPanorama(
-            id=raw_pano.panoid,
-            batch_id=tile.unknown13[raw_pano.batch_id_idx].batch_id,
+            id=pano_pb.panoid,
+            build_id=tile.build_table[pano_pb.build_table_idx].build_id,
             lat=lat,
             lon=lon,
             heading=heading,
-            coverage_type=CoverageType(tile.unknown13[raw_pano.batch_id_idx].coverage_type),
-            date=datetime.utcfromtimestamp(raw_pano.timestamp / 1000.0),
-            has_blurs=tile.unknown13[raw_pano.batch_id_idx].unknown14 != 0,
+            coverage_type=CoverageType(tile.build_table[pano_pb.build_table_idx].coverage_type),
+            date=datetime.utcfromtimestamp(pano_pb.timestamp / 1000.0),
+            elevation=_convert_altitude(pano_pb.tile_position.altitude, lat, lon, tile_x, tile_y),
+            has_blurs=tile.build_table[pano_pb.build_table_idx].index != 0,
         )
         panos.append(pano)
     return panos
@@ -197,12 +202,60 @@ def _protobuf_tile_offset_to_wgs84(x_offset: int, y_offset: int, tile_x: int, ti
     return lat, lon
 
 
-def _build_panorama_face_url(panoid: str, batch_id: str, face: int, zoom: int, auth: Authenticator) -> str:
+def _build_panorama_face_url(panoid: str, build_id: str, face: int, zoom: int, auth: Authenticator) -> str:
     zoom = min(7, zoom)
     panoid_padded = panoid.zfill(20)
     panoid_split = [panoid_padded[i:i + 4] for i in range(0, len(panoid_padded), 4)]
     panoid_url = "/".join(panoid_split)
-    batch_id_padded = batch_id.zfill(10)
-    url = FACE_ENDPOINT + f"{panoid_url}/{batch_id_padded}/t/{face}/{zoom}"
+    build_id_padded = build_id.zfill(10)
+    url = FACE_ENDPOINT + f"{panoid_url}/{build_id_padded}/t/{face}/{zoom}"
     url = auth.authenticate_url(url)
     return url
+
+
+def _convert_altitude(raw_altitude: int, lat: float, lon: float, tile_x: int, tile_y: int) -> float:
+    """
+    Converts the raw altitude returned by the API to height above MSL.
+
+    :param raw_altitude: Raw altitude from the API.
+    :param lat: WGS84 latitude of the location.
+    :param lon: WGS84 longitude of the location.
+    :param tile_x: X coordinate of the XYZ tile coordinates.
+    :param tile_y: Y coordinate of the XYZ tile coordinates.
+    :return: Height above MSL in meters.
+    """
+    # Adapted from _GEOOrientedPositionFromPDTilePosition in GeoServices.
+    # Don't really have much of a clue what's going on here, but it seems to work
+    zoom = 17
+    top_left = _tile_coord_to_mercator(tile_x, tile_y, zoom)
+    top_right = _tile_coord_to_mercator(tile_x + 1, tile_y, zoom)
+
+    top_left_ecef = tf_web_mercator_to_ecef.transform(*top_left)
+    top_right_ecef = tf_web_mercator_to_ecef.transform(*top_right)
+
+    delta_x = top_left_ecef[0] - top_right_ecef[0]
+    delta_y = top_left_ecef[1] - top_right_ecef[1]
+
+    height = math.sqrt(delta_x ** 2 + delta_y ** 2) * (raw_altitude / 16383.0)
+    geoid_height = geo.get_geoid_height(lat, lon)
+    ortho_height = lon - geoid_height
+    return height + ortho_height - lon
+
+
+def _tile_coord_to_mercator(tile_x: int, tile_y: int, zoom: int) -> Tuple[float, float]:
+    """
+    Converts XYZ tile coordinates to Web Mercator coordinates.
+
+    :param tile_x: X coordinate.
+    :param tile_y: Y coordinate.
+    :param zoom: Z coordinate.
+    :return: The Web Mercator coordinate.
+    """
+    # Adapted from _GEOOrientedPositionFromPDTilePosition in GeoServices.
+    # Don't really have much of a clue what's going on here, but it seems to work
+    scale = 1 << zoom
+    scale_recip = 1.0 / scale
+    web_mercator_size = 40086474.44
+    x = (tile_x * scale_recip - 0.5) * web_mercator_size
+    y = ((scale + ~tile_y) * scale_recip - 0.5) * web_mercator_size
+    return x, y

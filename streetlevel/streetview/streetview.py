@@ -8,7 +8,7 @@ from typing import List, Optional, Tuple
 from . import api
 from .depth import parse as parse_depth
 from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, \
-    UploadDate, Artwork
+    UploadDate, Artwork, ArtworkLink
 from .util import is_third_party_panoid
 from ..dataclasses import Size, Tile, Link
 from ..geo import wgs84_to_tile_coord, get_bearing
@@ -241,7 +241,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
     img_sizes = msg[2][3][0]
     img_sizes = list(map(lambda x: Size(x[0][1], x[0][0]), img_sizes))
     others = try_get(lambda: msg[5][0][3][0])
-    date = msg[6][7]
+    date = try_get(lambda: msg[6][7])
 
     links, other_bld_levels, other_dates = _parse_other_pano_indices(msg)
 
@@ -277,7 +277,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
         depth=depth,
         date=CaptureDate(date[0],
                          date[1],
-                         date[2] if len(date) > 2 else None),
+                         date[2] if len(date) > 2 else None) if date else None,
         upload_date=upload_date,
         elevation=try_get(lambda: msg[5][0][1][1][0]),
         tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),
@@ -313,7 +313,8 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
             )
 
             if idx in other_dates:
-                connected.date = CaptureDate(other_dates[idx][1], other_dates[idx][0])
+                if other_dates[idx]:
+                    connected.date = CaptureDate(other_dates[idx][0], other_dates[idx][1])
                 pano.historical.append(connected)
             else:
                 if idx in links:
@@ -327,7 +328,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
                 pano.neighbors.append(connected)
 
             connected.street_name = try_get(lambda: other[3][2][0])
-    pano.historical = sorted(pano.historical, key=lambda x: (x.date.year, x.date.month), reverse=True)
+    pano.historical = sorted(pano.historical, key=lambda x: (x.date.year, x.date.month) if x.date else None, reverse=True)
 
     return pano
 
@@ -357,8 +358,8 @@ def _parse_building_level_message(bld_level: Optional[list]) -> Optional[Buildin
     if bld_level and len(bld_level) > 1:
         return BuildingLevel(
             bld_level[1],
-            LocalizedString(*bld_level[2]),
-            LocalizedString(*bld_level[3]))
+            try_get(lambda: LocalizedString(*bld_level[2])),
+            try_get(lambda: LocalizedString(*bld_level[3])))
     return None
 
 
@@ -376,21 +377,30 @@ def _parse_places(places_raw: list) -> Tuple[List[Artwork], List[Place]]:
 
 
 def _parse_artwork(place: dict) -> Artwork:
+    marker_yaw = try_get(lambda: place[1][0][0][0])
+    if marker_yaw:
+        marker_yaw = _marker_yaw_to_rad(marker_yaw)
+    marker_pitch = try_get(lambda: place[1][0][0][1])
+    if marker_pitch:
+        marker_pitch = _marker_pitch_to_rad(marker_pitch)
+
+    if len(place[5]) > 9:
+        link = ArtworkLink(place[5][9][0][1], LocalizedString(*place[5][9][1]))
+    else:
+        link = None
+
     artwork = Artwork(
-        id=place[0][2][0],
+        id=try_get(lambda: place[0][2][0]),
         title=LocalizedString(*place[5][0]),
-        description=LocalizedString(*place[5][1]),
+        description=try_get(lambda: LocalizedString(*place[5][1])),
         thumbnail=place[5][3],
-        creator=LocalizedString(*place[5][6]),
-        url=place[5][7][1][0],
-        collection=LocalizedString(*place[5][2][0][1]),
-        date_created=LocalizedString(*place[5][2][2][1]),
-        dimensions=LocalizedString(*place[5][2][3][1]),
-        type=LocalizedString(*place[5][2][4][1]),
-        medium=LocalizedString(*place[5][2][5][1]),
+        creator=try_get(lambda: LocalizedString(*place[5][6])),
+        url=try_get(lambda: place[5][7][1][0]),
+        attributes={prop[0][0]: LocalizedString(*prop[1]) for prop in place[5][2]} if place[5][2] else {},
         marker_icon_url=place[4],
-        marker_yaw=_marker_yaw_to_rad(place[1][0][0][0]),
-        marker_pitch=_marker_pitch_to_rad(place[1][0][0][1]),
+        marker_yaw=marker_yaw,
+        marker_pitch=marker_pitch,
+        link=link
     )
     return artwork
 

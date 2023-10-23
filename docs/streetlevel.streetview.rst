@@ -23,6 +23,8 @@ Data classes
 ------------
     .. autoclass:: streetlevel.streetview.panorama.Artwork
        :members:
+    .. autoclass:: streetlevel.streetview.panorama.ArtworkLink
+       :members:
     .. autoclass:: streetlevel.streetview.panorama.BusinessStatus
        :members:
        :member-order: bysource
