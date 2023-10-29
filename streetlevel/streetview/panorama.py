@@ -258,6 +258,7 @@ class BusinessStatus(Enum):
     """
     Status of a place.
     """
+    NotOpenYet = 1  #:
     Operational = 2  #:
     TemporarilyClosed = 3  #:
     PermanentlyClosed = 4  #:
