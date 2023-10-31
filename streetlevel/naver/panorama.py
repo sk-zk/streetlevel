@@ -15,16 +15,16 @@ class PanoramaType(IntEnum):
     """
     The panorama type. Most identifiers are taken directly from the source.
     """
-    AIR = 1,  #:
-    CAR = 3,  #:
-    BICYCLE = 4,  #:
-    INSIDE = 5,  #:
-    INTERIOR = 7,  #:
-    JIMMY_JIB = 8,  #:
-    INDOOR = 10,  #:
-    TREKKER = 13,  #:
-    UNDERWATER = 12,  #:
-    INDOOR_3D = 100,  #:
+    AIR = 1  #:
+    CAR = 3  #:
+    BICYCLE = 4  #:
+    INSIDE = 5  #:
+    INTERIOR = 7  #:
+    JIMMY_JIB = 8  #:
+    INDOOR = 10  #:
+    TREKKER = 13  #:
+    UNDERWATER = 12  #:
+    INDOOR_3D = 100  #:
 
 
 @dataclass
