@@ -36,20 +36,22 @@ await session.close()
 Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.readthedocs.io/).
 
 ## Functionality overview
+Services covering multiple countries are on the left; services covering one specific country are on the right.
+
 ✔ implemented / available; 🟡 partially implemented; ❌ not implemented; ⚫ not available / not applicable
 
 <table>
   <thead>
     <th></th>
-    <th align="center">Google Street&nbsp;View</th>
-    <th align="center">Apple Look&nbsp;Around</th>
-    <th align="center">Yandex Panorama</th>
-    <th align="center">Bing Streetside</th>
+    <th align="center">Google<br>Street View</th>
+    <th align="center">Apple<br>Look Around</th>
+    <th align="center">Yandex<br>Panorama</th>
+    <th align="center">Bing<br>Streetside</th>
     <th></th>
-    <th align="center">Kakao Road&nbsp;View</th>
-    <th align="center">Naver Street&nbsp;View</th>
-    <th align="center">Mapy.cz Panorama</th>
-    <th align="center">Já 360</th>
+    <th align="center">🇰🇷 Kakao<br>Road View</th>
+    <th align="center">🇰🇷 Naver<br>Street View</th>
+    <th align="center">🇨🇿 Mapy.cz<br>Panorama</th>
+    <th align="center">🇮🇸 Já<br>360</th>
   </thead>
   <thead>
     <td colspan="10" style="padding-top:20px"><br><b>Finding panoramas</b><br>
