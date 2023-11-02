@@ -49,9 +49,10 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <th align="center">Kakao Road&nbsp;View</th>
     <th align="center">Naver Street&nbsp;View</th>
     <th align="center">Mapy.cz Panorama</th>
+    <th align="center">Já 360</th>
   </thead>
   <thead>
-    <td colspan="9" style="padding-top:20px"><br><b>Finding panoramas</b><br>
+    <td colspan="10" style="padding-top:20px"><br><b>Finding panoramas</b><br>
       How panoramas can be retrieved through the API.
     </td>
   </thead>
@@ -65,6 +66,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔<sup>1</sup></td>
     <td align="center">✔<sup>1</sup></td>
+    <td align="center">✔<sup>1</sup></td>
   </tr>
   <tr>
     <td align="right">Find panoramas by slippy map tile or bounding box</td>
@@ -73,6 +75,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">⚫</td>
     <td align="center">✔<sup>3</sup></td>
     <td></td>
+    <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
@@ -87,9 +90,10 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
+    <td align="center">✔</td>
   </tr>
   <thead>
-    <td colspan="9" style="padding-top:20px"><br><b>Imagery</b><br>
+    <td colspan="10" style="padding-top:20px"><br><b>Imagery</b><br>
       The type of imagery returned by the service.
     </td>
   </thead>
@@ -100,6 +104,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td></td>
+    <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
@@ -114,6 +119,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔<sup>5</sup></td>
     <td align="center">⚫<br></td>
+    <td align="center">⚫<br></td>
   </tr>
   <tr>
     <td align="right">Image projection</td>
@@ -125,6 +131,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">Equirectangular</td>
     <td align="center">Cubemap</td>
     <td align="center">Equirectangular</td>
+    <td align="center">Cubemap</td>
   </tr>
   <tr>
     <td align="right">Image format</td>
@@ -136,9 +143,10 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">JPEG</td>
     <td align="center">JPEG</td>
     <td align="center">JPEG</td>
+    <td align="center">JPEG</td>
   </tr>
   <thead>
-    <td colspan="9" style="padding-top:20px"><br><b>Available metadata</b><br>
+    <td colspan="10" style="padding-top:20px"><br><b>Available metadata</b><br>
       Metadata returned by the API of the service alongside ID and location.
     </td>
   </thead>
@@ -152,6 +160,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
+    <td align="center">✔<sup>10</sup></td>
   </tr>
   <tr>
     <td align="right">Heading, pitch, roll</td>
@@ -163,6 +172,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔<sup>8</sup></td>
     <td align="center">✔<sup>8</sup></td>
     <td align="center">✔<br></td>
+    <td align="center">✔<sup>8</sup></td>
   </tr>
   <tr>
     <td align="right">Elevation</td>
@@ -174,6 +184,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">⚫</td>
     <td align="center">❌</td>
     <td align="center">✔</td>
+    <td align="center">⚫</td>
   </tr>
   <tr>
     <td align="right">Nearby / linked panoramas</td>
@@ -182,6 +193,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔<sup>9</sup></td>
     <td></td>
+    <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
@@ -196,6 +208,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
+    <td align="center">⚫</td>
   </tr>
   <tr>
     <td align="right">Address</td>
@@ -207,6 +220,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
+    <td align="center">✔</td>
   </tr>
   <tr>
     <td align="right">PoIs</td>
@@ -215,6 +229,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td></td>
+    <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
@@ -229,6 +244,7 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td align="center">✔</td>
+    <td align="center">⚫</td>
   </tr>
 </table>
 
@@ -241,3 +257,4 @@ Documentation is available at [streetlevel.readthedocs.io](https://streetlevel.r
 7: Only heading is implemented; inaccurate in some locations  
 8: Only heading; pitch/roll do not appear to be available  
 9: Previous and next image in sequence  
+10: Month and year only  
