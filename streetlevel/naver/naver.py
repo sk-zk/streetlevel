@@ -12,7 +12,7 @@ from . import api
 from .panorama import NaverPanorama, PanoramaType, Overlay, Neighbors
 from ..dataclasses import Tile, Link
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
-    save_cubemap_panorama, get_image, get_image_async
+    save_cubemap_panorama, get_image, get_image_async, stitch_cubemap_face
 
 
 def find_panorama_by_id(panoid: str, language: str = "en",
@@ -319,18 +319,10 @@ async def _download_tiles_async(face_tiles: List[List[Tile]], session: ClientSes
 
 def _stitch_panorama(tile_images: List[dict], cols: int, rows: int,
                      stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
-    TILE_SIZE = 512
     stitched_faces = []
     for tiles in tile_images:
-        face = Image.new("RGB", (cols * TILE_SIZE, rows * TILE_SIZE))
-        for row_idx in range(0, rows):
-            for col_idx in range(0, cols):
-                tile = Image.open(BytesIO(tiles[(col_idx, row_idx)]))
-                face.paste(im=tile,
-                           box=(col_idx * TILE_SIZE, row_idx * TILE_SIZE))
-                del tile
-        stitched_faces.append(face)
-
+        stitched_face = stitch_cubemap_face(tiles, 512, cols, rows)
+        stitched_faces.append(stitched_face)
     return stitch_cubemap_faces(stitched_faces, stitched_faces[0].size[0], stitching_method)
 
 
