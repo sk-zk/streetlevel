@@ -16,7 +16,7 @@ Downloading panoramas
     .. autofunction:: streetlevel.ja.download_panorama
     .. autofunction:: streetlevel.ja.download_panorama_async
 
-Data classes and Enums
+Data classes
 ----------------------
     .. autoclass:: streetlevel.ja.panorama.Address
       :members:
