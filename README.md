@@ -43,13 +43,13 @@ Services covering multiple countries are on the left; services covering one spec
 <table>
   <thead>
     <th></th>
-    <th align="center">Google<br>Street View</th>
-    <th align="center">Apple<br>Look Around</th>
+    <th align="center">Google<br>Street&nbsp;View</th>
+    <th align="center">Apple<br>Look&nbsp;Around</th>
     <th align="center">Yandex<br>Panorama</th>
     <th align="center">Bing<br>Streetside</th>
     <th></th>
-    <th align="center">🇰🇷 Kakao<br>Road View</th>
-    <th align="center">🇰🇷 Naver<br>Street View</th>
+    <th align="center">🇰🇷 Kakao<br>Road&nbsp;View</th>
+    <th align="center">🇰🇷 Naver<br>Street&nbsp;View</th>
     <th align="center">🇨🇿 Mapy.cz<br>Panorama</th>
     <th align="center">🇮🇸 Já<br>360</th>
   </thead>
