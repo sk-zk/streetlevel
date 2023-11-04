@@ -79,8 +79,8 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
     """
     top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
     return find_panoramas_in_bbox(
-        top_left[1], top_left[0],
-        bottom_right[1], bottom_right[0],
+        top_left[0], top_left[1],
+        bottom_right[0], bottom_right[1],
         limit=limit, session=session)
 
 
@@ -89,8 +89,8 @@ async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
 
     top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
     return await find_panoramas_in_bbox_async(
-        top_left[1], top_left[0],
-        bottom_right[1], bottom_right[0],
+        top_left[0], top_left[1],
+        bottom_right[0], bottom_right[1],
         session, limit=limit)
 
 

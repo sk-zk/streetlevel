@@ -43,7 +43,7 @@ def wgs84_to_tile_coord(lat: float, lon: float, zoom: int) -> Tuple[int, int]:
     return int(x), int(y)
 
 
-def wgs84_to_isn93(lat, lon):
+def wgs84_to_isn93(lat: float, lon: float) -> Tuple[float, float]:
     """
     Converts WGS84 coordinates to ISN93 coordinates.
 
@@ -54,7 +54,8 @@ def wgs84_to_isn93(lat, lon):
     return _tf_wgs84_to_isn93.transform(lat, lon)
 
 
-def create_bounding_box_around_point(lat, lon, radius):
+def create_bounding_box_around_point(lat: float, lon: float, radius: float) \
+        -> Tuple[Tuple[float, float], Tuple[float, float]]:
     """
     Creates a square bounding box around a point.
 
@@ -64,8 +65,10 @@ def create_bounding_box_around_point(lat, lon, radius):
     :return: Latitude and longitude of the NW and SE points.
     """
     dist_to_corner = math.sqrt(2 * pow(2 * radius, 2)) / 2
-    top_left = _geod.fwd(lon, lat, 315, dist_to_corner)
-    bottom_right = _geod.fwd(lon, lat, 135, dist_to_corner)
+    lon1, lat1, _ = _geod.fwd(lon, lat, 315, dist_to_corner)
+    top_left = lat1, lon1
+    lon2, lat2, _ = _geod.fwd(lon, lat, 135, dist_to_corner)
+    bottom_right = lat2, lon2
     return top_left, bottom_right
 
 
