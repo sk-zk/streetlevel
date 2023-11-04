@@ -1,6 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import List
+import math
+
+from .. import geo
 
 
 @dataclass
@@ -36,6 +39,26 @@ class JaPanorama:
     """Name of the street."""
     address: Address = None
     """Nearest address to the capture location."""
+
+    def permalink(self: JaPanorama, heading: float = 0.0, radians: bool = False) -> str:
+        """
+        Creates a permalink to a panorama at this location. Directly linking to a specific panorama
+        by its ID does not appear to be possible.
+
+        :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
+        :param radians: *(optional)* Whether angles are in radians. Defaults to False.
+        :return: A Já.is Kort URL.
+        """
+        if radians:
+            heading = math.degrees(heading)
+        # if the heading is exactly 0, ja.is will act as though it is not set
+        # and choose a weird default value instead
+        if heading == 0.0:
+            heading = 0.0001
+        x, y = geo.wgs84_to_isn93(self.lat, self.lon)
+        x = int(x)
+        y = int(y)
+        return f"https://ja.is/kort/?nz=17&x={x}&y={y}&ja360=1&jh={heading}"
 
 
 @dataclass
