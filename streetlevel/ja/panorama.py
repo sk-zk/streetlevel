@@ -23,7 +23,7 @@ class JaPanorama:
     """Longitude of the panorama's location."""
 
     heading: float
-    """ """
+    """Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west."""
 
     neighbors: List[JaPanorama] = None
     """A list of nearby panoramas."""
