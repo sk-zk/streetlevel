@@ -24,7 +24,7 @@ def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[Street
     :param session: *(optional)* A requests session.
     :return: A StreetsidePanorama object if a panorama was found, or None.
     """
-    response = api.find_panorama_by_id_raw(panoid, session)
+    response = api.find_panorama_by_id(panoid, session)
     if len(response) < 2:
         return None
     pano = _parse_pano(response[1])
@@ -32,7 +32,7 @@ def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[Street
 
 
 async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Optional[StreetsidePanorama]:
-    response = await api.find_panorama_by_id_raw_async(panoid, session)
+    response = await api.find_panorama_by_id_async(panoid, session)
     if len(response) < 2:
         return None
     pano = _parse_pano(response[1])
@@ -52,14 +52,14 @@ def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
     :param session: *(optional)* A requests session.
     :return: A list of StreetsidePanorama objects.
     """
-    response = api.find_panoramas_raw(north, west, south, east, limit, session)
+    response = api.find_panoramas(north, west, south, east, limit, session)
     panos = _parse_panos(response)
     return panos
 
 
 async def find_panoramas_in_bbox_async(north: float, west: float, south: float, east: float,
                                        session: ClientSession, limit: int = 50) -> List[StreetsidePanorama]:
-    response = await api.find_panoramas_raw_async(north, west, south, east, session, limit)
+    response = await api.find_panoramas_async(north, west, south, east, session, limit)
     panos = _parse_panos(response)
     return panos
 

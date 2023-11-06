@@ -35,8 +35,8 @@ def find_panorama(lat: float, lon: float, radius: int = 50, locale: str = "en",
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
 
-    resp = api.find_panorama_raw(lat, lon, radius=radius, download_depth=False,
-                                 locale=locale, search_third_party=search_third_party, session=session)
+    resp = api.find_panorama(lat, lon, radius=radius, download_depth=False,
+                             locale=locale, search_third_party=search_third_party, session=session)
 
     response_code = resp[0][0][0]
     # 0: OK
@@ -54,8 +54,8 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession, ra
     # TODO
     # the `SingleImageSearch` call returns a different kind of depth data
     # than `photometa`; need to deal with that at some point
-    resp = await api.find_panorama_raw_async(lat, lon, session, radius=radius, download_depth=False,
-                                             locale=locale, search_third_party=search_third_party)
+    resp = await api.find_panorama_async(lat, lon, session, radius=radius, download_depth=False,
+                                         locale=locale, search_third_party=search_third_party)
 
     response_code = resp[0][0][0]
     # 0: OK
@@ -83,8 +83,8 @@ def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str =
     :param session: *(optional)* A requests session.
     :return: A StreetViewPanorama object if a panorama with this ID exists, or None.
     """
-    resp = api.find_panorama_by_id_raw(panoid, download_depth=download_depth,
-                                       locale=locale, session=session)
+    resp = api.find_panorama_by_id(panoid, download_depth=download_depth,
+                                   locale=locale, session=session)
 
     response_code = resp[1][0][0][0]
     # 1: OK
@@ -99,7 +99,7 @@ def find_panorama_by_id(panoid: str, download_depth: bool = False, locale: str =
 
 async def find_panorama_by_id_async(panoid: str, session: ClientSession, download_depth: bool = False,
                                     locale: str = "en") -> Optional[StreetViewPanorama]:
-    resp = await api.find_panorama_by_id_raw_async(panoid, session, download_depth=download_depth, locale=locale)
+    resp = await api.find_panorama_by_id_async(panoid, session, download_depth=download_depth, locale=locale)
 
     response_code = resp[1][0][0][0]
     # 1: OK
@@ -130,7 +130,7 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     :param session: *(optional)* A requests session.
     :return: A list of StreetViewPanoramas. If no coverage was returned by the API, the list is empty.
     """
-    resp = api.get_coverage_tile_raw(tile_x, tile_y, session)
+    resp = api.get_coverage_tile(tile_x, tile_y, session)
 
     if resp is None:
         return []
@@ -139,7 +139,7 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
 
 
 async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> List[StreetViewPanorama]:
-    resp = await api.get_coverage_tile_raw_async(tile_x, tile_y, session)
+    resp = await api.get_coverage_tile_async(tile_x, tile_y, session)
 
     if resp is None:
         return []

@@ -10,11 +10,11 @@ def test_is_third_party_panoid(request):
 
 
 def test_find_panorama_by_id():
-    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/find_by_id.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
 
     panoid = "n-Zd6bDDL_XOc_jkNgFsGg"
     pano = streetview.find_panorama_by_id(panoid, download_depth=False, session=None)
@@ -30,27 +30,26 @@ def test_find_panorama_by_id():
 
 
 def test_find_panorama():
-    def mocked_find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en",
+    def mocked_api_find_panorama(lat, lon, radius=50, download_depth=False, locale="en",
                                  search_third_party=False, session=None):
         with open("streetview/data/find.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_raw = mocked_find_panorama_raw
+    streetview.api.find_panorama = mocked_api_find_panorama
 
-    pano = streetview.find_panorama(47.15048822721601, 11.13385612403307,
-                                    radius=100, session=None)
+    pano = streetview.find_panorama(47.15048822721601, 11.13385612403307, radius=100, session=None)
     assert pano.id == "n-Zd6bDDL_XOc_jkNgFsGg"
     assert pano.lat == approx(47.15048822721601, 0.001)
     assert pano.lon == approx(11.13385612403307, 0.001)
 
 
 async def test_find_panorama_async():
-    async def mocked_find_panorama_raw_async(lat, lon, session, radius=50, download_depth=False, locale="en",
+    async def mocked_api_find_panorama_async(lat, lon, session, radius=50, download_depth=False, locale="en",
                                              search_third_party=False):
         with open("streetview/data/find.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_raw_async = mocked_find_panorama_raw_async
+    streetview.api.find_panorama_async = mocked_api_find_panorama_async
 
     pano = await streetview.find_panorama_async(47.15048822721601, 11.13385612403307, None, radius=100)
     assert pano.id == "n-Zd6bDDL_XOc_jkNgFsGg"
@@ -59,22 +58,22 @@ async def test_find_panorama_async():
 
 
 def test_find_get_coverage_tile_by_latlon():
-    def mocked_get_coverage_tile_raw(tile_x, tile_y, session=None):
+    def mocked_api_get_coverage_tile(tile_x, tile_y, session=None):
         with open("streetview/data/coverage_tile.json", "r") as f:
             return json.load(f)
 
-    streetview.api.get_coverage_tile_raw = mocked_get_coverage_tile_raw
+    streetview.api.get_coverage_tile = mocked_api_get_coverage_tile
 
     panos = streetview.get_coverage_tile_by_latlon(47.15048822721601, 11.13385612403307)
     assert any(p.id == "n-Zd6bDDL_XOc_jkNgFsGg" for p in panos)
 
 
 def test_nepal_links():
-    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/nepal_links.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
 
     pano = streetview.find_panorama_by_id("75oFcYmZUOnqgvAaX2q-_w")
     assert pano.links[0].pano.id == "yCIEQ7o37R49IxNPOkhWgw"
@@ -84,22 +83,22 @@ def test_nepal_links():
 
 
 def test_missing_link_direction():
-    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/missing_link_direction.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
 
     pano = streetview.find_panorama_by_id("VAhJEVyAlZg-QgAnUwcIRA")
     assert pano.links[0].direction == approx(0.07641416505750565)
 
 
 def test_places():
-    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/places.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
 
     pano = streetview.find_panorama_by_id("gjDG9WfyVFri9OT0A4LaWw")
     assert len(pano.places) == 3
@@ -113,11 +112,11 @@ def test_places():
 
 
 def test_missing_level_name():
-    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/missing_level_name.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
 
     pano = streetview.find_panorama_by_id("4pRBISc-WOW0Qw8kB8mC3Q")
     assert pano.building_level is not None
@@ -127,21 +126,22 @@ def test_missing_level_name():
     
 
 def test_missing_date():
-    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/missing_date.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
 
     pano = streetview.find_panorama_by_id("_RqEb7FskACC8WVKWHQ66w")
     assert pano.date is None
-    
+
+
 def test_missing_historical_date():
-    def mocked_find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/missing_historical_date.json", "r") as f:
             return json.load(f)
 
-    streetview.api.find_panorama_by_id_raw = mocked_find_panorama_by_id_raw
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
 
     pano = streetview.find_panorama_by_id("_Bhrz-OIcZ8AAAQ4hFiG7A")
     assert pano.date.year == 2017
@@ -149,4 +149,3 @@ def test_missing_historical_date():
     assert len(pano.historical) == 1
     assert pano.historical[0].id == "ZvY4uyCZ7BkAAARDoyHfCA"
     assert pano.historical[0].date is None
-    

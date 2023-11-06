@@ -22,7 +22,7 @@ def find_panorama(lat: float, lon: float, radius: int = 100, session: Session = 
     :param session: *(optional)* A requests session.
     :return: A JaPanorama if a panorama was found, or None.
     """
-    response = api.find_panorama_raw(lat, lon, radius, session)
+    response = api.find_panorama(lat, lon, radius, session)
 
     if "message" in response:
         return None
@@ -32,7 +32,7 @@ def find_panorama(lat: float, lon: float, radius: int = 100, session: Session = 
 
 async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
                                radius: int = 100) -> Optional[JaPanorama]:
-    response = await api.find_panorama_raw_async(lat, lon, session, radius)
+    response = await api.find_panorama_async(lat, lon, session, radius)
 
     if "message" in response:
         return None
@@ -48,12 +48,12 @@ def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[JaPano
     :param session: *(optional)* A requests session.
     :return: A JaPanorama object if a panorama with this ID was found, or None.
     """
-    response = api.find_panorama_by_id_raw(panoid, session)
+    response = api.find_panorama_by_id(panoid, session)
     return _parse_panorama_by_id(response)
 
 
 async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Optional[JaPanorama]:
-    response = await api.find_panorama_by_id_raw_async(panoid, session)
+    response = await api.find_panorama_by_id_async(panoid, session)
     return _parse_panorama_by_id(response)
 
 

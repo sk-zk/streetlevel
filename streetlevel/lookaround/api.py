@@ -8,7 +8,7 @@ from streetlevel.lookaround.proto import GroundMetadataTile_pb2
 COVERAGE_TILE_ENDPOINT = "https://gspe76-ssl.ls.apple.com/api/tile?"
 
 
-def get_coverage_tile_raw(tile_x: int, tile_y: int, session: Session = None) \
+def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) \
         -> GroundMetadataTile_pb2.GroundMetadataTile():
     headers = _build_coverage_tile_request_headers(tile_x, tile_y)
     requester = session if session else requests
@@ -18,7 +18,7 @@ def get_coverage_tile_raw(tile_x: int, tile_y: int, session: Session = None) \
     return tile
 
 
-async def get_coverage_tile_raw_async(tile_x: int, tile_y: int, session: ClientSession) \
+async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) \
         -> GroundMetadataTile_pb2.GroundMetadataTile():
     headers = _build_coverage_tile_request_headers(tile_x, tile_y)
 

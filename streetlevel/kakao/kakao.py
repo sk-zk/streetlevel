@@ -38,7 +38,7 @@ def find_panoramas(lat: float, lon: float, radius: int = 35,
     :param session: *(optional)* A requests session.
     :return: A list of KakaoPanorama objects.
     """
-    response = api.find_panoramas_raw(lat, lon, radius, limit, session)
+    response = api.find_panoramas(lat, lon, radius, limit, session)
 
     if response["street_view"]["cnt"] == 0:
         return []
@@ -48,7 +48,7 @@ def find_panoramas(lat: float, lon: float, radius: int = 35,
 
 async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
                                radius: int = 35, limit: int = 50) -> List[KakaoPanorama]:
-    response = await api.find_panoramas_raw_async(lat, lon, session, radius, limit)
+    response = await api.find_panoramas_async(lat, lon, session, radius, limit)
 
     if response["street_view"]["cnt"] == 0:
         return []
@@ -69,7 +69,7 @@ def find_panorama_by_id(panoid: int, neighbors: bool = True, session: Session = 
     :param session: *(optional)* A requests session.
     :return: A KakaoPanorama object if a panorama with this ID was found, or None.
     """
-    response = api.find_panorama_by_id_raw(panoid, session)
+    response = api.find_panorama_by_id(panoid, session)
 
     if response["street_view"]["cnt"] == 0:
         return None
@@ -82,7 +82,7 @@ def find_panorama_by_id(panoid: int, neighbors: bool = True, session: Session = 
 
 async def find_panorama_by_id_async(panoid: int, session: ClientSession,
                                     neighbors: bool = True) -> Optional[KakaoPanorama]:
-    response = await api.find_panorama_by_id_raw_async(panoid, session)
+    response = await api.find_panorama_by_id_async(panoid, session)
 
     if response["street_view"]["cnt"] == 0:
         return None

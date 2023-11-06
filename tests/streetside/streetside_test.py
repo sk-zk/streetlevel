@@ -3,12 +3,12 @@ import json
 from streetlevel import streetside
 
 
-def mocked_find_panoramas_raw(north, west, south, east, limit=50, session=None):
+def mocked_api_find_panoramas(north, west, south, east, limit=50, session=None):
     with open("streetside/data/find.json", "r") as f:
         return json.load(f)
 
 
-streetside.api.find_panoramas_raw = mocked_find_panoramas_raw
+streetside.api.find_panoramas = mocked_api_find_panoramas
 
 
 def test_find_panoramas_in_bbox():

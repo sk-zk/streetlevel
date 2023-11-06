@@ -26,7 +26,7 @@ def find_panorama(lat: float, lon: float, session: Session = None) -> Optional[Y
     :return: A YandexPanorama object if a panorama was found, or None.
     """
 
-    resp = api.find_panorama_raw(lat, lon, session)
+    resp = api.find_panorama(lat, lon, session)
 
     if resp["status"] == "error":
         return None
@@ -36,7 +36,7 @@ def find_panorama(lat: float, lon: float, session: Session = None) -> Optional[Y
 
 
 async def find_panorama_async(lat: float, lon: float, session: ClientSession) -> Optional[YandexPanorama]:
-    resp = await api.find_panorama_raw_async(lat, lon, session)
+    resp = await api.find_panorama_async(lat, lon, session)
 
     if resp["status"] == "error":
         return None
@@ -53,7 +53,7 @@ def find_panorama_by_id(panoid: str, session: Session = None) -> Optional[Yandex
     :param session: *(optional)* A requests session.
     :return: A YandexPanorama object if a panorama with this ID exists, or None.
     """
-    resp = api.find_panorama_by_id_raw(panoid, session)
+    resp = api.find_panorama_by_id(panoid, session)
 
     if resp["status"] == "error":
         return None
@@ -63,7 +63,7 @@ def find_panorama_by_id(panoid: str, session: Session = None) -> Optional[Yandex
 
 
 async def find_panorama_by_id_async(panoid: str, session: ClientSession) -> Optional[YandexPanorama]:
-    resp = await api.find_panorama_by_id_raw_async(panoid, session)
+    resp = await api.find_panorama_by_id_async(panoid, session)
 
     if resp["status"] == "error":
         return None

@@ -11,17 +11,17 @@ def build_find_panorama_request_url(lat: float, lon: float, radius: int) -> str:
     return f"https://ja.is/kort/closest/?lat={lat}&lng={lon}&meters={radius}"
 
 
-def find_panorama_by_id_raw(panoid: int, session: Session = None) -> dict:
+def find_panorama_by_id(panoid: int, session: Session = None) -> dict:
     return get_json(build_find_panorama_by_id_request_url(panoid), session)
 
 
-async def find_panorama_by_id_raw_async(panoid: int, session: ClientSession) -> dict:
+async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> dict:
     return await get_json_async(build_find_panorama_by_id_request_url(panoid), session)
 
 
-def find_panorama_raw(lat: float, lon: float, radius: int, session: Session = None) -> dict:
+def find_panorama(lat: float, lon: float, radius: int, session: Session = None) -> dict:
     return get_json(build_find_panorama_request_url(lat, lon, radius), session)
 
 
-async def find_panorama_raw_async(lat: float, lon: float, session: ClientSession, radius: int) -> dict:
+async def find_panorama_async(lat: float, lon: float, session: ClientSession, radius: int) -> dict:
     return await get_json_async(build_find_panorama_request_url(lat, lon, radius), session)
