@@ -122,7 +122,7 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     2) there are various hidden/removed locations which cannot be found by any other method
     (unless you access them by pano ID directly).
 
-    Note, however, that only ID, latitude and longitude of the most recent coverage are returned.
+    Note, however, that only ID, latitude, longitude, elevation, heading, pitch, and roll of the most recent coverage are returned.
     The rest of the metadata, as well as historical panoramas, must be fetched manually one by one.
 
     :param tile_x: X coordinate of the tile.
@@ -233,7 +233,11 @@ def _parse_coverage_tile_response(tile):
             panoid = pano[0][0][1]
             lat = pano[0][2][0][2]
             lon = pano[0][2][0][3]
-            panos.append(StreetViewPanorama(panoid, lat, lon))
+            elevation = pano[0][2][1][0]
+            heading = math.radians(pano[0][2][2][0])
+            pitch = math.radians(90 - pano[0][2][2][1])
+            roll = math.radians(pano[0][2][2][2])
+            panos.append(StreetViewPanorama(panoid, lat, lon, heading, pitch, roll, elevation=elevation))
     return panos
 
 
