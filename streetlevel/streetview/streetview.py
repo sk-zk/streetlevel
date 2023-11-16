@@ -217,14 +217,14 @@ async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, z
         session)
 
 
-def _validate_get_panorama_params(pano, zoom):
+def _validate_get_panorama_params(pano: StreetViewPanorama, zoom: int) -> int:
     if not pano.image_sizes:
         raise ValueError("pano.image_sizes is None.")
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
     return zoom
 
 
-def _parse_coverage_tile_response(tile):
+def _parse_coverage_tile_response(tile: list) -> List[StreetViewPanorama]:
     panos = []
     if tile[1] is not None and len(tile[1]) > 0:
         for raw_pano in tile[1][1]:
