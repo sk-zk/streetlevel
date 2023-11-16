@@ -122,8 +122,8 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     2) there are various hidden/removed locations which cannot be found by any other method
     (unless you access them by pano ID directly).
 
-    Note, however, that only ID, latitude, longitude, elevation, and orientation of the most recent coverage
-    are returned. The rest of the metadata, as well as historical panoramas, must be fetched manually one by one.
+    This function returns ID, position, elevation, orientation, and links within the tile of the most recent coverage.
+    The rest of the metadata, such as historical panoramas or links across tiles, must be fetched manually one by one.
 
     :param tile_x: X coordinate of the tile.
     :param tile_y: Y coordinate of the tile.
@@ -227,17 +227,23 @@ def _validate_get_panorama_params(pano, zoom):
 def _parse_coverage_tile_response(tile):
     panos = []
     if tile[1] is not None and len(tile[1]) > 0:
-        for pano in tile[1][1]:
-            if pano[0][0] == 1:
+        for raw_pano in tile[1][1]:
+            if raw_pano[0][0] == 1:
                 continue
-            panoid = pano[0][0][1]
-            lat = pano[0][2][0][2]
-            lon = pano[0][2][0][3]
-            elevation = pano[0][2][1][0]
-            heading = math.radians(pano[0][2][2][0])
-            pitch = math.radians(90 - pano[0][2][2][1])
-            roll = math.radians(pano[0][2][2][2])
-            panos.append(StreetViewPanorama(panoid, lat, lon, heading, pitch, roll, elevation=elevation))
+            panos.append(
+                StreetViewPanorama(id=raw_pano[0][0][1],
+                                   lat=raw_pano[0][2][0][2],
+                                   lon=raw_pano[0][2][0][3],
+                                   heading=math.radians(raw_pano[0][2][2][0]),
+                                   pitch=math.radians(90 - raw_pano[0][2][2][1]),
+                                   roll=math.radians(raw_pano[0][2][2][2]),
+                                   elevation=raw_pano[0][2][1][0]))
+        for idx, raw_pano in enumerate(tile[1][1]):
+            link_indices = raw_pano[1]
+            panos[idx].links = [Link(panos[link_idx],
+                                     get_bearing(panos[idx].lat, panos[idx].lon,
+                                                 panos[link_idx].lat, panos[link_idx].lon))
+                                for link_idx in link_indices]
     return panos
 
 
