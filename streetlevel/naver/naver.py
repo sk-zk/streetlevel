@@ -272,7 +272,7 @@ async def _get_zoom_0_async(pano: NaverPanorama, session: ClientSession,
     return stitch_cubemap_faces(faces, FACE_SIZE, stitching_method)
 
 
-def _validate_zoom(pano, zoom):
+def _validate_zoom(pano: NaverPanorama, zoom: int) -> int:
     if not pano.max_zoom:
         if zoom > 1:
             raise ValueError("max_zoom is None; please call find_panorama_by_id to fetch this info")
