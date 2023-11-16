@@ -1,6 +1,5 @@
 import math
 from datetime import datetime
-from io import BytesIO
 from typing import Optional, List, Union, Tuple
 
 import numpy as np
@@ -333,15 +332,20 @@ def _parse_neighbors(response: dict, parent_id: str) -> Neighbors:
 
 
 def _parse_neighbor_section(response: dict, section: str, parent_id: str) -> List[NaverPanorama]:
+    panos = []
     if section in response["around"]["panoramas"]:
-        return [NaverPanorama(
-            id=pano[0],
-            lat=pano[2],
-            lon=pano[1]
-        ) for pano in response["around"]["panoramas"][section][1:]
-            if pano[0] != parent_id]
-    else:
-        return []
+        for raw_pano in response["around"]["panoramas"][section][1:]:
+            if raw_pano[0] == parent_id:
+                continue
+            elevation = raw_pano[4] * 0.01
+            pano = NaverPanorama(
+                id=raw_pano[0],
+                lat=raw_pano[2],
+                lon=raw_pano[1],
+                elevation=elevation,
+                camera_height=(raw_pano[3] * 0.01) - elevation)
+            panos.append(pano)
+    return panos
 
 
 def _parse_historical(response: dict, parent_id: str) -> List[NaverPanorama]:
@@ -356,6 +360,7 @@ def _parse_historical(response: dict, parent_id: str) -> List[NaverPanorama]:
 
 def _parse_nearby(response: dict) -> NaverPanorama:
     feature = response["features"][0]
+    elevation = feature["properties"]["land_altitude"] * 0.01
     return NaverPanorama(
         id=feature["properties"]["id"],
         lat=feature["geometry"]["coordinates"][1],
@@ -364,6 +369,8 @@ def _parse_nearby(response: dict) -> NaverPanorama:
         date=_parse_date(feature["properties"]["photodate"]),
         description=feature["properties"]["description"],
         title=feature["properties"]["title"],
+        elevation=elevation,
+        camera_height=(feature["properties"]["camera_altitude"] * 0.01) - elevation
     )
 
 
@@ -373,6 +380,7 @@ def _parse_date(date_str: str) -> datetime:
 
 def _parse_panorama(response: dict) -> NaverPanorama:
     basic = response["basic"]
+    elevation = basic["land_altitude"] * 0.01
     pano = NaverPanorama(
         id=basic["id"],
         lat=basic["latitude"],
@@ -384,7 +392,9 @@ def _parse_panorama(response: dict) -> NaverPanorama:
         is_latest=basic["latest"],
         description=basic["description"],
         title=basic["title"],
-        panorama_type=PanoramaType(int(basic["dtl_type"]))
+        panorama_type=PanoramaType(int(basic["dtl_type"])),
+        elevation=elevation,
+        camera_height=(basic["camera_altitude"] * 0.01) - elevation
     )
 
     if len(basic["image"]["overlays"]) > 1:

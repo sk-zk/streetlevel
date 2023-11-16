@@ -45,6 +45,10 @@ class NaverPanorama:
 
     heading: float = None
     """Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west."""
+    elevation: float = None
+    """Elevation at the capture location in meters."""
+    camera_height: float = None
+    """Height of the camera in meters above ground."""
 
     max_zoom: int = None
     """Highest zoom level available for this panorama."""
