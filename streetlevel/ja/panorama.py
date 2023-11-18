@@ -60,6 +60,15 @@ class JaPanorama:
         y = int(y)
         return f"https://ja.is/kort/?nz=17&x={x}&y={y}&ja360=1&jh={heading}"
 
+    def __repr__(self):
+        output = str(self)
+        if self.date is not None:
+            output += f" [{self.date}]"
+        return output
+
+    def __str__(self):
+        return f"{self.id} ({self.lat:.5f}, {self.lon:.5f})"
+
 
 @dataclass
 class CaptureDate:
