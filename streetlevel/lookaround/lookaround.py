@@ -41,12 +41,12 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     :param session: *(optional)* A requests session.
     :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
     """
-    tile = api.get_coverage_tile_raw(tile_x, tile_y, session=session)
+    tile = api.get_coverage_tile(tile_x, tile_y, session=session)
     return _parse_panos(tile, tile_x, tile_y)
 
 
 async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> List[LookaroundPanorama]:
-    tile = await api.get_coverage_tile_raw_async(tile_x, tile_y, session)
+    tile = await api.get_coverage_tile_async(tile_x, tile_y, session)
     return _parse_panos(tile, tile_x, tile_y)
 
 

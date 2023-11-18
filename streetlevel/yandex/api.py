@@ -13,17 +13,17 @@ def build_find_panorama_by_id_request_url(panoid: str) -> str:
            f"&oid={panoid}&origin=userAction&provider=streetview"
 
 
-def find_panorama_raw(lat: float, lon: float, session: Session = None) -> dict:
+def find_panorama(lat: float, lon: float, session: Session = None) -> dict:
     return get_json(build_find_panorama_request_url(lat, lon), session=session)
 
 
-async def find_panorama_raw_async(lat: float, lon: float, session: ClientSession) -> dict:
+async def find_panorama_async(lat: float, lon: float, session: ClientSession) -> dict:
     return await get_json_async(build_find_panorama_request_url(lat, lon), session)
 
 
-def find_panorama_by_id_raw(panoid: str, session: Session = None) -> dict:
+def find_panorama_by_id(panoid: str, session: Session = None) -> dict:
     return get_json(build_find_panorama_by_id_request_url(panoid), session=session)
 
 
-async def find_panorama_by_id_raw_async(panoid: str, session: ClientSession) -> dict:
+async def find_panorama_by_id_async(panoid: str, session: ClientSession) -> dict:
     return await get_json_async(build_find_panorama_by_id_request_url(panoid), session)

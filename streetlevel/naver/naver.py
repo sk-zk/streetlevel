@@ -1,6 +1,5 @@
 import math
 from datetime import datetime
-from io import BytesIO
 from typing import Optional, List, Union, Tuple
 
 import numpy as np
@@ -12,7 +11,7 @@ from . import api
 from .panorama import NaverPanorama, PanoramaType, Overlay, Neighbors
 from ..dataclasses import Tile, Link
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
-    save_cubemap_panorama, get_image, get_image_async
+    save_cubemap_panorama, get_image, get_image_async, stitch_cubemap_face
 
 
 def find_panorama_by_id(panoid: str, language: str = "en",
@@ -273,7 +272,7 @@ async def _get_zoom_0_async(pano: NaverPanorama, session: ClientSession,
     return stitch_cubemap_faces(faces, FACE_SIZE, stitching_method)
 
 
-def _validate_zoom(pano, zoom):
+def _validate_zoom(pano: NaverPanorama, zoom: int) -> int:
     if not pano.max_zoom:
         if zoom > 1:
             raise ValueError("max_zoom is None; please call find_panorama_by_id to fetch this info")
@@ -319,18 +318,10 @@ async def _download_tiles_async(face_tiles: List[List[Tile]], session: ClientSes
 
 def _stitch_panorama(tile_images: List[dict], cols: int, rows: int,
                      stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
-    TILE_SIZE = 512
     stitched_faces = []
     for tiles in tile_images:
-        face = Image.new("RGB", (cols * TILE_SIZE, rows * TILE_SIZE))
-        for row_idx in range(0, rows):
-            for col_idx in range(0, cols):
-                tile = Image.open(BytesIO(tiles[(col_idx, row_idx)]))
-                face.paste(im=tile,
-                           box=(col_idx * TILE_SIZE, row_idx * TILE_SIZE))
-                del tile
-        stitched_faces.append(face)
-
+        stitched_face = stitch_cubemap_face(tiles, 512, cols, rows)
+        stitched_faces.append(stitched_face)
     return stitch_cubemap_faces(stitched_faces, stitched_faces[0].size[0], stitching_method)
 
 
@@ -341,15 +332,20 @@ def _parse_neighbors(response: dict, parent_id: str) -> Neighbors:
 
 
 def _parse_neighbor_section(response: dict, section: str, parent_id: str) -> List[NaverPanorama]:
+    panos = []
     if section in response["around"]["panoramas"]:
-        return [NaverPanorama(
-            id=pano[0],
-            lat=pano[2],
-            lon=pano[1]
-        ) for pano in response["around"]["panoramas"][section][1:]
-            if pano[0] != parent_id]
-    else:
-        return []
+        for raw_pano in response["around"]["panoramas"][section][1:]:
+            if raw_pano[0] == parent_id:
+                continue
+            elevation = raw_pano[4] * 0.01
+            pano = NaverPanorama(
+                id=raw_pano[0],
+                lat=raw_pano[2],
+                lon=raw_pano[1],
+                elevation=elevation,
+                camera_height=(raw_pano[3] * 0.01) - elevation)
+            panos.append(pano)
+    return panos
 
 
 def _parse_historical(response: dict, parent_id: str) -> List[NaverPanorama]:
@@ -364,6 +360,7 @@ def _parse_historical(response: dict, parent_id: str) -> List[NaverPanorama]:
 
 def _parse_nearby(response: dict) -> NaverPanorama:
     feature = response["features"][0]
+    elevation = feature["properties"]["land_altitude"] * 0.01
     return NaverPanorama(
         id=feature["properties"]["id"],
         lat=feature["geometry"]["coordinates"][1],
@@ -372,6 +369,8 @@ def _parse_nearby(response: dict) -> NaverPanorama:
         date=_parse_date(feature["properties"]["photodate"]),
         description=feature["properties"]["description"],
         title=feature["properties"]["title"],
+        elevation=elevation,
+        camera_height=(feature["properties"]["camera_altitude"] * 0.01) - elevation
     )
 
 
@@ -381,6 +380,7 @@ def _parse_date(date_str: str) -> datetime:
 
 def _parse_panorama(response: dict) -> NaverPanorama:
     basic = response["basic"]
+    elevation = basic["land_altitude"] * 0.01
     pano = NaverPanorama(
         id=basic["id"],
         lat=basic["latitude"],
@@ -392,7 +392,9 @@ def _parse_panorama(response: dict) -> NaverPanorama:
         is_latest=basic["latest"],
         description=basic["description"],
         title=basic["title"],
-        panorama_type=PanoramaType(int(basic["dtl_type"]))
+        panorama_type=PanoramaType(int(basic["dtl_type"])),
+        elevation=elevation,
+        camera_height=(basic["camera_altitude"] * 0.01) - elevation
     )
 
     if len(basic["image"]["overlays"]) > 1:

@@ -154,7 +154,7 @@ def repair_find_panorama_response(text):
     return "[" + text[first_paren + 1:last_paren] + "]"
 
 
-def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", search_third_party=False, session=None):
+def find_panorama(lat, lon, radius=50, download_depth=False, locale="en", search_third_party=False, session=None):
     return get_json(
         build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party),
         session=session,
@@ -162,8 +162,8 @@ def find_panorama_raw(lat, lon, radius=50, download_depth=False, locale="en", se
     )
 
 
-async def find_panorama_raw_async(lat, lon, session: aiohttp.ClientSession, radius=50,
-                                  download_depth=False, locale="en", search_third_party=False):
+async def find_panorama_async(lat, lon, session: aiohttp.ClientSession, radius=50,
+                              download_depth=False, locale="en", search_third_party=False):
     return await get_json_async(
         build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party),
         session,
@@ -171,28 +171,28 @@ async def find_panorama_raw_async(lat, lon, session: aiohttp.ClientSession, radi
     )
 
 
-def find_panorama_by_id_raw(panoid, download_depth=False, locale="en", session=None):
+def find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
     return get_json(
         build_find_panorama_by_id_request_url(panoid, download_depth, locale),
         session=session,
         preprocess_function=lambda text: text[4:])
 
 
-async def find_panorama_by_id_raw_async(panoid, session, download_depth=False, locale="en"):
+async def find_panorama_by_id_async(panoid, session, download_depth=False, locale="en"):
     return await get_json_async(
         build_find_panorama_by_id_request_url(panoid, download_depth, locale),
         session,
         preprocess_function=lambda text: text[4:])
 
 
-def get_coverage_tile_raw(tile_x, tile_y, session=None):
+def get_coverage_tile(tile_x, tile_y, session=None):
     return get_json(
         build_coverage_tile_request_url(tile_x, tile_y),
         session=session,
         preprocess_function=lambda text: text[4:])
 
 
-async def get_coverage_tile_raw_async(tile_x, tile_y, session):
+async def get_coverage_tile_async(tile_x, tile_y, session):
     return await get_json_async(
         build_coverage_tile_request_url(tile_x, tile_y),
         session,

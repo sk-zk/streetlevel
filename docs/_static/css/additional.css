@@ -88,3 +88,14 @@
 #streetlevel\.naver\.panorama\.Overlay + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+
+
+#streetlevel\.ja\.panorama\.JaPanorama + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.ja\.panorama\.Address + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.ja\.panorama\.CaptureDate + dd > dl:first-of-type.field-list {
+  display:none !important;
+}

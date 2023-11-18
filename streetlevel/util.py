@@ -249,13 +249,33 @@ class CubemapStitchingMethod(Enum):
     """The faces are combined into one image arranged in one row in the order front, right, back, left, top, bottom."""
 
 
+def stitch_cubemap_face(face_tiles: dict, tile_size: int, cols: int, rows: int):
+    """
+    Stitches one face of a cubemap.
+
+    :param face_tiles: Tiles of this face.
+    :param tile_size: The side length of one tile in pixels.
+    :param cols: Number of tile columns.
+    :param rows: Number of tile rows.
+    :return: The stitched face.
+    """
+    face = Image.new("RGB", (cols * tile_size, rows * tile_size))
+    for row_idx in range(0, rows):
+        for col_idx in range(0, cols):
+            tile = Image.open(BytesIO(face_tiles[(col_idx, row_idx)]))
+            face.paste(im=tile,
+                       box=(col_idx * tile_size, row_idx * tile_size))
+            del tile
+    return face
+
+
 def stitch_cubemap_faces(faces: List[Image.Image], face_size: int,
                          stitching_method: CubemapStitchingMethod) -> Union[Image.Image, List[Image.Image]]:
     """
     Stitches the six faces of a cubemap into one image.
 
     :param faces: A list of faces in the order front, right, back, left, top, bottom.
-    :param face_size: The size of one face of the cubemap.
+    :param face_size: The side length of one face of the cubemap in pixels.
     :param stitching_method: The stitching method.
     :return: A stitched image, or ``faces`` if the stitching method is ``NONE``.
     """

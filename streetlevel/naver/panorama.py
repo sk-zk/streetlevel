@@ -15,16 +15,16 @@ class PanoramaType(IntEnum):
     """
     The panorama type. Most identifiers are taken directly from the source.
     """
-    AIR = 1,  #:
-    CAR = 3,  #:
-    BICYCLE = 4,  #:
-    INSIDE = 5,  #:
-    INTERIOR = 7,  #:
-    JIMMY_JIB = 8,  #:
-    INDOOR = 10,  #:
-    TREKKER = 13,  #:
-    UNDERWATER = 12,  #:
-    INDOOR_3D = 100,  #:
+    AIR = 1  #:
+    CAR = 3  #:
+    BICYCLE = 4  #:
+    INSIDE = 5  #:
+    INTERIOR = 7  #:
+    JIMMY_JIB = 8  #:
+    INDOOR = 10  #:
+    TREKKER = 13  #:
+    UNDERWATER = 12  #:
+    INDOOR_3D = 100  #:
 
 
 @dataclass
@@ -45,6 +45,10 @@ class NaverPanorama:
 
     heading: float = None
     """Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west."""
+    elevation: float = None
+    """Elevation at the capture location in meters."""
+    camera_height: float = None
+    """Height of the camera in meters above ground."""
 
     max_zoom: int = None
     """Highest zoom level available for this panorama."""

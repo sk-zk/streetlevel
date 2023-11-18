@@ -8,12 +8,12 @@ from requests import Session
 from streetlevel import yandex
 
 
-def mocked_find_panorama_raw(lat: float, lon: float, session: Session = None) -> dict:
+def mocked_api_find_panorama(lat: float, lon: float, session: Session = None) -> dict:
     with open("yandex/data/find.json", "r") as f:
         return json.load(f)
 
 
-yandex.api.find_panorama_raw = mocked_find_panorama_raw
+yandex.api.find_panorama = mocked_api_find_panorama
 
 
 def test_find_panorama():

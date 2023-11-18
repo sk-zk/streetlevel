@@ -12,22 +12,22 @@ def build_find_panorama_by_id_request_url(panoid):
            f"id={panoid}"
 
 
-def find_panoramas_raw(north, west, south, east, limit=50, session=None):
+def find_panoramas(north, west, south, east, limit=50, session=None):
     return get_json(build_find_panoramas_request_url(north, west, south, east, limit), session)
 
 
-async def find_panoramas_raw_async(north, west, south, east, session: ClientSession, limit=50):
+async def find_panoramas_async(north, west, south, east, session: ClientSession, limit=50):
     return await get_json_async(
         build_find_panoramas_request_url(north, west, south, east, limit), session,
         # common microsoft L
         json_function_parameters={"content_type": "text/plain"})
 
 
-def find_panorama_by_id_raw(panoid, session=None):
+def find_panorama_by_id(panoid, session=None):
     return get_json(build_find_panorama_by_id_request_url(panoid), session)
 
 
-async def find_panorama_by_id_raw_async(panoid, session=None):
+async def find_panorama_by_id_async(panoid, session=None):
     return await get_json_async(
         build_find_panorama_by_id_request_url(panoid), session,
         # common microsoft L
