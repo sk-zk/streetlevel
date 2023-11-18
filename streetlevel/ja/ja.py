@@ -9,7 +9,7 @@ from . import api
 from .panorama import JaPanorama, CaptureDate, Address
 from ..dataclasses import Tile
 from ..util import download_tiles, download_tiles_async, CubemapStitchingMethod, stitch_cubemap_faces, \
-    save_cubemap_panorama, stitch_cubemap_face
+    save_cubemap_panorama, stitch_cubemap_face, try_get
 
 
 def find_panorama(lat: float, lon: float, radius: int = 100, session: Session = None) -> Optional[JaPanorama]:
@@ -117,6 +117,10 @@ async def download_panorama_async(pano: JaPanorama, path: str, session: ClientSe
 
 
 def _parse_panorama_by_id(pano_dict: dict) -> JaPanorama:
+    address = try_get(lambda: pano_dict["streets"]["nearestAddress"])
+    if address:
+        address = Address(*address.values())
+
     return JaPanorama(
         id=pano_dict["image"]["id"],
         lat=pano_dict["image"]["lat"],
@@ -126,7 +130,7 @@ def _parse_panorama_by_id(pano_dict: dict) -> JaPanorama:
         pano_url="https:" + pano_dict["image"]["pano_url"],
         blur_key=pano_dict["image"]["blur_key"],
         street_name=pano_dict["streets"]["street"]["name"],
-        address=Address(*pano_dict["streets"]["nearestAddress"].values()),
+        address=address,
         neighbors=_parse_hotspots(pano_dict["hotspots"]),
     )
 
