@@ -256,7 +256,7 @@ Services covering multiple countries are on the left; services covering one spec
 4: Unstitched  
 5: Appears to be a synthetic depth map created from elevation data and building footprints  
 6: Month and year only for official coverage, full date for inofficial coverage  
-7: Only heading is implemented; inaccurate in some locations  
+7: Only heading; pitch/roll conversion not yet implemented
 8: Only heading; pitch/roll do not appear to be available  
 9: Previous and next image in sequence  
 10: Month and year only  

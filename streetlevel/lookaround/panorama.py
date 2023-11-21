@@ -46,10 +46,7 @@ class LookaroundPanorama:
     """
     Heading in radians, where 0° is north, 90° is west, 180° is south, 270° is east.
     
-    This value is converted from a field in the API response which I don't really understand,
-    and the resulting heading is occasionally inaccurate.
-    
-    I've yet to find a way to convert the pitch and roll.
+    Pitch and roll are not yet available in this library.
     """
 
     coverage_type: CoverageType = None

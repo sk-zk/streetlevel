@@ -1,22 +1,20 @@
-import math
 from datetime import datetime
 from enum import IntEnum
 from typing import List, Union, Tuple
 
 import requests
 from aiohttp import ClientSession
-from pyproj import Transformer
 from requests import Session
 
 from . import api
 from .auth import Authenticator
 from .panorama import LookaroundPanorama, CoverageType
 from .proto import GroundMetadataTile_pb2
+from .geo import protobuf_tile_offset_to_wgs84, convert_altitude, convert_pano_orientation
 from .. import geo
 
 
 FACE_ENDPOINT = "https://gspe72-ssl.ls.apple.com/mnn_us/"
-tf_web_mercator_to_ecef = Transformer.from_crs(3857, 4978)
 
 
 class Face(IntEnum):
@@ -153,12 +151,14 @@ def _panoid_to_string(pano: Union[LookaroundPanorama, Tuple[int, int]]) -> Tuple
 def _parse_panos(tile: GroundMetadataTile_pb2.GroundMetadataTile, tile_x: int, tile_y: int) -> List[LookaroundPanorama]:
     panos = []
     for pano_pb in tile.pano:
-        lat, lon = _protobuf_tile_offset_to_wgs84(
+        lat, lon = protobuf_tile_offset_to_wgs84(
             pano_pb.tile_position.x,
             pano_pb.tile_position.y,
             tile_x,
             tile_y)
-        heading = _convert_heading(lat, lon, pano_pb.tile_position.yaw)
+        altitude, elevation = convert_altitude(pano_pb.tile_position.altitude, lat, lon, tile_x, tile_y)
+        heading, _, _ = convert_pano_orientation(lat, lon, altitude, pano_pb.tile_position.yaw,
+                                                 pano_pb.tile_position.pitch, pano_pb.tile_position.roll)
         pano = LookaroundPanorama(
             id=pano_pb.panoid,
             build_id=tile.build_table[pano_pb.build_table_idx].build_id,
@@ -167,39 +167,11 @@ def _parse_panos(tile: GroundMetadataTile_pb2.GroundMetadataTile, tile_x: int, t
             heading=heading,
             coverage_type=CoverageType(tile.build_table[pano_pb.build_table_idx].coverage_type),
             date=datetime.utcfromtimestamp(pano_pb.timestamp / 1000.0),
-            elevation=_convert_altitude(pano_pb.tile_position.altitude, lat, lon, tile_x, tile_y),
+            elevation=elevation,
             has_blurs=tile.build_table[pano_pb.build_table_idx].index != 0,
         )
         panos.append(pano)
     return panos
-
-
-def _convert_heading(lat: float, lon: float, raw_heading: int) -> float:
-    """
-    Converts the raw heading value to radians.
-    """
-    offset_factor = 1 / (16384 / 360)
-    heading = (offset_factor * raw_heading) - lon
-    # in the southern hemisphere, the heading also needs to be mirrored across the 90°/270° line
-    if lat < 0:
-        heading = -(heading - 90) + 90
-    return math.radians(heading)
-
-
-def _protobuf_tile_offset_to_wgs84(x_offset: int, y_offset: int, tile_x: int, tile_y: int) -> Tuple[float, float]:
-    """
-    Calculates the absolute position of a pano from the tile offsets returned by the API.
-    :param x_offset: The X coordinate of the raw tile offset returned by the API.
-    :param y_offset: The Y coordinate of the raw tile offset returned by the API.
-    :param tile_x: X coordinate of the tile this pano is on, at z=17.
-    :param tile_y: Y coordinate of the tile this pano is on, at z=17.
-    :return: The WGS84 lat/lon of the pano.
-    """
-    TILE_SIZE = 256
-    pano_x = tile_x + (x_offset / 64.0) / (TILE_SIZE - 1)
-    pano_y = tile_y + (255 - (y_offset / 64.0)) / (TILE_SIZE - 1)
-    lat, lon = geo.tile_coord_to_wgs84(pano_x, pano_y, 17)
-    return lat, lon
 
 
 def _build_panorama_face_url(panoid: str, build_id: str, face: int, zoom: int, auth: Authenticator) -> str:
@@ -211,51 +183,3 @@ def _build_panorama_face_url(panoid: str, build_id: str, face: int, zoom: int, a
     url = FACE_ENDPOINT + f"{panoid_url}/{build_id_padded}/t/{face}/{zoom}"
     url = auth.authenticate_url(url)
     return url
-
-
-def _convert_altitude(raw_altitude: int, lat: float, lon: float, tile_x: int, tile_y: int) -> float:
-    """
-    Converts the raw altitude returned by the API to height above MSL.
-
-    :param raw_altitude: Raw altitude from the API.
-    :param lat: WGS84 latitude of the location.
-    :param lon: WGS84 longitude of the location.
-    :param tile_x: X coordinate of the XYZ tile coordinates.
-    :param tile_y: Y coordinate of the XYZ tile coordinates.
-    :return: Height above MSL in meters.
-    """
-    # Adapted from _GEOOrientedPositionFromPDTilePosition in GeoServices.
-    # Don't really have much of a clue what's going on here, but it seems to work
-    zoom = 17
-    top_left = _tile_coord_to_mercator(tile_x, tile_y, zoom)
-    top_right = _tile_coord_to_mercator(tile_x + 1, tile_y, zoom)
-
-    top_left_ecef = tf_web_mercator_to_ecef.transform(*top_left)
-    top_right_ecef = tf_web_mercator_to_ecef.transform(*top_right)
-
-    delta_x = top_left_ecef[0] - top_right_ecef[0]
-    delta_y = top_left_ecef[1] - top_right_ecef[1]
-
-    height = math.sqrt(delta_x ** 2 + delta_y ** 2) * (raw_altitude / 16383.0)
-    geoid_height = geo.get_geoid_height(lat, lon)
-    ortho_height = lon - geoid_height
-    return height + ortho_height - lon
-
-
-def _tile_coord_to_mercator(tile_x: int, tile_y: int, zoom: int) -> Tuple[float, float]:
-    """
-    Converts XYZ tile coordinates to Web Mercator coordinates.
-
-    :param tile_x: X coordinate.
-    :param tile_y: Y coordinate.
-    :param zoom: Z coordinate.
-    :return: The Web Mercator coordinate.
-    """
-    # Adapted from _GEOOrientedPositionFromPDTilePosition in GeoServices.
-    # Don't really have much of a clue what's going on here, but it seems to work
-    scale = 1 << zoom
-    scale_recip = 1.0 / scale
-    web_mercator_size = 40086474.44
-    x = (tile_x * scale_recip - 0.5) * web_mercator_size
-    y = ((scale + ~tile_y) * scale_recip - 0.5) * web_mercator_size
-    return x, y
