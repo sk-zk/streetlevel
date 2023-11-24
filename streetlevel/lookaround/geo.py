@@ -53,8 +53,7 @@ def convert_altitude(raw_altitude: int, lat: float, lon: float, tile_x: int, til
 
     altitude = math.sqrt(delta_x ** 2 + delta_y ** 2) * (raw_altitude / 16383.0)
     geoid_height = geo.get_geoid_height(lat, lon)
-    ortho_height = lon - geoid_height
-    elevation = altitude + ortho_height - lon
+    elevation = altitude - geoid_height
     return altitude, elevation
 
 
