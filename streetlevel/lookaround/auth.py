@@ -23,7 +23,7 @@ class Authenticator:
     def __init__(self):
         self.session_id = _generate_session_id()
 
-    def authenticate_url(self, url):
+    def authenticate_url(self, url: str) -> str:
         """
         Appends authentication parameters to a URL.
 
@@ -53,15 +53,15 @@ class Authenticator:
         return final
 
 
-def _generate_session_id():
+def _generate_session_id() -> str:
     return ''.join(random.choices(string.digits, k=40))
 
 
-def _generate_token_p3():
+def _generate_token_p3() -> str:
     return ''.join(random.choices(string.digits + string.ascii_lowercase + string.ascii_uppercase, k=16))
 
 
-def _pad_pkcs7(data, block_size=16):
+def _pad_pkcs7(data, block_size: int = 16):
     if type(data) != bytearray and type(data) != bytes:
         raise TypeError()
     padding_size = block_size - (len(data) % block_size)
