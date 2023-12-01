@@ -78,13 +78,13 @@ class LookaroundPanorama:
                 geo.convert_pano_orientation(self.lat, self.lon, *self.raw_orientation)
 
     @property
-    def elevation(self):
+    def elevation(self) -> float:
         """Elevation at the capture location in meters."""
         self._set_altitude_and_elevation()
         return self._elevation
 
     @property
-    def heading(self):
+    def heading(self) -> float:
         """
         Heading in radians, where 0° is north, 90° is west, 180° is south, 270° is east.
         """
@@ -92,13 +92,13 @@ class LookaroundPanorama:
         return self._heading
 
     @property
-    def pitch(self):
+    def pitch(self) -> float:
         """Pitch offset for upright correction of the panorama, in radians."""
         self._set_orientation()
         return self._pitch
 
     @property
-    def roll(self):
+    def roll(self) -> float:
         """Roll offset for upright correction of the panorama, in radians."""
         self._set_orientation()
         return self._roll
