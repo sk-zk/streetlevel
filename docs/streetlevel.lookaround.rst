@@ -1,7 +1,7 @@
 streetlevel.lookaround: Apple Look Around
 =========================================
 
-Rudimentary support for Apple Look Around. Note that, unlike with the other providers, the library
+Support for Apple Look Around. Note that, unlike with the other providers, the library
 does not automatically stitch the images - the side faces appear to be equirectangular with some overlap,
 but the top and bottom face are ... something else. (Please contact me if you know which projection is being used.)
 
@@ -11,7 +11,6 @@ Finding panoramas
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_async
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_by_latlon
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_by_latlon_async
-
 
 Downloading panoramas
 ---------------------
@@ -28,7 +27,6 @@ Data classes and Enums
       :member-order: bysource
     .. autoclass:: streetlevel.lookaround.panorama.LookaroundPanorama
       :members:
-
 
 Authentication
 --------------
