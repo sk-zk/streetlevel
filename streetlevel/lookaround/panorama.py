@@ -53,10 +53,10 @@ class LookaroundPanorama:
     """Whether something in this panorama, typically a building, has been blurred."""
 
     raw_orientation: Tuple[int, int, int] = None
-    """The raw yaw, pitch, and roll values returned from the API."""
+    """The raw yaw, pitch, and roll values returned by the API."""
 
     raw_altitude: int = None
-    """The raw altitude values returned from the API."""
+    """The raw altitude value returned by the API."""
 
     tile: Tuple[int, int, int] = None
     """The tile this panorama is located on."""
