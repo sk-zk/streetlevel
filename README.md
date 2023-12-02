@@ -162,19 +162,19 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
-    <td align="center">✔<sup>10</sup></td>
+    <td align="center">✔<sup>9</sup></td>
   </tr>
   <tr>
     <td align="right">Heading, pitch, roll</td>
     <td align="center">✔</td>
-    <td align="center">🟡<sup>7</sup></td>
-    <td align="center">✔<sup>8</sup></td>
+    <td align="center">✔</td>
+    <td align="center">✔<sup>7</sup></td>
     <td align="center">✔</td>
     <td></td>
-    <td align="center">✔<sup>8</sup></td>
-    <td align="center">✔<sup>8</sup></td>
+    <td align="center">✔<sup>7</sup></td>
+    <td align="center">✔<sup>7</sup></td>
     <td align="center">✔<br></td>
-    <td align="center">✔<sup>8</sup></td>
+    <td align="center">✔<sup>7</sup></td>
   </tr>
   <tr>
     <td align="right">Elevation</td>
@@ -193,7 +193,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td align="center">✔</td>
-    <td align="center">✔<sup>9</sup></td>
+    <td align="center">✔<sup>8</sup></td>
     <td></td>
     <td align="center">✔</td>
     <td align="center">✔</td>
@@ -256,7 +256,6 @@ Services covering multiple countries are on the left; services covering one spec
 4: Unstitched  
 5: Appears to be a synthetic depth map created from elevation data and building footprints  
 6: Month and year only for official coverage, full date for inofficial coverage  
-7: Only heading; pitch/roll conversion not yet implemented  
-8: Only heading; pitch/roll do not appear to be available  
-9: Previous and next image in sequence  
-10: Month and year only  
+7: Only heading; pitch/roll do not appear to be available  
+8: Previous and next image in sequence  
+9: Month and year only  

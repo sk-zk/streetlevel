@@ -156,19 +156,17 @@ def _parse_panos(tile: GroundMetadataTile_pb2.GroundMetadataTile, tile_x: int, t
             pano_pb.tile_position.y,
             tile_x,
             tile_y)
-        altitude, elevation = convert_altitude(pano_pb.tile_position.altitude, lat, lon, tile_x, tile_y)
-        heading, _, _ = convert_pano_orientation(lat, lon, altitude, pano_pb.tile_position.yaw,
-                                                 pano_pb.tile_position.pitch, pano_pb.tile_position.roll)
         pano = LookaroundPanorama(
             id=pano_pb.panoid,
             build_id=tile.build_table[pano_pb.build_table_idx].build_id,
             lat=lat,
             lon=lon,
-            heading=heading,
             coverage_type=CoverageType(tile.build_table[pano_pb.build_table_idx].coverage_type),
             date=datetime.utcfromtimestamp(pano_pb.timestamp / 1000.0),
-            elevation=elevation,
             has_blurs=tile.build_table[pano_pb.build_table_idx].index != 0,
+            raw_orientation=(pano_pb.tile_position.yaw, pano_pb.tile_position.pitch, pano_pb.tile_position.roll),
+            raw_altitude=pano_pb.tile_position.altitude,
+            tile=(tile_x, tile_y, 17),
         )
         panos.append(pano)
     return panos
