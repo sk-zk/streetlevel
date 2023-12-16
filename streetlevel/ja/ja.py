@@ -30,7 +30,7 @@ def find_panorama(lat: float, lon: float, radius: int = 100, session: Session = 
     return _parse_panorama(response)
 
 
-async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
+async def find_panorama_async(lat: float, lon: float, session: ClientSession,
                                radius: int = 100) -> Optional[JaPanorama]:
     response = await api.find_panorama_async(lat, lon, session, radius)
 
