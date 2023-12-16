@@ -63,7 +63,7 @@
 #streetlevel\.yandex\.panorama\.YandexPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
-#streetlevel\.yandex\.panorama\.Company + dd > dl:first-of-type.field-list {
+#streetlevel\.yandex\.panorama\.Place + dd > dl:first-of-type.field-list {
   display:none !important;
 }
 #streetlevel\.yandex\.panorama\.Address + dd > dl:first-of-type.field-list {
