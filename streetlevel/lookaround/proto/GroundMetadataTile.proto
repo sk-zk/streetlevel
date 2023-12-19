@@ -51,7 +51,6 @@ message GroundMetadataTile {
     int32 index = 1;
     
     int32 build_id = 3;
-    int32 unknown15 = 4;
     int32 data_format_version = 5;
     
     // whether the coverage was taken by car or backpack
