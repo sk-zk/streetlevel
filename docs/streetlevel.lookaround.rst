@@ -5,7 +5,7 @@ Support for Apple Look Around. Note that, unlike with the other providers, the l
 does not automatically stitch the images as Look Around does not serve one image broken up into tiles,
 but rather six faces which form a sort-of-but-not-really cubemap.
 
-Panoramas can be rendered by creating spherical rectangles (meaning rectangles on the surface of a sphere) for each face, centered on
+Panoramas can be rendered by creating a spherical rectangle (meaning a rectangle on the surface of a sphere) for each face, centered on
 phi=0, theta=0. ``fov_s`` is the phi size (width), ``fov_h`` is the theta size (height), and ``cy`` is an additional offset
 which must be subtracted from phi. The resulting geometry for the face is then rotated by the given Euler angles. (The API
 returns several other parameters, but they do not appear to be in use.)
