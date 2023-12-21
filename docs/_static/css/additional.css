@@ -58,6 +58,15 @@
 #streetlevel\.lookaround\.panorama\.LookaroundPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+#streetlevel\.lookaround\.panorama\.CameraMetadata + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.lookaround\.panorama\.LensProjection + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.lookaround\.panorama\.OrientedPosition + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
 
 
 #streetlevel\.yandex\.panorama\.YandexPanorama + dd > dl:first-of-type.field-list {

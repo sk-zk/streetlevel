@@ -8,9 +8,9 @@ from requests import Session
 
 from . import api
 from .auth import Authenticator
-from .panorama import LookaroundPanorama, CoverageType
+from .panorama import LookaroundPanorama, CoverageType, CameraMetadata, LensProjection, OrientedPosition
 from .proto import GroundMetadataTile_pb2
-from .geo import protobuf_tile_offset_to_wgs84, convert_altitude, convert_pano_orientation
+from .geo import protobuf_tile_offset_to_wgs84
 from .. import geo
 
 
@@ -72,7 +72,7 @@ def get_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
     """
     Downloads one face of a panorama and returns it as ``bytes``.
 
-    Images are in HEIC format. Since HEIC is a poorly supported format across the board,
+    Images are in HEIC format. Since HEIC is poorly supported across the board,
     decoding the image is left to the user of the library.
 
     :param pano: The panorama, or its ID.
@@ -150,6 +150,7 @@ def _panoid_to_string(pano: Union[LookaroundPanorama, Tuple[int, int]]) -> Tuple
 
 def _parse_panos(tile: GroundMetadataTile_pb2.GroundMetadataTile, tile_x: int, tile_y: int) -> List[LookaroundPanorama]:
     panos = []
+    camera_metadatas = [_camera_metadata_to_dataclass(c) for c in tile.camera_metadata]
     for pano_pb in tile.pano:
         lat, lon = protobuf_tile_offset_to_wgs84(
             pano_pb.tile_position.x,
@@ -167,9 +168,36 @@ def _parse_panos(tile: GroundMetadataTile_pb2.GroundMetadataTile, tile_x: int, t
             raw_orientation=(pano_pb.tile_position.yaw, pano_pb.tile_position.pitch, pano_pb.tile_position.roll),
             raw_altitude=pano_pb.tile_position.altitude,
             tile=(tile_x, tile_y, 17),
+            camera_metadata=[camera_metadatas[i] for i in pano_pb.camera_metadata_idx]
         )
         panos.append(pano)
     return panos
+
+
+def _camera_metadata_to_dataclass(camera_metadata_pb: GroundMetadataTile_pb2.CameraMetadata):
+    lens_projection_pb = camera_metadata_pb.lens_projection
+    position_pb =  camera_metadata_pb.position
+    return CameraMetadata(
+        lens_projection=LensProjection(
+            fov_s=lens_projection_pb.fov_s,
+            fov_h=lens_projection_pb.fov_h,
+            k2=lens_projection_pb.k2,
+            k3=lens_projection_pb.k3,
+            k4=lens_projection_pb.k4,
+            cx=lens_projection_pb.cx,
+            cy=lens_projection_pb.cy,
+            lx=lens_projection_pb.lx,
+            ly=lens_projection_pb.ly,
+        ),
+        position=OrientedPosition(
+            x=position_pb.x,
+            y=position_pb.y,
+            z=position_pb.z,
+            yaw=position_pb.yaw,
+            pitch=position_pb.pitch,
+            roll=position_pb.roll,
+        )
+    )
 
 
 def _build_panorama_face_url(panoid: str, build_id: str, face: int, zoom: int, auth: Authenticator) -> str:

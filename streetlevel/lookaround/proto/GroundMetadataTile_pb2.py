@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18GroundMetadataTile.proto\x12\x0bstreetlevel\"\xc1\x0c\n\x12GroundMetadataTile\x12;\n\x04pano\x18\x01 \x03(\x0b\x32-.streetlevel.GroundMetadataTile.PhotoPosition\x12\x44\n\x0b\x62uild_table\x18\x04 \x03(\x0b\x32/.streetlevel.GroundMetadataTile.GroundDataBuild\x12G\n\x0f\x63\x61mera_metadata\x18\x05 \x03(\x0b\x32..streetlevel.GroundMetadataTile.CameraMetadata\x12G\n\x0ftile_coordinate\x18\x06 \x01(\x0b\x32..streetlevel.GroundMetadataTile.TileCoordinate\x1a\xb5\x03\n\rPhotoPosition\x12\x0e\n\x06panoid\x18\x01 \x01(\x04\x12\x10\n\x08revision\x18\x04 \x01(\x05\x12\x11\n\ttimestamp\x18\x05 \x01(\x03\x12\x17\n\x0f\x62uild_table_idx\x18\x07 \x01(\x05\x12\x1b\n\x13\x63\x61mera_metadata_idx\x18\t \x03(\x05\x12Y\n\rtile_position\x18\n \x01(\x0b\x32\x42.streetlevel.GroundMetadataTile.PhotoPosition.OrientedTilePosition\x12M\n\x0brig_metrics\x18\x0c \x01(\x0b\x32\x38.streetlevel.GroundMetadataTile.PhotoPosition.RigMetrics\x1ah\n\x14OrientedTilePosition\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\x10\n\x08\x61ltitude\x18\x03 \x01(\x05\x12\x0b\n\x03yaw\x18\x04 \x01(\x05\x12\r\n\x05pitch\x18\x05 \x01(\x05\x12\x0c\n\x04roll\x18\x06 \x01(\x05\x1a%\n\nRigMetrics\x12\x17\n\x0focclusion_score\x18\x01 \x03(\x05\x1a\xcf\x02\n\x0fGroundDataBuild\x12\r\n\x05index\x18\x01 \x01(\x05\x12\x10\n\x08\x62uild_id\x18\x03 \x01(\x05\x12\x11\n\tunknown15\x18\x04 \x01(\x05\x12\x1b\n\x13\x64\x61ta_format_version\x18\x05 \x01(\x05\x12S\n\rcoverage_type\x18\x06 \x01(\x0e\x32<.streetlevel.GroundMetadataTile.GroundDataBuild.CoverageType\x12\x11\n\tbucket_id\x18\t \x01(\x05\x12\x19\n\x11lod_with_textures\x18\n \x01(\x05\x12\x17\n\x0fmetrics_version\x18\x0b \x01(\x05\x12\x1b\n\x13\x64\x61ta_output_version\x18\x0c \x01(\x05\"2\n\x0c\x43overageType\x12\x0b\n\x07\x44\x45\x46\x41ULT\x10\x00\x12\x07\n\x03\x43\x41R\x10\x02\x12\x0c\n\x08\x42\x41\x43KPACK\x10\x03\x1a\xd8\x03\n\x0e\x43\x61meraMetadata\x12\x15\n\rcamera_number\x18\x01 \x01(\x05\x12V\n\x0flens_projection\x18\x04 \x01(\x0b\x32=.streetlevel.GroundMetadataTile.CameraMetadata.LensProjection\x12Q\n\x08position\x18\x05 \x01(\x0b\x32?.streetlevel.GroundMetadataTile.CameraMetadata.OrientedPosition\x12\x12\n\ntexture_id\x18\x06 \x01(\x05\x1a\x90\x01\n\x0eLensProjection\x12\x0c\n\x04type\x18\x01 \x01(\x05\x12\r\n\x05\x66ov_s\x18\x02 \x01(\x01\x12\r\n\x05\x66ov_h\x18\x03 \x01(\x01\x12\n\n\x02k2\x18\x04 \x01(\x01\x12\n\n\x02k3\x18\x05 \x01(\x01\x12\n\n\x02k4\x18\x06 \x01(\x01\x12\n\n\x02\x63x\x18\x07 \x01(\x01\x12\n\n\x02\x63y\x18\x08 \x01(\x01\x12\n\n\x02lx\x18\t \x01(\x01\x12\n\n\x02ly\x18\n \x01(\x01\x1a]\n\x10OrientedPosition\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\t\n\x01z\x18\x03 \x01(\x01\x12\x0b\n\x03yaw\x18\x04 \x01(\x01\x12\r\n\x05pitch\x18\x05 \x01(\x01\x12\x0c\n\x04roll\x18\x06 \x01(\x01\x1a\x31\n\x0eTileCoordinate\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\t\n\x01z\x18\x03 \x01(\x05\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18GroundMetadataTile.proto\x12\x0bstreetlevel\"\xfa\x07\n\x12GroundMetadataTile\x12;\n\x04pano\x18\x01 \x03(\x0b\x32-.streetlevel.GroundMetadataTile.PhotoPosition\x12\x44\n\x0b\x62uild_table\x18\x04 \x03(\x0b\x32/.streetlevel.GroundMetadataTile.GroundDataBuild\x12\x34\n\x0f\x63\x61mera_metadata\x18\x05 \x03(\x0b\x32\x1b.streetlevel.CameraMetadata\x12\x34\n\x0ftile_coordinate\x18\x06 \x01(\x0b\x32\x1b.streetlevel.TileCoordinate\x1a\xb5\x03\n\rPhotoPosition\x12\x0e\n\x06panoid\x18\x01 \x01(\x04\x12\x10\n\x08revision\x18\x04 \x01(\x05\x12\x11\n\ttimestamp\x18\x05 \x01(\x03\x12\x17\n\x0f\x62uild_table_idx\x18\x07 \x01(\x05\x12\x1b\n\x13\x63\x61mera_metadata_idx\x18\t \x03(\x05\x12Y\n\rtile_position\x18\n \x01(\x0b\x32\x42.streetlevel.GroundMetadataTile.PhotoPosition.OrientedTilePosition\x12M\n\x0brig_metrics\x18\x0c \x01(\x0b\x32\x38.streetlevel.GroundMetadataTile.PhotoPosition.RigMetrics\x1ah\n\x14OrientedTilePosition\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\x10\n\x08\x61ltitude\x18\x03 \x01(\x05\x12\x0b\n\x03yaw\x18\x04 \x01(\x05\x12\r\n\x05pitch\x18\x05 \x01(\x05\x12\x0c\n\x04roll\x18\x06 \x01(\x05\x1a%\n\nRigMetrics\x12\x17\n\x0focclusion_score\x18\x01 \x03(\x05\x1a\xbc\x02\n\x0fGroundDataBuild\x12\r\n\x05index\x18\x01 \x01(\x05\x12\x10\n\x08\x62uild_id\x18\x03 \x01(\x05\x12\x1b\n\x13\x64\x61ta_format_version\x18\x05 \x01(\x05\x12S\n\rcoverage_type\x18\x06 \x01(\x0e\x32<.streetlevel.GroundMetadataTile.GroundDataBuild.CoverageType\x12\x11\n\tbucket_id\x18\t \x01(\x05\x12\x19\n\x11lod_with_textures\x18\n \x01(\x05\x12\x17\n\x0fmetrics_version\x18\x0b \x01(\x05\x12\x1b\n\x13\x64\x61ta_output_version\x18\x0c \x01(\x05\"2\n\x0c\x43overageType\x12\x0b\n\x07\x44\x45\x46\x41ULT\x10\x00\x12\x07\n\x03\x43\x41R\x10\x02\x12\x0c\n\x08\x42\x41\x43KPACK\x10\x03\"\xb2\x03\n\x0e\x43\x61meraMetadata\x12\x15\n\rcamera_number\x18\x01 \x01(\x05\x12\x43\n\x0flens_projection\x18\x04 \x01(\x0b\x32*.streetlevel.CameraMetadata.LensProjection\x12>\n\x08position\x18\x05 \x01(\x0b\x32,.streetlevel.CameraMetadata.OrientedPosition\x12\x12\n\ntexture_id\x18\x06 \x01(\x05\x1a\x90\x01\n\x0eLensProjection\x12\x0c\n\x04type\x18\x01 \x01(\x05\x12\r\n\x05\x66ov_s\x18\x02 \x01(\x01\x12\r\n\x05\x66ov_h\x18\x03 \x01(\x01\x12\n\n\x02k2\x18\x04 \x01(\x01\x12\n\n\x02k3\x18\x05 \x01(\x01\x12\n\n\x02k4\x18\x06 \x01(\x01\x12\n\n\x02\x63x\x18\x07 \x01(\x01\x12\n\n\x02\x63y\x18\x08 \x01(\x01\x12\n\n\x02lx\x18\t \x01(\x01\x12\n\n\x02ly\x18\n \x01(\x01\x1a]\n\x10OrientedPosition\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\t\n\x01z\x18\x03 \x01(\x01\x12\x0b\n\x03yaw\x18\x04 \x01(\x01\x12\r\n\x05pitch\x18\x05 \x01(\x01\x12\x0c\n\x04roll\x18\x06 \x01(\x01\"1\n\x0eTileCoordinate\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\t\n\x01z\x18\x03 \x01(\x05\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,23 +22,23 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _globals['_GROUNDMETADATATILE']._serialized_start=42
-  _globals['_GROUNDMETADATATILE']._serialized_end=1643
-  _globals['_GROUNDMETADATATILE_PHOTOPOSITION']._serialized_start=342
-  _globals['_GROUNDMETADATATILE_PHOTOPOSITION']._serialized_end=779
-  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_ORIENTEDTILEPOSITION']._serialized_start=636
-  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_ORIENTEDTILEPOSITION']._serialized_end=740
-  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_RIGMETRICS']._serialized_start=742
-  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_RIGMETRICS']._serialized_end=779
-  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD']._serialized_start=782
-  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD']._serialized_end=1117
-  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD_COVERAGETYPE']._serialized_start=1067
-  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD_COVERAGETYPE']._serialized_end=1117
-  _globals['_GROUNDMETADATATILE_CAMERAMETADATA']._serialized_start=1120
-  _globals['_GROUNDMETADATATILE_CAMERAMETADATA']._serialized_end=1592
-  _globals['_GROUNDMETADATATILE_CAMERAMETADATA_LENSPROJECTION']._serialized_start=1353
-  _globals['_GROUNDMETADATATILE_CAMERAMETADATA_LENSPROJECTION']._serialized_end=1497
-  _globals['_GROUNDMETADATATILE_CAMERAMETADATA_ORIENTEDPOSITION']._serialized_start=1499
-  _globals['_GROUNDMETADATATILE_CAMERAMETADATA_ORIENTEDPOSITION']._serialized_end=1592
-  _globals['_GROUNDMETADATATILE_TILECOORDINATE']._serialized_start=1594
-  _globals['_GROUNDMETADATATILE_TILECOORDINATE']._serialized_end=1643
+  _globals['_GROUNDMETADATATILE']._serialized_end=1060
+  _globals['_GROUNDMETADATATILE_PHOTOPOSITION']._serialized_start=304
+  _globals['_GROUNDMETADATATILE_PHOTOPOSITION']._serialized_end=741
+  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_ORIENTEDTILEPOSITION']._serialized_start=598
+  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_ORIENTEDTILEPOSITION']._serialized_end=702
+  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_RIGMETRICS']._serialized_start=704
+  _globals['_GROUNDMETADATATILE_PHOTOPOSITION_RIGMETRICS']._serialized_end=741
+  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD']._serialized_start=744
+  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD']._serialized_end=1060
+  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD_COVERAGETYPE']._serialized_start=1010
+  _globals['_GROUNDMETADATATILE_GROUNDDATABUILD_COVERAGETYPE']._serialized_end=1060
+  _globals['_CAMERAMETADATA']._serialized_start=1063
+  _globals['_CAMERAMETADATA']._serialized_end=1497
+  _globals['_CAMERAMETADATA_LENSPROJECTION']._serialized_start=1258
+  _globals['_CAMERAMETADATA_LENSPROJECTION']._serialized_end=1402
+  _globals['_CAMERAMETADATA_ORIENTEDPOSITION']._serialized_start=1404
+  _globals['_CAMERAMETADATA_ORIENTEDPOSITION']._serialized_end=1497
+  _globals['_TILECOORDINATE']._serialized_start=1499
+  _globals['_TILECOORDINATE']._serialized_end=1548
 # @@protoc_insertion_point(module_scope)
