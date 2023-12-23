@@ -5,7 +5,7 @@ import math
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, List
 
 from streetlevel.lookaround import geo
 from streetlevel.lookaround.proto import MuninViewState_pb2
@@ -36,7 +36,7 @@ class LookaroundPanorama:
     build_id: int
     """
     An additional parameter required for requesting the imagery. Every time Apple publishes or updates 
-    a bunch of panoramas, they are assigned a build ID to act as a revision number.
+    a set of panoramas, they are assigned a build ID to act as a revision number.
     """
 
     lat: float
@@ -60,6 +60,9 @@ class LookaroundPanorama:
 
     tile: Tuple[int, int, int] = None
     """The tile this panorama is located on."""
+
+    camera_metadata: List[CameraMetadata] = None
+    """Properties needed for rendering the panorama faces."""
 
     _heading: float = None
     _pitch: float = None
@@ -131,3 +134,37 @@ class LookaroundPanorama:
 
     def __str__(self):
         return f"{self.id}/{self.build_id} ({self.lat:.5f}, {self.lon:.5f})"
+
+
+@dataclass
+class CameraMetadata:
+    lens_projection: LensProjection  #:
+    position: OrientedPosition  #:
+
+
+@dataclass
+class LensProjection:
+    fov_s: float
+    """Phi size of the panorama face."""
+    fov_h: float
+    """Theta size of the panorama face."""
+    k2: float  #:
+    k3: float  #:
+    k4: float  #:
+    cx: float
+    """Theta offset."""
+    cy: float
+    """Phi offset."""
+    lx: float  #:
+    ly: float  #:
+
+
+@dataclass
+class OrientedPosition:
+    """Position and rotation of a panorama face in the scene. Angles are in radians."""
+    x: float  #:
+    y: float  #:
+    z: float  #:
+    yaw: float  #:
+    pitch: float  #:
+    roll: float  #:

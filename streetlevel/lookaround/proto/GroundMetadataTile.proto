@@ -8,7 +8,6 @@ message GroundMetadataTile {
   TileCoordinate tile_coordinate = 6;
   
   message PhotoPosition {
-    // the pano id, a number with up to 20 digits
     uint64 panoid = 1;
     
     int32 revision = 4;
@@ -32,9 +31,7 @@ message GroundMetadataTile {
       // raw altitude; see geo.convert_altitude().
       int32 altitude = 3;
       
-      // heading of the car; north is 0 and it goes around CCW from there.
-      // for some reason this has an offset based on the current longitude applied to it.
-      // see convert_heading() in geo.py for the formula.
+      // raw orientation; see geo.convert_pano_orientation()
       int32 yaw = 4;
       int32 pitch = 5;
       int32 roll = 6;
@@ -51,7 +48,6 @@ message GroundMetadataTile {
     int32 index = 1;
     
     int32 build_id = 3;
-    int32 unknown15 = 4;
     int32 data_format_version = 5;
     
     // whether the coverage was taken by car or backpack
@@ -68,47 +64,48 @@ message GroundMetadataTile {
       BACKPACK = 3;
     }
   }
-  
-  message CameraMetadata {
-    int32 camera_number = 1;
-    LensProjection lens_projection = 4;
-    OrientedPosition position = 5;
-    int32 texture_id = 6;
+}
 
-    message LensProjection {
-      int32 type = 1;
-      
-      double fov_s = 2;
-      double fov_h = 3;
-      
-      // lens distortion?
-      double k2 = 4;
-      double k3 = 5;
-      double k4 = 6;
-      
-      // principal point?
-      double cx = 7;
-      double cy = 8;
-      
-      // ???
-      double lx = 9;
-      double ly = 10;
-    }
 
-    message OrientedPosition {
-      double x = 1;
-      double y = 2;
-      double z = 3;
-      double yaw = 4;
-      double pitch = 5;
-      double roll = 6;
-    }
+message CameraMetadata {
+  int32 camera_number = 1;
+  LensProjection lens_projection = 4;
+  OrientedPosition position = 5;
+  int32 texture_id = 6;
+
+  message LensProjection {
+    int32 type = 1;
+
+    double fov_s = 2;
+    double fov_h = 3;
+
+    // lens distortion?
+    double k2 = 4;
+    double k3 = 5;
+    double k4 = 6;
+
+    // principal point?
+    double cx = 7;
+    double cy = 8;
+
+    // ???
+    double lx = 9;
+    double ly = 10;
   }
 
-  // The tile's coordinates in the slippy map standard.
-  message TileCoordinate {
-    int32 x = 1;
-    int32 y = 2;
-    int32 z = 3;
+  message OrientedPosition {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+    double yaw = 4;
+    double pitch = 5;
+    double roll = 6;
   }
+}
+
+// The tile's coordinates in the slippy map standard.
+message TileCoordinate {
+  int32 x = 1;
+  int32 y = 2;
+  int32 z = 3;
 }
