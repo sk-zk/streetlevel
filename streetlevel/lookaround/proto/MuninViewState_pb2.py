@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14MuninViewState.proto\x12\x0bstreetlevel\"\xaa\x02\n\x0eMuninViewState\x12\x38\n\tviewState\x18\x01 \x01(\x0b\x32%.streetlevel.MuninViewState.ViewState\x12\x34\n\x07\x61\x64\x64ress\x18\x02 \x01(\x0b\x32#.streetlevel.MuninViewState.Address\x1ap\n\tViewState\x12\x10\n\x08latitude\x18\x01 \x01(\x01\x12\x11\n\tlongitude\x18\x02 \x01(\x01\x12\x10\n\x08unknown5\x18\x03 \x01(\x01\x12\x0b\n\x03yaw\x18\x04 \x01(\x01\x12\r\n\x05pitch\x18\x05 \x01(\x01\x12\x10\n\x08unknown8\x18\x06 \x01(\x01\x1a\x36\n\x07\x41\x64\x64ress\x12\r\n\x05\x61\x64\x64r1\x18\x01 \x01(\t\x12\r\n\x05\x61\x64\x64r2\x18\x02 \x01(\t\x12\r\n\x05\x61\x64\x64r3\x18\x03 \x01(\tb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14MuninViewState.proto\"\xc5\x02\n\x0eMuninViewState\x12\x30\n\x0b\x63\x61meraFrame\x18\x01 \x01(\x0b\x32\x1b.MuninViewState.CameraFrame\x12\x32\n\x0clocationInfo\x18\x02 \x01(\x0b\x32\x1c.MuninViewState.LocationInfo\x1an\n\x0b\x43\x61meraFrame\x12\x10\n\x08latitude\x18\x01 \x01(\x01\x12\x11\n\tlongitude\x18\x02 \x01(\x01\x12\x10\n\x08\x61ltitude\x18\x03 \x01(\x01\x12\x0b\n\x03yaw\x18\x04 \x01(\x01\x12\r\n\x05pitch\x18\x05 \x01(\x01\x12\x0c\n\x04roll\x18\x06 \x01(\x01\x1a]\n\x0cLocationInfo\x12\x15\n\rlocation_name\x18\x01 \x01(\t\x12\x1f\n\x17secondary_location_name\x18\x02 \x01(\t\x12\x15\n\rlocality_name\x18\x03 \x01(\tb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -21,10 +21,10 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'MuninViewState_pb2', _globa
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _globals['_MUNINVIEWSTATE']._serialized_start=38
-  _globals['_MUNINVIEWSTATE']._serialized_end=336
-  _globals['_MUNINVIEWSTATE_VIEWSTATE']._serialized_start=168
-  _globals['_MUNINVIEWSTATE_VIEWSTATE']._serialized_end=280
-  _globals['_MUNINVIEWSTATE_ADDRESS']._serialized_start=282
-  _globals['_MUNINVIEWSTATE_ADDRESS']._serialized_end=336
+  _globals['_MUNINVIEWSTATE']._serialized_start=25
+  _globals['_MUNINVIEWSTATE']._serialized_end=350
+  _globals['_MUNINVIEWSTATE_CAMERAFRAME']._serialized_start=145
+  _globals['_MUNINVIEWSTATE_CAMERAFRAME']._serialized_end=255
+  _globals['_MUNINVIEWSTATE_LOCATIONINFO']._serialized_start=257
+  _globals['_MUNINVIEWSTATE_LOCATIONINFO']._serialized_end=350
 # @@protoc_insertion_point(module_scope)

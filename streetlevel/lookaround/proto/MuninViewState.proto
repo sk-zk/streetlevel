@@ -1,22 +1,21 @@
 syntax = "proto3";
-package streetlevel;
 
 message MuninViewState {
-  ViewState viewState = 1;
-  Address address = 2;
+  CameraFrame cameraFrame = 1;
+  LocationInfo locationInfo = 2;
 
-  message ViewState {
+  message CameraFrame {
     double latitude = 1;
     double longitude = 2;
-    double unknown5 = 3;
+    double altitude = 3;
     double yaw = 4;
     double pitch = 5;
-    double unknown8 = 6;
+    double roll = 6;
   }
   
-  message Address {
-    string addr1 = 1;
-    string addr2 = 2;
-    string addr3 = 3;
+  message LocationInfo {
+    string location_name = 1;
+    string secondary_location_name = 2;
+    string locality_name = 3;
   }
 }
