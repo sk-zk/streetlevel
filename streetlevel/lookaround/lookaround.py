@@ -21,10 +21,10 @@ class Face(IntEnum):
     """
     Face indices of a Look Around panorama.
     """
-    FRONT = 0,  #:
-    RIGHT = 1,  #:
-    BACK = 2,  #:
-    LEFT = 3,  #:
+    BACK = 0,  #:
+    LEFT = 1,  #:
+    FRONT = 2,  #:
+    RIGHT = 3,  #:
     TOP = 4,  #:
     BOTTOM = 5  #:
 
