@@ -13,14 +13,66 @@ returns several other parameters, but they do not appear to be in use.)
 Finding panoramas
 -----------------
     .. autofunction:: streetlevel.lookaround.get_coverage_tile
+    
+    Usage sample: ::
+    
+      from streetlevel import lookaround
+      
+      panos = lookaround.get_coverage_tile(109775, 56716)
+      print(f"""
+      Got {len(panos)} panoramas. Here's one of them:
+      ID: {panos[0].id}\t\tBuild ID: {panos[0].build_id}
+      Latitude: {panos[0].lat}\tLongitude: {panos[0].lon}
+      Capture date: {panos[0].date}
+      """)
+    
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_async
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_by_latlon
+    
+     Usage sample: ::
+    
+      from streetlevel import lookaround
+      
+      panos = lookaround.get_coverage_tile_by_latlon(23.53239040648735, 121.5068719584602)
+      print(f"""
+      Got {len(panos)} panoramas. Here's one of them:
+      ID: {panos[0].id}\t\tBuild ID: {panos[0].build_id}
+      Latitude: {panos[0].lat}\tLongitude: {panos[0].lon}
+      Capture date: {panos[0].date}
+      """)
+    
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_by_latlon_async
 
 Downloading panoramas
 ---------------------
     .. autofunction:: streetlevel.lookaround.get_panorama_face
+    
+    Usage sample: ::
+    
+      from streetlevel import lookaround
+      
+      panos = lookaround.get_coverage_tile_by_latlon(46.52943, 10.45544)
+      
+      auth = lookaround.Authenticator()
+      faces = []
+      zoom = 0
+      for faceIdx in range(0, 6):
+          face = lookaround.get_panorama_face(panos[0], faceIdx, zoom, auth)
+          faces.append(face)
+ 
     .. autofunction:: streetlevel.lookaround.download_panorama_face
+    
+    Usage sample: ::
+    
+      from streetlevel import lookaround
+      
+      panos = lookaround.get_coverage_tile_by_latlon(46.52943, 10.45544)
+      
+      auth = lookaround.Authenticator()
+      zoom = 0
+      for face in range(0, 6):
+          lookaround.download_panorama_face(panos[0], f"{panos[0].id}_{face}_{zoom}.heic",
+            face, zoom, auth)
 
 Data classes and Enums
 ----------------------
