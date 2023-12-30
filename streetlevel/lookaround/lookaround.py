@@ -31,7 +31,7 @@ class Face(IntEnum):
 
 def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List[LookaroundPanorama]:
     """
-    Fetches Look Around coverage on a specific map tile. Coordinates are in Slippy Map aka XYZ format
+    Fetches Look Around panoramas on a specific map tile. Coordinates are in Slippy Map aka XYZ format
     at zoom level 17.
 
     :param tile_x: X coordinate of the tile.
@@ -56,6 +56,7 @@ def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None)
     :param lon: Longitude of the point.
     :param session: *(optional)* A requests session.
     :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
+             Note that the list is not sorted - the panoramas are in the order in which they were returned by the API.
     """
     x, y = geo.wgs84_to_tile_coord(lat, lon, 17)
     return get_coverage_tile(x, y, session=session)
