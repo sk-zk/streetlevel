@@ -11,3 +11,4 @@ pycryptodome~=3.15.0
 sphinx_rtd_theme
 pyequilib
 torch
+torchvision
