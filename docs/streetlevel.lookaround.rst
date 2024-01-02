@@ -1,14 +1,18 @@
 streetlevel.lookaround: Apple Look Around
 =========================================
 
-Support for Apple Look Around. Note that, unlike with the other providers, the library
-does not automatically stitch the images as Look Around does not serve one image broken up into tiles,
-but rather six faces which form a sort-of-but-not-really cubemap.
+Support for Apple Look Around.
+
+Note that, unlike with the other providers, this library does not automatically stitch the panoramas
+since 1) Look Around does not serve one image broken up into tiles, but six faces which form a
+sort-of-but-not-really cubemap, and 2) its image format is somewhat inconvenient to work with. 
+A function to create an equirectangular image out of the panorama faces is available, but not exactly fast,
+so it is recommended to display the faces unmodified.
 
 Panoramas can be rendered by creating a spherical rectangle (meaning a rectangle on the surface of a sphere) for each face, centered on
 phi=0, theta=0. ``fov_s`` is the phi size (width), ``fov_h`` is the theta size (height), and ``cy`` is an additional offset
 which must be subtracted from phi. The resulting geometry for the face is then rotated by the given Euler angles. (The API
-returns several other parameters, but they do not appear to be in use.)
+returns several other parameters, but they do not appear to be in use.) 
 
 Finding panoramas
 -----------------
@@ -93,6 +97,30 @@ Data classes and Enums
     .. autoclass:: streetlevel.lookaround.panorama.OrientedPosition
       :members:
       :member-order: bysource
+
+Reprojection
+------------
+    .. autofunction:: streetlevel.lookaround.reproject.to_equirectangular
+    
+    Usage sample: ::
+      
+      from streetlevel import lookaround
+
+      panos = lookaround.get_coverage_tile_by_latlon(-42.907473, 171.559290)
+      pano = panos[0]
+
+      auth = lookaround.Authenticator()
+      faces = []
+      zoom = 2
+      for faceIdx in range(0, 6):
+          face_heic = lookaround.get_panorama_face(pano, faceIdx, zoom, auth)
+          # Convert the face to a PIL image here.
+          # This step is left to the user of the library, so that you can
+          # choose whichever library performs best on your machine.
+          faces.append(face)
+      
+      result = lookaround.to_equirectangular(faces, pano.camera_metadata)
+      result.save(f"{pano.id}_{zoom}.jpg", options={"quality": 100})
 
 Authentication
 --------------
