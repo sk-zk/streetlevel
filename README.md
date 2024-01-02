@@ -26,10 +26,9 @@ Or async:
 from streetlevel import streetview
 from aiohttp import ClientSession
 
-session = ClientSession()
-pano = await streetview.find_panorama_async(46.883958, 12.169002, session)
-await streetview.download_panorama_async(pano, f"{pano.id}.jpg", session)
-await session.close()
+async with ClientSession() as session:
+    pano = await streetview.find_panorama_async(46.883958, 12.169002, session)
+    await streetview.download_panorama_async(pano, f"{pano.id}.jpg", session)
 ```
 
 ## Documentation

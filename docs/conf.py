@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'streetlevel'
-copyright = '2023, skzk'
+copyright = '2024, skzk'
 author = 'skzk'
-release = '0.6.5'
+release = '0.7.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

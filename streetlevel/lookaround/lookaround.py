@@ -21,17 +21,17 @@ class Face(IntEnum):
     """
     Face indices of a Look Around panorama.
     """
-    FRONT = 0,  #:
-    RIGHT = 1,  #:
-    BACK = 2,  #:
-    LEFT = 3,  #:
+    BACK = 0,  #:
+    LEFT = 1,  #:
+    FRONT = 2,  #:
+    RIGHT = 3,  #:
     TOP = 4,  #:
     BOTTOM = 5  #:
 
 
 def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List[LookaroundPanorama]:
     """
-    Fetches Look Around coverage on a specific map tile. Coordinates are in Slippy Map aka XYZ format
+    Fetches Look Around panoramas on a specific map tile. Coordinates are in Slippy Map aka XYZ format
     at zoom level 17.
 
     :param tile_x: X coordinate of the tile.
@@ -56,6 +56,7 @@ def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None)
     :param lon: Longitude of the point.
     :param session: *(optional)* A requests session.
     :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
+             Note that the list is not sorted - the panoramas are in the order in which they were returned by the API.
     """
     x, y = geo.wgs84_to_tile_coord(lat, lon, 17)
     return get_coverage_tile(x, y, session=session)
@@ -67,20 +68,20 @@ async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: Cli
 
 
 def get_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
-                      face: Face, zoom: int,
+                      face: Union[Face, int], zoom: int,
                       auth: Authenticator, session: Session = None) -> bytes:
     """
-    Downloads one face of a panorama and returns it as ``bytes``.
+    Fetches one face of a panorama.
 
     Images are in HEIC format. Since HEIC is poorly supported across the board,
     decoding the image is left to the user of the library.
 
     :param pano: The panorama, or its ID.
-    :param face: The face.
+    :param face: Index of the face.
     :param zoom: The zoom level. 0 is highest, 7 is lowest.
     :param auth: An Authenticator object.
     :param session: *(optional)* A requests session.
-    :return: The HEIC file containing the face.
+    :return: The HEIC file containing the face, as ``bytes``.
     """
     panoid, build_id = _panoid_to_string(pano)
     url = _build_panorama_face_url(panoid, build_id, int(face), zoom, auth)
@@ -94,14 +95,14 @@ def get_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
 
 
 def download_panorama_face(pano: Union[LookaroundPanorama, Tuple[int, int]],
-                           path: str, face: Face, zoom: int,
+                           path: str, face: Union[Face, int], zoom: int,
                            auth: Authenticator, session: Session = None) -> None:
     """
     Downloads one face of a panorama to a file.
 
     :param pano: The panorama, or its ID.
     :param path: Output path.
-    :param face: The face.
+    :param face: Index of the face.
     :param zoom: The zoom level. 0 is highest, 7 is lowest.
     :param auth: An Authenticator object.
     :param session: *(optional)* A requests session.

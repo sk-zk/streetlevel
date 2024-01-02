@@ -122,10 +122,10 @@ class LookaroundPanorama:
             heading = math.degrees(heading)
             pitch = math.degrees(pitch)
         mvs = MuninViewState_pb2.MuninViewState()
-        mvs.viewState.latitude = self.lat
-        mvs.viewState.longitude = self.lon
-        mvs.viewState.yaw = heading
-        mvs.viewState.pitch = -pitch
+        mvs.cameraFrame.latitude = self.lat
+        mvs.cameraFrame.longitude = self.lon
+        mvs.cameraFrame.yaw = heading
+        mvs.cameraFrame.pitch = -pitch
         mvs_base64 = base64.b64encode(mvs.SerializeToString())
         return f"https://maps.apple.com/?ll={self.lat},{self.lon}&_mvs={mvs_base64.decode()}"
 
