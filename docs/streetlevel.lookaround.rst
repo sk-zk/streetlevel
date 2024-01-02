@@ -106,15 +106,15 @@ Reprojection
       
       from streetlevel import lookaround
 
-      panos = lookaround.get_coverage_tile_by_latlon(-42.907473, 171.559290)
-      pano = panos[0]
+      panos = lookaround.get_coverage_tile_by_latlon(54.583244, 9.820249)
+      pano = next(p for p in panos if p.id == 6651337760361848285)
 
       auth = lookaround.Authenticator()
       faces = []
       zoom = 2
       for faceIdx in range(0, 6):
           face_heic = lookaround.get_panorama_face(pano, faceIdx, zoom, auth)
-          # Convert the face to a PIL image here.
+          # Convert the HEIC file to a PIL image here.
           # This step is left to the user of the library, so that you can
           # choose whichever library performs best on your machine.
           faces.append(face)
