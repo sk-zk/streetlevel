@@ -19,11 +19,11 @@ def to_equirectangular(faces: List[Image.Image], camera_metadata: List[CameraMet
     Reprojects the faces of a Look Around panorama to a single equirectangular image. The center of the
     returned image is the inverse direction of travel (meaning you're looking backwards).
 
-    Note that this method is *very* slow. On my machine, a full resolution image (16384×8192) takes
+    Note that this method is *very* slow. On my machine, a full resolution image (zoom 0, 16384×8192) takes
     about 50 seconds to convert.
 
-    **PyTorch must be installed** to call this method. Due to its size, it is not installed automatically
-    alongside the other dependencies of this library.
+    **PyTorch must be installed** to call this function. Due to its size and differing CUDA versions,
+    it is not installed automatically alongside the other dependencies of this library.
 
     :param faces: The faces of the panorama as PIL images.
     :param camera_metadata: The camera metadata of the faces.
