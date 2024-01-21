@@ -12,7 +12,7 @@ so it is recommended to display the faces unmodified.
 Panoramas can be rendered by creating a spherical rectangle (meaning a rectangle on the surface of a sphere) for each face, centered on
 phi=0, theta=0. ``fov_s`` is the phi size (width), ``fov_h`` is the theta size (height), and ``cy`` is an additional offset
 which must be subtracted from phi. The resulting geometry for the face is then rotated by the given Euler angles. (The API
-returns several other parameters, but they do not appear to be in use.) 
+returns several other parameters as well, but they do not appear to be in use.) 
 
 Finding panoramas
 -----------------
