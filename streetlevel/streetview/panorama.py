@@ -80,10 +80,10 @@ class StreetViewPanorama:
 
     country_code: str = None
     """Two-letter country code for the country in which the panorama is located."""
-    street_name: LocalizedString = None
+    street_names: Optional[List[StreetLabel]] = None
     """
-    | The name of the street the panorama is located on and the language of that name, e.g.
-    | ``LocalizedString(value='Piazza Teatro', language='it')``.
+    | Street name labels visible in this panorama, featuring the name of the street(s) the panorama is located on and the language of that name, e.g.
+    | ``LocalizedString(value='Piazza Teatro', language='it') and the angles that the label appears at.``.
     
     Typically only set for official road coverage.
     """
@@ -339,3 +339,11 @@ class ArtworkLink:
     """The pano ID which the annotation links to."""
     link_text: LocalizedString
     """The link text."""
+
+@dataclass
+class StreetLabel:
+    """A label that floats in the air showing you the names of streets in official road coverage."""
+    name: LocalizedString
+    """The street's name."""
+    angles: List[float]
+    """Angles that this street name appears at, in radians."""
