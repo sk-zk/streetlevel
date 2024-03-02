@@ -346,4 +346,4 @@ class StreetLabel:
     name: LocalizedString
     """The street's name."""
     angles: List[float]
-    """Angles that this street name appears at, in radians."""
+    """A list of different yaws that this street name appears at, in radians."""
