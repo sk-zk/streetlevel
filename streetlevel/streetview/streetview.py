@@ -7,7 +7,7 @@ from typing import List, Optional, Tuple
 
 from . import api
 from .depth import parse as parse_depth
-from .panorama import Place, BusinessStatus, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, \
+from .panorama import Place, BusinessStatus, StreetLabel, StreetViewPanorama, LocalizedString, CaptureDate, BuildingLevel, \
     UploadDate, Artwork, ArtworkLink
 from .util import is_third_party_panoid
 from ..dataclasses import Size, Tile, Link
@@ -255,9 +255,9 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
 
     links, other_bld_levels, other_dates = _parse_other_pano_indices(msg)
 
-    street_name = try_get(lambda: msg[5][0][12][0][0][0][2])
-    if street_name is not None:
-        street_name = LocalizedString(street_name[0], street_name[1])
+    street_names = try_get(lambda: msg[5][0][12])
+    if street_names is not None:
+        street_names = [_parse_street_name(street_name) for street_name in street_names]
 
     address = try_get(lambda: msg[3][2])
     if address is not None:
@@ -294,7 +294,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
         image_sizes=img_sizes,
         source=try_get(lambda: msg[6][5][2].lower()),
         country_code=try_get(lambda: msg[5][0][1][4]),
-        street_name=street_name,
+        street_names=street_names,
         address=address,
         copyright_message=try_get(lambda: msg[4][0][0][0][0]),
         uploader=try_get(lambda: msg[4][1][0][0][0]),
@@ -337,10 +337,20 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
                     pano.building_levels.append(connected)
                 pano.neighbors.append(connected)
 
-            connected.street_name = try_get(lambda: other[3][2][0])
+            other_address = try_get(lambda: other[3][2])
+            if other_address:
+                connected.address = [LocalizedString(x[0], x[1]) for x in other_address]
     pano.historical = sorted(pano.historical, key=lambda x: (x.date.year, x.date.month) if x.date else None, reverse=True)
 
     return pano
+
+
+def _parse_street_name(msg: dict) -> StreetLabel:
+    #Unknown what [0][0][0][1] is, but it may be something interesting, always 2 numbers as a string
+    name_raw = msg[0][0][2]
+    name = LocalizedString(name_raw[0], name_raw[1])
+    angles = [math.radians(angle) for angle in msg[1]]
+    return StreetLabel(name, angles)
 
 
 def _parse_other_pano_indices(msg: dict) -> Tuple[dict, list, dict]:
