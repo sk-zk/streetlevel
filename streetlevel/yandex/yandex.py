@@ -102,6 +102,8 @@ def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0, pil_args: 
     """
     Downloads a panorama to a file.
 
+    Note that most official car coverage has its bottom part cropped out.
+
     :param pano: The panorama to download.
     :param path: Output path.
     :param zoom: *(optional)* Image size; 0 is highest, 4 is lowest. The dimensions of a zoom level of a
