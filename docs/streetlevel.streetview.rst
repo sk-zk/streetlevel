@@ -100,6 +100,8 @@ Data classes
        :members:
     .. autoclass:: streetlevel.streetview.panorama.Place
        :members:
+    .. autoclass:: streetlevel.streetview.panorama.StreetLabel
+       :members:
     .. autoclass:: streetlevel.streetview.panorama.StreetViewPanorama
        :members:
     .. autoclass:: streetlevel.streetview.panorama.UploadDate
