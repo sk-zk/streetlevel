@@ -82,8 +82,8 @@ class StreetViewPanorama:
     """Two-letter country code for the country in which the panorama is located."""
     street_names: Optional[List[StreetLabel]] = None
     """
-    | Street name labels visible in this panorama, featuring the name of the street(s) the panorama is located on and the language of that name, e.g.
-    | ``LocalizedString(value='Piazza Teatro', language='it') and the angles that the label appears at.``.
+    Street name labels overlaid on this panorama in Google Maps, featuring the name of the street(s) the panorama
+    is located on and the angles that the label appears at.
     
     Typically only set for official road coverage.
     """
