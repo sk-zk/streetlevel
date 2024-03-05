@@ -340,6 +340,7 @@ class ArtworkLink:
     link_text: LocalizedString
     """The link text."""
 
+
 @dataclass
 class StreetLabel:
     """A label that floats in the air showing you the names of streets in official road coverage."""

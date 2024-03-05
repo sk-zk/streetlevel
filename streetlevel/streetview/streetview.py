@@ -346,7 +346,7 @@ def _parse_pano_message(msg: dict) -> StreetViewPanorama:
 
 
 def _parse_street_name(msg: dict) -> StreetLabel:
-    #Unknown what [0][0][0][1] is, but it may be something interesting, always 2 numbers as a string
+    # Unknown what [0][0][0][1] is, but it may be something interesting, always 2 numbers as a string
     name_raw = msg[0][0][2]
     name = LocalizedString(name_raw[0], name_raw[1])
     angles = [math.radians(angle) for angle in msg[1]]
