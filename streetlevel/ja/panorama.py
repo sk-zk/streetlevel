@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 import math
 
 from .. import geo
@@ -35,8 +35,16 @@ class JaPanorama:
     blur_key: int = None
     """Part of the panorama tile URL."""
 
-    street_name: str = None
-    """Name of the street."""
+    street_names: List[StreetLabel] = None
+    """
+    Street name labels overlaid on this panorama, featuring the name of the street(s) the panorama
+    is located on and the angles that the label appears at.
+    
+    The first entry is the name of the street the panorama is located on; subsequent
+    entries label nearby streets at junctions. 
+    
+    Note that ``distance`` is ``None`` for the first entry.
+    """
     address: Address = None
     """Nearest address to the capture location."""
 
@@ -90,3 +98,14 @@ class Address:
     street_name_and_house_number: str  #:
     postal_code: int  #:
     place: str  #:
+
+
+@dataclass
+class StreetLabel:
+    """A label overlaid on the panorama in official road coverage displaying the name of a street."""
+    name: str
+    """The street name."""
+    angles: List[float]
+    """A list of different yaws that this street name appears at, in radians."""
+    distance: Optional[int] = None
+    """Distance from the camera, presumably in meters."""
