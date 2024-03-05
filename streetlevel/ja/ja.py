@@ -6,7 +6,7 @@ from aiohttp import ClientSession
 from requests import Session
 
 from . import api
-from .panorama import JaPanorama, CaptureDate, Address
+from .panorama import JaPanorama, CaptureDate, Address, StreetLabel
 from ..dataclasses import Tile
 from ..util import download_tiles, download_tiles_async, CubemapStitchingMethod, stitch_cubemap_faces, \
     save_cubemap_panorama, stitch_cubemap_face, try_get
@@ -129,10 +129,23 @@ def _parse_panorama_by_id(pano_dict: dict) -> JaPanorama:
         date=_parse_date(pano_dict["image"]["month"]),
         pano_url="https:" + pano_dict["image"]["pano_url"],
         blur_key=pano_dict["image"]["blur_key"],
-        street_name=pano_dict["streets"]["street"]["name"],
+        street_names=_parse_streets(pano_dict["streets"]),
         address=address,
         neighbors=_parse_hotspots(pano_dict["hotspots"]),
     )
+
+
+def _parse_streets(streets: dict) -> List[StreetLabel]:
+    main = StreetLabel(name=streets["street"]["name"],
+                       angles=[math.radians(a) for a in streets["street"]["azimuths"]])
+    connections = []
+    for connection_dict in streets["connections"]:
+        connection = StreetLabel(name=connection_dict["name"],
+                                 angles=[math.radians(connection_dict["angle"])],
+                                 distance=connection_dict["distance"])
+        connections.append(connection)
+
+    return [main] + connections
 
 
 def _parse_hotspots(hotspots: list) -> List[JaPanorama]:
