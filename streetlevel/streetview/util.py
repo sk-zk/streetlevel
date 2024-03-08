@@ -35,8 +35,7 @@ def build_permalink(id: str = None, lat: float = None, lon: float = None,
     elif id is None:
         id = ""
     elif lat is None and lon is None:
-        lat = 0.0
-        lon = 0.0
+        (lat, lon) = (0.0, 0.0)
     elif (lat is None and lon is not None) or (lat is not None and lon is None):
         raise ValueError("lat and lon must either both be set or both be null.")
 
