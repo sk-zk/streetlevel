@@ -17,6 +17,7 @@ def build_permalink(id: str = None, lat: float = None, lon: float = None,
     """
     Creates a permalink to a panorama. All parameters are optional, but
     either a location, or a pano ID, or both must be passed.
+    
     :param id: *(optional)* The pano ID.
     :param lat: *(optional)* Latitude of the panorama's location.
     :param lon: *(optional)* Longitude of the panorama's location.
