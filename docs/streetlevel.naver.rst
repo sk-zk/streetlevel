@@ -94,3 +94,7 @@ Data classes and Enums
     .. autoclass:: streetlevel.naver.panorama.PanoramaType
       :members:
       :member-order: bysource
+
+Miscellaneous
+-------------
+    .. autofunction:: streetlevel.mapy.build_permalink
