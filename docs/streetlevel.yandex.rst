@@ -1,7 +1,6 @@
 streetlevel.yandex: Yandex Panorama
 ===================================
 
-
 Finding panoramas
 -----------------
     .. autofunction:: streetlevel.yandex.find_panorama
@@ -52,7 +51,6 @@ Finding panoramas
           print(pano.date)
           print(pano.heading)
 
-
 Downloading panoramas
 ---------------------
     .. autofunction:: streetlevel.yandex.get_panorama
@@ -77,7 +75,6 @@ Downloading panoramas
           pano = await yandex.find_panorama_by_id_async("1532719828_788624743_23_1678861237", session)
           await yandex.download_panorama_async(pano, f"{pano.id}.jpg", session)
 
-
 Data classes
 ------------
     .. autoclass:: streetlevel.yandex.panorama.Address
@@ -88,3 +85,7 @@ Data classes
       :members:
     .. autoclass:: streetlevel.yandex.panorama.YandexPanorama
       :members:
+
+Miscellaneous
+-------------
+    .. autofunction:: streetlevel.yandex.build_permalink

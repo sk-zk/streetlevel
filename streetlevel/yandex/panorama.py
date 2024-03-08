@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List
 
-
 from streetlevel.dataclasses import Size, Link
+from .util import build_permalink
 
 
 @dataclass
@@ -73,18 +72,10 @@ class YandexPanorama:
         :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
         :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: A Yandex Maps URL.
+        :return: A Yandex Maps URL which will open this panorama.
         """
-        if radians:
-            heading = math.degrees(heading)
-            pitch = math.degrees(pitch)
-        return f"https://yandex.com/maps/?" \
-               f"&ll={self.lon}%2C{self.lat}" \
-               f"&panorama%5Bdirection%5D={heading}%2C{pitch}" \
-               f"&panorama%5Bfull%5D=true" \
-               f"&panorama%5Bid%5D={self.id}" \
-               f"&panorama%5Bpoint%5D={self.lon}%2C{self.lat}" \
-               f"&z={map_zoom}"
+        return build_permalink(id=self.id, lat=self.lat, lon=self.lon, heading=heading, pitch=pitch,
+                               map_zoom=map_zoom, radians=radians)
 
     def __repr__(self):
         output = str(self)
