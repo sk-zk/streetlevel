@@ -84,3 +84,7 @@ Data classes
       :members:
     .. autoclass:: streetlevel.ja.panorama.JaPanorama
       :members:
+
+Miscellaneous
+-------------
+    .. autofunction:: streetlevel.ja.build_permalink

@@ -1,9 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional
-import math
 
-from .. import geo
+from .util import build_permalink
 
 
 @dataclass
@@ -46,7 +45,7 @@ class JaPanorama:
     Note that ``distance`` is ``None`` for the first entry.
     """
     address: Address = None
-    """Nearest address to the capture location."""
+    """Nearest address to the panorama's location."""
 
     def permalink(self: JaPanorama, heading: float = 0.0, radians: bool = False) -> str:
         """
@@ -55,18 +54,9 @@ class JaPanorama:
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: A Já.is Kort URL.
+        :return: A Já.is Kort URL which will open the panorama at this location.
         """
-        if radians:
-            heading = math.degrees(heading)
-        # if the heading is exactly 0, ja.is will act as though it is not set
-        # and choose a weird default value instead
-        if heading == 0.0:
-            heading = 0.0001
-        x, y = geo.wgs84_to_isn93(self.lat, self.lon)
-        x = int(x)
-        y = int(y)
-        return f"https://ja.is/kort/?nz=17&x={x}&y={y}&ja360=1&jh={heading}"
+        return build_permalink(self.lat, self.lon, heading=heading, radians=radians)
 
     def __repr__(self):
         output = str(self)
