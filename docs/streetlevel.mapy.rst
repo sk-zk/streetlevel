@@ -1,7 +1,6 @@
 streetlevel.mapy: Mapy.cz Panorama
 =======================================
 
-
 Finding panoramas
 -----------------
     .. autofunction:: streetlevel.mapy.find_panorama
@@ -83,3 +82,7 @@ Data classes
 ------------
     .. autoclass:: streetlevel.mapy.panorama.MapyPanorama
       :members:
+
+Miscellaneous
+-------------
+    .. autofunction:: streetlevel.mapy.build_permalink

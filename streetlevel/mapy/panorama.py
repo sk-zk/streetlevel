@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List
 
 from streetlevel.dataclasses import Size, Link
+from .util import build_permalink
 
 
 @dataclass
@@ -72,14 +72,10 @@ class MapyPanorama:
         :param fov: *(optional)* Initial FOV of the viewport. Defaults to 72°.
         :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: A Mapy.cz URL.
+        :return: A Mapy.cz URL which will open the given panorama.
         """
-        if not radians:
-            heading = math.radians(heading)
-            pitch = math.radians(pitch)
-            fov = math.radians(fov)
-        return f"https://en.mapy.cz/zakladni?pano=1&pid={self.id}" \
-               f"&newest=0&yaw={heading}&fov={fov}&pitch={pitch}&x={self.lon}&y={self.lat}&z={map_zoom}"
+        return build_permalink(id=self.id, lat=self.lat, lon=self.lon, heading=heading, pitch=pitch,
+                               fov=fov, map_zoom=map_zoom, radians=radians)
 
     def __repr__(self):
         return str(self) + f" [{self.date}]"
