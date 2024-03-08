@@ -10,9 +10,9 @@ def build_permalink(id: int = None, wcongx: float = None, wcongy: float = None,
     When linking by ID, the link will only work as expected for the most recent coverage
     at a location -- it does not appear to be possible to directly link to older panoramas.
 
-    :param id: The pano ID.
-    :param wcongx: X coordinate of the panorama's location in the WCongnamul coordinate system.
-    :param wcongy: Y coordinate of the panorama's location in the WCongnamul coordinate system.
+    :param id: *(optional)* The pano ID.
+    :param wcongx: *(optional)* X coordinate of the panorama's location in the WCongnamul coordinate system.
+    :param wcongy: *(optional)* Y coordinate of the panorama's location in the WCongnamul coordinate system.
     :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
     :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
     :param radians: *(optional)* Whether angles are in radians. Defaults to False.
