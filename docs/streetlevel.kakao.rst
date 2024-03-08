@@ -87,3 +87,7 @@ Data classes and enums
     .. autoclass:: streetlevel.kakao.panorama.PanoramaType
       :members:
       :member-order: bysource
+
+Miscellaneous
+-------------
+    .. autofunction:: streetlevel.kakako.build_permalink
