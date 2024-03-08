@@ -97,4 +97,4 @@ Data classes and Enums
 
 Miscellaneous
 -------------
-    .. autofunction:: streetlevel.mapy.build_permalink
+    .. autofunction:: streetlevel.naver.build_permalink
