@@ -85,5 +85,6 @@ Data classes
 
 Miscellaneous
 -------------
+    .. autofunction:: streetlevel.streetside.build_permalink
     .. autofunction:: streetlevel.streetside.util.from_base4
     .. autofunction:: streetlevel.streetside.util.to_base4
