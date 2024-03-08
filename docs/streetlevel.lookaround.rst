@@ -126,3 +126,7 @@ Authentication
 --------------
     .. autoclass:: streetlevel.lookaround.auth.Authenticator
       :members:
+
+Miscellaneous
+-------------
+    .. autofunction:: streetlevel.lookaround.build_permalink

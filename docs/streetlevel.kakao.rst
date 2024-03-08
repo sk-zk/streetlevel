@@ -90,4 +90,4 @@ Data classes and enums
 
 Miscellaneous
 -------------
-    .. autofunction:: streetlevel.kakako.build_permalink
+    .. autofunction:: streetlevel.kakao.build_permalink
