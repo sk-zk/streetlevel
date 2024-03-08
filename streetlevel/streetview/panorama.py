@@ -343,8 +343,8 @@ class ArtworkLink:
 
 @dataclass
 class StreetLabel:
-    """A label that floats in the air showing you the names of streets in official road coverage."""
+    """A label overlaid on the panorama in official road coverage displaying the name of a street."""
     name: LocalizedString
-    """The street's name."""
+    """The street name."""
     angles: List[float]
     """A list of different yaws that this street name appears at, in radians."""
