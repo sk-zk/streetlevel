@@ -1,4 +1,4 @@
-from pytest import approx
+from pytest import approx, raises
 import json
 from streetlevel import streetview
 from streetlevel.dataclasses import Size
@@ -150,6 +150,7 @@ def test_missing_historical_date():
     assert pano.historical[0].id == "ZvY4uyCZ7BkAAARDoyHfCA"
     assert pano.historical[0].date is None
 
+
 def test_street_names():
     def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
         with open("streetview/data/street_names.json", "r") as f:
@@ -169,3 +170,12 @@ def test_street_names():
     assert len(pano.street_names[1].angles) == 2
     assert pano.street_names[1].angles[0] == approx(1.949208880825891)
     assert pano.street_names[1].angles[1] == approx(5.04117805487591)
+
+
+def test_build_permalink_raises():
+    with raises(ValueError):
+        streetview.build_permalink(lat=42, lon=None)
+    with raises(ValueError):
+        streetview.build_permalink(lat=None, lon=42)
+    with raises(ValueError):
+        streetview.build_permalink()

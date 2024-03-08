@@ -1,14 +1,12 @@
 from __future__ import annotations
 from enum import Enum
-
-import math
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict
 
 from numpy import ndarray
 
 from streetlevel.dataclasses import Size, Link
-from .util import is_third_party_panoid
+from .util import is_third_party_panoid, build_permalink
 
 
 @dataclass
@@ -155,14 +153,10 @@ class StreetViewPanorama:
         :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 90°.
         :param fov: *(optional)* Initial FOV of the viewport. Defaults to 75°.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: A Google Maps URL.
+        :return: A Google Maps URL which will open this panorama.
         """
-        if radians:
-            heading = math.degrees(heading)
-            pitch = math.degrees(pitch)
-            fov = math.degrees(fov)
-        return f"https://www.google.com/maps/@{self.lat},{self.lon},3a,{fov}y,{heading}h,{pitch}t" \
-               f"/data=!3m4!1e1!3m2!1s{self.id}!2e{10 if self.is_third_party else 0}"
+        return build_permalink(id=self.id, lat=self.lat, lon=self.lon,
+                               heading=heading, pitch=pitch, fov=fov, radians=radians)
 
     def __repr__(self):
         output = str(self)

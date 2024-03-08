@@ -110,4 +110,5 @@ Data classes
 
 Miscellaneous
 -------------
+    .. autofunction:: streetlevel.streetview.build_permalink
     .. autofunction:: streetlevel.streetview.util.is_third_party_panoid
