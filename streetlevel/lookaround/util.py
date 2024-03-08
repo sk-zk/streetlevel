@@ -11,6 +11,7 @@ def build_permalink(lat: float, lon: float, heading: float = 0.0, pitch: float =
     Linking to a specific panorama by its ID does not appear to be possible.
 
     On non-Apple devices, the link will redirect to Google Maps.
+
     :param lat: Latitude of the panorama's location.
     :param lon: Longitude of the panorama's location.
     :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
