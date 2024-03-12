@@ -1,4 +1,4 @@
-from pytest import approx
+from pytest import approx, raises
 import json
 from streetlevel import streetview
 from streetlevel.dataclasses import Size
@@ -149,3 +149,33 @@ def test_missing_historical_date():
     assert len(pano.historical) == 1
     assert pano.historical[0].id == "ZvY4uyCZ7BkAAARDoyHfCA"
     assert pano.historical[0].date is None
+
+
+def test_street_names():
+    def mocked_api_find_panorama_by_id(panoid, download_depth=False, locale="en", session=None):
+        with open("streetview/data/street_names.json", "r") as f:
+            return json.load(f)
+    
+    streetview.api.find_panorama_by_id = mocked_api_find_panorama_by_id
+
+    pano = streetview.find_panorama_by_id('BoiJ2WQ2FM7Rr9UjcGqK8w')
+    assert pano is not None
+    assert pano.street_names is not None
+    assert len(pano.street_names) == 2
+    assert pano.street_names[0].name.value == "Benjamin Way"
+    assert len(pano.street_names[0].angles) == 2
+    assert pano.street_names[0].angles[0] == approx(0.5802275672274712)
+    assert pano.street_names[0].angles[1] == approx(3.980519023317289)
+    assert pano.street_names[1].name.value == "Belconnen Way"
+    assert len(pano.street_names[1].angles) == 2
+    assert pano.street_names[1].angles[0] == approx(1.949208880825891)
+    assert pano.street_names[1].angles[1] == approx(5.04117805487591)
+
+
+def test_build_permalink_raises():
+    with raises(ValueError):
+        streetview.build_permalink(lat=42, lon=None)
+    with raises(ValueError):
+        streetview.build_permalink(lat=None, lon=42)
+    with raises(ValueError):
+        streetview.build_permalink()

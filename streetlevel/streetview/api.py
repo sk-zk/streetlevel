@@ -88,6 +88,7 @@ def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
     include_copyright_information = True
     include_neighbors_and_historical = True
     include_places = True
+    include_street_labels = True
     ietf_lang, ietf_country = split_ietf(locale)
 
     if include_resolution_info:
@@ -101,9 +102,10 @@ def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
         toggles.append(ProtobufEnum(5))
     if include_neighbors_and_historical:
         toggles.append(ProtobufEnum(6))
+    if include_street_labels:
+        toggles.append(ProtobufEnum(8))
 
     # these change stuff, but idk what exactly:
-    toggles.append(ProtobufEnum(8))
     # toggles.append(ProtobufEnum(11))
     toggles.append(ProtobufEnum(12))
     # toggles.append(ProtobufEnum(13))

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
@@ -9,6 +8,7 @@ from typing import List
 import numpy as np
 
 from streetlevel.dataclasses import Link
+from .util import build_permalink
 
 
 class PanoramaType(IntEnum):
@@ -99,13 +99,10 @@ class NaverPanorama:
         :param fov: *(optional)* Initial FOV of the viewport. Defaults to 80°.
         :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: A Naver Map URL.
+        :return: A Naver Map URL which will open this panorama.
         """
-        if radians:
-            heading = math.degrees(heading)
-            pitch = math.degrees(pitch)
-            fov = math.degrees(fov)
-        return f"https://map.naver.com/p?c={map_zoom},0,0,0,adh&p={self.id},{heading},{pitch},{fov},Float"
+        return build_permalink(self.id, heading=heading, pitch=pitch, fov=fov,
+                               map_zoom=map_zoom, radians=radians)
 
     def __repr__(self):
         output = str(self)

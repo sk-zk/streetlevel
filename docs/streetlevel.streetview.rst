@@ -100,6 +100,8 @@ Data classes
        :members:
     .. autoclass:: streetlevel.streetview.panorama.Place
        :members:
+    .. autoclass:: streetlevel.streetview.panorama.StreetLabel
+       :members:
     .. autoclass:: streetlevel.streetview.panorama.StreetViewPanorama
        :members:
     .. autoclass:: streetlevel.streetview.panorama.UploadDate
@@ -108,4 +110,5 @@ Data classes
 
 Miscellaneous
 -------------
+    .. autofunction:: streetlevel.streetview.build_permalink
     .. autofunction:: streetlevel.streetview.util.is_third_party_panoid

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
 from typing import List
 
 from streetlevel.dataclasses import Link
+from .util import build_permalink
 
 
 class PanoramaType(IntEnum):
@@ -85,7 +85,7 @@ class KakaoPanorama:
         """
         Creates a permalink to a panorama at this location.
 
-        The link will only work as expected for the most recent coverage at a location -
+        The link will only work as expected for the most recent coverage at a location --
         it does not appear to be possible to directly link to older panoramas.
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
@@ -93,12 +93,8 @@ class KakaoPanorama:
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
         :return: A KakaoMap URL.
         """
-        if radians:
-            heading = math.degrees(heading)
-            pitch = math.degrees(pitch)
-        return f"https://map.kakao.com/?map_type=TYPE_MAP&map_attribute=ROADVIEW" \
-               f"&panoid={self.id}&pan={heading}&tilt={pitch}&zoom=0&urlLevel=3" \
-               f"&urlX={self.wcongx}&urlY={self.wcongy}"
+        return build_permalink(id=self.id, wcongx=self.wcongx, wcongy=self.wcongy,
+                               heading=heading, pitch=pitch, radians=radians)
 
     def __repr__(self):
         output = str(self)

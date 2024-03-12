@@ -5,14 +5,14 @@ Support for Apple Look Around.
 
 Note that, unlike with the other providers, this library does not automatically stitch the panoramas
 since 1) Look Around does not serve one image broken up into tiles, but six faces which form a
-sort-of-but-not-really cubemap, and 2) its image format is somewhat inconvenient to work with. 
+sort-of-but-not-really cubemap, and 2) its image format, HEIC, is somewhat inconvenient to work with. 
 A function to create an equirectangular image out of the panorama faces is available, but not exactly fast,
 so it is recommended to display the faces unmodified.
 
 Panoramas can be rendered by creating a spherical rectangle (meaning a rectangle on the surface of a sphere) for each face, centered on
 phi=0, theta=0. ``fov_s`` is the phi size (width), ``fov_h`` is the theta size (height), and ``cy`` is an additional offset
-which must be subtracted from phi. The resulting geometry for the face is then rotated by the given Euler angles. (The API
-returns several other parameters, but they do not appear to be in use.) 
+which must be subtracted from phi. The resulting geometry for the face is then rotated by the specified Euler angles. (The API
+returns several other parameters as well, but they do not appear to be in use.) 
 
 Finding panoramas
 -----------------
@@ -60,8 +60,8 @@ Downloading panoramas
       auth = lookaround.Authenticator()
       faces = []
       zoom = 0
-      for faceIdx in range(0, 6):
-          face = lookaround.get_panorama_face(panos[0], faceIdx, zoom, auth)
+      for face_idx in range(0, 6):
+          face = lookaround.get_panorama_face(panos[0], face_idx, zoom, auth)
           faces.append(face)
  
     .. autofunction:: streetlevel.lookaround.download_panorama_face
@@ -74,9 +74,9 @@ Downloading panoramas
       
       auth = lookaround.Authenticator()
       zoom = 0
-      for face in range(0, 6):
-          lookaround.download_panorama_face(panos[0], f"{panos[0].id}_{face}_{zoom}.heic",
-            face, zoom, auth)
+      for face_idx in range(0, 6):
+          lookaround.download_panorama_face(panos[0], f"{panos[0].id}_{face_idx}_{zoom}.heic",
+            face_idx, zoom, auth)
 
 Data classes and Enums
 ----------------------
@@ -112,11 +112,11 @@ Reprojection
       auth = lookaround.Authenticator()
       faces = []
       zoom = 2
-      for faceIdx in range(0, 6):
-          face_heic = lookaround.get_panorama_face(pano, faceIdx, zoom, auth)
+      for face_idx in range(0, 6):
+          face_heic = lookaround.get_panorama_face(pano, face_idx, zoom, auth)
           # Convert the HEIC file to a PIL image here.
-          # This step is left to the user of the library, so that you can
-          # choose whichever library performs best on your machine.
+          # This step is left to the user so that you can choose whichever
+          # library performs best on your machine.
           faces.append(face)
       
       result = lookaround.to_equirectangular(faces, pano.camera_metadata)
@@ -126,3 +126,7 @@ Authentication
 --------------
     .. autoclass:: streetlevel.lookaround.auth.Authenticator
       :members:
+
+Miscellaneous
+-------------
+    .. autofunction:: streetlevel.lookaround.build_permalink
