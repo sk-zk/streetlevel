@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-import base64
-import math
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Tuple, List
 
 from streetlevel.lookaround import geo
-from streetlevel.lookaround.proto import MuninViewState_pb2
+from .util import build_permalink
 
 
 class CoverageType(Enum):
@@ -108,26 +106,17 @@ class LookaroundPanorama:
 
     def permalink(self: LookaroundPanorama, heading: float = 0.0, pitch: float = 0.0, radians: bool = False) -> str:
         """
-        Creates a link which will open a panorama at this location in Apple Maps. Linking to a specific panorama
-        by its ID does not appear to be possible.
+        Creates a link which will open a panorama at this location in Apple Maps.
+        Linking to a specific panorama by its ID does not appear to be possible.
 
         On non-Apple devices, the link will redirect to Google Maps.
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
         :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: An Apple Maps URL.
+        :return: An Apple Maps URL which will open the closest panorama to this location.
         """
-        if radians:
-            heading = math.degrees(heading)
-            pitch = math.degrees(pitch)
-        mvs = MuninViewState_pb2.MuninViewState()
-        mvs.cameraFrame.latitude = self.lat
-        mvs.cameraFrame.longitude = self.lon
-        mvs.cameraFrame.yaw = heading
-        mvs.cameraFrame.pitch = -pitch
-        mvs_base64 = base64.b64encode(mvs.SerializeToString())
-        return f"https://maps.apple.com/?ll={self.lat},{self.lon}&_mvs={mvs_base64.decode()}"
+        return build_permalink(self.lat, self.lon, heading=heading, pitch=pitch, radians=radians)
 
     def __repr__(self):
         return str(self)

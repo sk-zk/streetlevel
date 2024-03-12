@@ -2,6 +2,8 @@ import math
 from dataclasses import dataclass
 from datetime import datetime
 
+from .util import build_permalink
+
 
 @dataclass
 class StreetsidePanorama:
@@ -38,20 +40,17 @@ class StreetsidePanorama:
     def permalink(self, heading: float = 0.0, pitch: float = 0.0,
                   map_zoom: float = 17.0, radians: bool = False) -> str:
         """
-        Creates a permalink to a panorama at this location. (If a URL for opening a panorama by ID
-        exists, I've yet to find it.)
+        Creates a permalink to the closest panorama to the given location.
+        Directly linking to a specific panorama by its ID does not appear to be possible.
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
         :param pitch: *(optional)* Initial pitch of the viewport. Defaults to 0°.
         :param map_zoom: *(optional)* Initial zoom level of the map. Defaults to 17.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: A Bing Maps URL.
+        :return: A Bing Maps URL which will open the closest panorama to the given location.
         """
-        if radians:
-            heading = math.degrees(heading)
-            pitch = math.degrees(pitch)
-        return f"https://www.bing.com/maps?cp={self.lat}%7E{self.lon}&lvl={map_zoom}&v=2&sV=1" \
-               f"&pi={pitch}&style=x&dir={heading}"
+        return build_permalink(self.lat, self.lon, heading=heading, pitch=pitch,
+                               map_zoom=map_zoom, radians=radians)
 
     def __repr__(self):
         output = str(self)

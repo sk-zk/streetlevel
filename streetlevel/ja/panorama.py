@@ -1,9 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List
-import math
+from typing import List, Optional
 
-from .. import geo
+from .util import build_permalink
 
 
 @dataclass
@@ -35,10 +34,18 @@ class JaPanorama:
     blur_key: int = None
     """Part of the panorama tile URL."""
 
-    street_name: str = None
-    """Name of the street."""
+    street_names: List[StreetLabel] = None
+    """
+    Street name labels overlaid on this panorama, featuring the name of the street(s) the panorama
+    is located on and the angles that the label appears at.
+    
+    The first entry is the name of the street the panorama is located on; subsequent
+    entries label nearby streets at junctions. 
+    
+    Note that ``distance`` is ``None`` for the first entry.
+    """
     address: Address = None
-    """Nearest address to the capture location."""
+    """Nearest address to the panorama's location."""
 
     def permalink(self: JaPanorama, heading: float = 0.0, radians: bool = False) -> str:
         """
@@ -47,18 +54,9 @@ class JaPanorama:
 
         :param heading: *(optional)* Initial heading of the viewport. Defaults to 0°.
         :param radians: *(optional)* Whether angles are in radians. Defaults to False.
-        :return: A Já.is Kort URL.
+        :return: A Já.is Kort URL which will open the panorama at this location.
         """
-        if radians:
-            heading = math.degrees(heading)
-        # if the heading is exactly 0, ja.is will act as though it is not set
-        # and choose a weird default value instead
-        if heading == 0.0:
-            heading = 0.0001
-        x, y = geo.wgs84_to_isn93(self.lat, self.lon)
-        x = int(x)
-        y = int(y)
-        return f"https://ja.is/kort/?nz=17&x={x}&y={y}&ja360=1&jh={heading}"
+        return build_permalink(self.lat, self.lon, heading=heading, radians=radians)
 
     def __repr__(self):
         output = str(self)
@@ -90,3 +88,14 @@ class Address:
     street_name_and_house_number: str  #:
     postal_code: int  #:
     place: str  #:
+
+
+@dataclass
+class StreetLabel:
+    """A label overlaid on the panorama in official road coverage displaying the name of a street."""
+    name: str
+    """The street name."""
+    angles: List[float]
+    """A list of different yaws that this street name appears at, in radians."""
+    distance: Optional[int] = None
+    """Distance from the camera, presumably in meters."""
