@@ -10,3 +10,4 @@ scipy~=1.9.1
 aiohttp~=3.8.3
 pycryptodome~=3.15.0
 pyequilib~=0.5.7
+cython~=3.0.10
