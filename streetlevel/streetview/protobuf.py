@@ -1,6 +1,6 @@
 # Some code to deal with the URL-encoded protobuf Google uses in Maps.
 from enum import Enum
-
+from decimal import Decimal
 
 class ProtobufType(Enum):
     """
@@ -87,6 +87,8 @@ def _get_datatype_str(value):
     elif isinstance(value, int):
         datatype = ProtobufType.INT
     elif isinstance(value, float):
+        datatype = ProtobufType.DOUBLE
+    elif isinstance(value, Decimal):
         datatype = ProtobufType.DOUBLE
     elif isinstance(value, dict):
         datatype = ProtobufType.MESSAGE
