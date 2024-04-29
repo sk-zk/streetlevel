@@ -64,7 +64,8 @@ def parse_historical(response: dict, parent_id: str) -> List[NaverPanorama]:
         id=pano[0],
         lat=pano[2],
         lon=pano[1],
-        date=datetime.strptime(pano[3], "%Y-%m-%d %H:%M:%S.0")
+        panorama_type=PanoramaType(int(pano[3])),
+        date=datetime.strptime(pano[4], "%Y-%m-%d %H:%M:%S.0"),
     ) for pano in panos if pano[0] != parent_id]
 
 
@@ -80,7 +81,8 @@ def parse_nearby(response: dict) -> NaverPanorama:
         description=feature["properties"]["description"],
         title=feature["properties"]["title"],
         elevation=elevation,
-        camera_height=(feature["properties"]["camera_altitude"] * 0.01) - elevation
+        camera_height=(feature["properties"]["camera_altitude"] * 0.01) - elevation,
+        panorama_type=PanoramaType(int(feature["properties"]["type"])),
     )
 
 
