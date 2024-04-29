@@ -1,4 +1,3 @@
-import math
 from typing import Optional, List, Tuple, Union
 
 from PIL import Image
@@ -6,10 +5,11 @@ from aiohttp import ClientSession
 from requests import Session
 
 from . import api
-from .panorama import JaPanorama, CaptureDate, Address, StreetLabel
+from .panorama import JaPanorama
+from .parse import parse_panorama_radius_response, parse_panorama_id_response
 from ..dataclasses import Tile
 from ..util import download_tiles, download_tiles_async, CubemapStitchingMethod, stitch_cubemap_faces, \
-    save_cubemap_panorama, stitch_cubemap_face, try_get
+    save_cubemap_panorama, stitch_cubemap_face
 
 
 def find_panorama(lat: float, lon: float, radius: int = 100, session: Session = None) -> Optional[JaPanorama]:
@@ -23,21 +23,13 @@ def find_panorama(lat: float, lon: float, radius: int = 100, session: Session = 
     :return: A JaPanorama if a panorama was found, or None.
     """
     response = api.find_panorama(lat, lon, radius, session)
-
-    if "message" in response:
-        return None
-
-    return _parse_panorama(response)
+    return parse_panorama_radius_response(response)
 
 
 async def find_panorama_async(lat: float, lon: float, session: ClientSession,
-                               radius: int = 100) -> Optional[JaPanorama]:
+                              radius: int = 100) -> Optional[JaPanorama]:
     response = await api.find_panorama_async(lat, lon, session, radius)
-
-    if "message" in response:
-        return None
-
-    return _parse_panorama(response)
+    return parse_panorama_radius_response(response)
 
 
 def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[JaPanorama]:
@@ -49,12 +41,12 @@ def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[JaPano
     :return: A JaPanorama object if a panorama with this ID was found, or None.
     """
     response = api.find_panorama_by_id(panoid, session)
-    return _parse_panorama_by_id(response)
+    return parse_panorama_id_response(response)
 
 
 async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Optional[JaPanorama]:
     response = await api.find_panorama_by_id_async(panoid, session)
-    return _parse_panorama_by_id(response)
+    return parse_panorama_id_response(response)
 
 
 def get_panorama(pano: JaPanorama, zoom: int = 0,
@@ -69,7 +61,7 @@ def get_panorama(pano: JaPanorama, zoom: int = 0,
         image. Defaults to ``ROW``.
     :return: A PIL image or a list of six PIL images depending on ``stitching_method``.
     """
-    zoom = min(1, max(zoom, 0))
+    zoom = _validate_get_panorama_params(pano, zoom)
     face_tiles, cols, rows = _generate_tile_list(pano, zoom)
     tile_images = _download_tiles(face_tiles)
     return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
@@ -78,7 +70,7 @@ def get_panorama(pano: JaPanorama, zoom: int = 0,
 async def get_panorama_async(pano: JaPanorama, session: ClientSession, zoom: int = 0,
                              stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW) \
         -> Union[List[Image.Image], Image.Image]:
-    zoom = min(1, max(zoom, 0))
+    zoom = _validate_get_panorama_params(pano, zoom)
     face_tiles, cols, rows = _generate_tile_list(pano, zoom)
     tile_images = await _download_tiles_async(face_tiles, session)
     return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
@@ -116,66 +108,11 @@ async def download_panorama_async(pano: JaPanorama, path: str, session: ClientSe
     save_cubemap_panorama(output, path, pil_args)
 
 
-def _parse_panorama_by_id(pano_dict: dict) -> JaPanorama:
-    address = try_get(lambda: pano_dict["streets"]["nearestAddress"])
-    if address:
-        address = Address(*address.values())
-
-    return JaPanorama(
-        id=pano_dict["image"]["id"],
-        lat=pano_dict["image"]["lat"],
-        lon=pano_dict["image"]["lng"],
-        heading=math.radians(pano_dict["image"]["heading"]),
-        date=_parse_date(pano_dict["image"]["month"]),
-        pano_url="https:" + pano_dict["image"]["pano_url"],
-        blur_key=pano_dict["image"]["blur_key"],
-        street_names=_parse_streets(pano_dict["streets"]),
-        address=address,
-        neighbors=_parse_hotspots(pano_dict["hotspots"]),
-    )
-
-
-def _parse_streets(streets: dict) -> List[StreetLabel]:
-    main = StreetLabel(name=streets["street"]["name"],
-                       angles=[math.radians(a) for a in streets["street"]["azimuths"]])
-    connections = []
-    for connection_dict in streets["connections"]:
-        connection = StreetLabel(name=connection_dict["name"],
-                                 angles=[math.radians(connection_dict["angle"])],
-                                 distance=connection_dict["distance"])
-        connections.append(connection)
-
-    return [main] + connections
-
-
-def _parse_hotspots(hotspots: list) -> List[JaPanorama]:
-    neighbors = []
-    for hotspot in hotspots:
-        neighbors.append(JaPanorama(
-            id=hotspot["image"]["id"],
-            lat=hotspot["image"]["lat"],
-            lon=hotspot["image"]["lng"],
-            heading=math.radians(hotspot["image"]["heading"]),
-            date=_parse_date(hotspot["image"]["month"]),
-            pano_url="https:" + hotspot["image"]["pano_url"],
-            blur_key=hotspot["image"]["blur_key"],
-        ))
-    return neighbors
-
-
-def _parse_date(date_str: str) -> CaptureDate:
-    year, month = date_str.split("-")
-    date = CaptureDate(int(year), int(month))
-    return date
-
-
-def _parse_panorama(pano_dict: dict) -> JaPanorama:
-    return JaPanorama(
-        id=pano_dict["id"],
-        lat=pano_dict["lat"],
-        lon=pano_dict["lng"],
-        heading=math.radians(pano_dict["image_heading"]),
-    )
+def _validate_get_panorama_params(pano, zoom):
+    if not pano.pano_url:
+        raise ValueError("pano_url is None; please call find_panorama_by_id to fetch this info")
+    zoom = min(1, max(zoom, 0))
+    return zoom
 
 
 def _generate_tile_list(pano: JaPanorama, zoom: int) -> Tuple[List[List[Tile]], int, int]:

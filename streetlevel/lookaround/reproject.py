@@ -6,7 +6,7 @@ from equilib import Equi2Equi
 import torch
 from torchvision import transforms
 
-from streetlevel.lookaround import CameraMetadata
+from streetlevel.lookaround.panorama import CameraMetadata
 
 _equi2equi = Equi2Equi(mode="bilinear", z_down=True)
 _device = torch.device("cuda")

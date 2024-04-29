@@ -1,9 +1,11 @@
 # streetlevel
-**streetlevel** is a library for downloading panoramas and metadata from street-level imagery services including Google Street View, Apple Look Around, and several others.
+**streetlevel** is a library for downloading panoramas and metadata from street-level imagery services
+such as Google Street View, Apple Look Around, and several others. It provides a high-level abstraction
+over the internal APIs of the supported services &ndash; this means that no API keys are required, but the
+library may break unexpectedly. 
 
-Since it relies on calls to internal APIs, it may break unexpectedly.
-
-(Nearly) all functions are available as both a sync function using `requests` or an async function using `aiohttp`, requiring a `ClientSession`.
+(Nearly) all functions are available as either a sync function using `requests` or an async function
+using `aiohttp`, requiring a `ClientSession`.
 
 ## Installation
 ```sh
