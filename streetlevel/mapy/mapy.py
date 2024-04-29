@@ -1,15 +1,14 @@
 import itertools
-import math
 from typing import List, Optional
 
-from PIL import Image
 from aiohttp import ClientSession
-
-from .panorama import MapyPanorama
-from . import api
+from PIL import Image
 from requests import Session
-from ..dataclasses import Size, Tile, Link
-from ..geo import opk_to_rotation
+
+from . import api
+from .panorama import MapyPanorama
+from .parse import parse_pan_info_dict, parse_neighbors_response, parse_getbest_response
+from ..dataclasses import Tile, Link
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
 
 
@@ -31,23 +30,14 @@ def find_panorama(lat: float, lon: float,
         panoramas from other years. Defaults to True.
     :return: A MapyPanorama object if a panorama was found, or None.
     """
-    radius = float(radius)
-    if year is None:
-        options = None
-    else:
-        options = {'year': year, 'nopenalties': True}
+    options, radius = _validate_find_panorama_params(radius, year)
     response = api.getbest(lat, lon, radius, options=options)
-
-    if response["status"] != 200:
-        return None
-
-    pan_info = response["result"]["panInfo"]
-    pano = _parse_pan_info_dict(pan_info)
+    pano = parse_getbest_response(response)
 
     if links:
         pano.links = get_links(pano.id, year=pano.date.year)
     if historical:
-        _append_historical(lat, lon, pan_info, pano)
+        _append_historical(pano, response["result"]["panInfo"], lat, lon)
 
     return pano
 
@@ -57,24 +47,14 @@ async def find_panorama_async(lat: float, lon: float,
                               year: Optional[int] = None,
                               links: bool = True,
                               historical: bool = True) -> Optional[MapyPanorama]:
-    # TODO reduce duplication
-    radius = float(radius)
-    if year is None:
-        options = None
-    else:
-        options = {'year': year, 'nopenalties': True}
+    options, radius = _validate_find_panorama_params(radius, year)
     response = await api.getbest_async(lat, lon, radius, options=options)
-
-    if response["status"] != 200:
-        return None
-
-    pan_info = response["result"]["panInfo"]
-    pano = _parse_pan_info_dict(pan_info)
+    pano = parse_getbest_response(response)
 
     if links:
         pano.links = await get_links_async(pano.id, year=pano.date.year)
     if historical:
-        await _append_historical_async(lat, lon, pan_info, pano)
+        await _append_historical_async(pano, response["result"]["panInfo"], lat, lon)
 
     return pano
 
@@ -98,12 +78,12 @@ def find_panorama_by_id(panoid: int,
         return None
 
     pan_info = response["result"]
-    pano = _parse_pan_info_dict(pan_info)
+    pano = parse_pan_info_dict(pan_info)
 
     if links:
         pano.links = get_links(pano.id, year=pano.date.year)
     if historical:
-        _append_historical(pano.lat, pano.lon, pan_info, pano)
+        _append_historical(pano, pan_info, pano.lat, pano.lon)
 
     return pano
 
@@ -117,12 +97,12 @@ async def find_panorama_by_id_async(panoid: int,
         return None
 
     pan_info = response["result"]
-    pano = _parse_pan_info_dict(pan_info)
+    pano = parse_pan_info_dict(pan_info)
 
     if links:
         pano.links = await get_links_async(pano.id, year=pano.date.year)
     if historical:
-        await _append_historical_async(pano.lat, pano.lon, pan_info, pano)
+        await _append_historical_async(pano, pan_info, pano.lat, pano.lon)
 
     return pano
 
@@ -142,11 +122,7 @@ def get_links(panoid: int, year: Optional[int] = None) -> List[Link]:
         options = {"year": year}
 
     response = api.getneighbours(panoid, options)
-
-    if response["status"] != 200:
-        return []
-
-    return _neighbors_response_to_links(response)
+    return parse_neighbors_response(response)
 
 
 async def get_links_async(panoid: int, year: Optional[int] = None) -> List[Link]:
@@ -156,11 +132,7 @@ async def get_links_async(panoid: int, year: Optional[int] = None) -> List[Link]
         options = {"year": year}
 
     response = await api.getneighbours_async(panoid, options)
-
-    if response["status"] != 200:
-        return []
-
-    return _neighbors_response_to_links(response)
+    return parse_neighbors_response(response)
 
 
 def get_panorama(pano: MapyPanorama, zoom: int = 2) -> Image.Image:
@@ -222,7 +194,16 @@ async def download_panorama_async(pano: MapyPanorama, path: str, session: Client
     image.save(path, **pil_args)
 
 
-def _append_historical(lat, lon, pan_info, pano):
+def _validate_find_panorama_params(radius, year):
+    radius = float(radius)
+    if year is None:
+        options = None
+    else:
+        options = {'year': year, 'nopenalties': True}
+    return options, radius
+
+
+def _append_historical(pano, pan_info, lat, lon):
     for year in pan_info["timeline"]:
         if pano.date.year == year:
             continue
@@ -231,72 +212,13 @@ def _append_historical(lat, lon, pan_info, pano):
         pano.historical.append(historical_pano)
 
 
-async def _append_historical_async(lat, lon, pan_info, pano):
+async def _append_historical_async(pano, pan_info, lat, lon):
     for year in pan_info["timeline"]:
         if pano.date.year == year:
             continue
         historical_pano = await find_panorama_async(lat, lon, 50.0, year=year,
                                                     historical=False, links=False)
         pano.historical.append(historical_pano)
-
-
-def _neighbors_response_to_links(response: dict) -> List[Link]:
-    panos = []
-    for pan_info in response["result"]["neighbours"]:
-        pano = _parse_pan_info_dict(pan_info["near"])
-        angle = math.radians(float(pan_info["angle"]))
-        panos.append(Link(pano, angle))
-    return panos
-
-
-def _parse_pan_info_dict(pan_info: dict) -> MapyPanorama:
-    pano = MapyPanorama(
-        id=pan_info["pid"],
-        lat=pan_info["mark"]["lat"],
-        lon=pan_info["mark"]["lon"],
-        tile_size=Size(pan_info["tileWidth"], pan_info["tileHeight"]),
-        domain_prefix=pan_info["domainPrefix"],
-        uri_path=pan_info["uriPath"],
-        file_mask=pan_info["fileMask"],
-        max_zoom=pan_info["maxZoom"],
-        date=pan_info["createdAt"],
-        elevation=pan_info["mark"]["alt"],
-        provider=pan_info["provider"],
-    )
-
-    _parse_angles(pan_info, pano)
-    pano.num_tiles = _parse_num_tiles(pan_info)
-
-    return pano
-
-
-def _parse_num_tiles(pan_info: dict) -> List[Size]:
-    # zoom level 0
-    num_tiles = [Size(1, 1)]
-    # zoom levels 1 and 2 for cyclomedia
-    if "extra" in pan_info and "tileNumX" in pan_info["extra"]:
-        for i in range(0, len(pan_info["extra"]["tileNumX"])):
-            num = Size(int(pan_info["extra"]["tileNumX"][i]),
-                       int(pan_info["extra"]["tileNumY"][i]))
-            num_tiles.append(num)
-    # zoom level 1 for other providers
-    else:
-        num_tiles.append(Size(pan_info["tileNumX"], pan_info["tileNumY"]))
-    return num_tiles
-
-
-def _parse_angles(pan_info: dict, pano: MapyPanorama) -> None:
-    if "extra" in pan_info and "carDirection" in pan_info["extra"]:
-        pano.heading = math.radians(pan_info["extra"]["carDirection"])
-
-    pano.omega = math.radians(pan_info["omega"])
-    pano.phi = math.radians(pan_info["phi"])
-    pano.kappa = math.radians(pan_info["kappa"])
-    heading, pitch, roll = opk_to_rotation(pano.omega, pano.phi, pano.kappa).as_euler('yxz')
-    if not pano.heading:
-        pano.heading = heading
-    pano.pitch = pitch
-    pano.roll = roll
 
 
 def _get_zoom_0(pano: MapyPanorama, session: Session = None) -> Image.Image:

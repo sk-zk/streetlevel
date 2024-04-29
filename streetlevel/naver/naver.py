@@ -1,5 +1,3 @@
-import math
-from datetime import datetime
 from typing import Optional, List, Union, Tuple
 
 import numpy as np
@@ -8,8 +6,9 @@ from PIL import Image
 from requests import Session
 
 from . import api
-from .panorama import NaverPanorama, PanoramaType, Overlay, Neighbors
-from ..dataclasses import Tile, Link
+from .panorama import NaverPanorama, Neighbors
+from .parse import parse_panorama, parse_nearby, parse_historical, parse_neighbors
+from ..dataclasses import Tile
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
     save_cubemap_panorama, get_image, get_image_async, stitch_cubemap_face
 
@@ -37,7 +36,7 @@ def find_panorama_by_id(panoid: str, language: str = "en",
     if "errors" in response:
         return None
 
-    pano = _parse_panorama(response)
+    pano = parse_panorama(response)
     if neighbors:
         pano.neighbors = get_neighbors(pano.id, session=session)
     if historical:
@@ -54,7 +53,7 @@ async def find_panorama_by_id_async(panoid: str, session: ClientSession, languag
     if "errors" in response:
         return None
 
-    pano = _parse_panorama(response)
+    pano = parse_panorama(response)
     if neighbors:
         pano.neighbors = await get_neighbors_async(pano.id, session)
     if historical:
@@ -87,7 +86,7 @@ def find_panorama(lat: float, lon: float, neighbors: bool = True, historical: bo
     if "error" in response or len(response["features"]) == 0:
         return None
 
-    pano = _parse_nearby(response)
+    pano = parse_nearby(response)
     if neighbors:
         pano.neighbors = get_neighbors(pano.id, session=session)
     if historical:
@@ -104,7 +103,7 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession, ne
     if "error" in response or len(response["features"]) == 0:
         return None
 
-    pano = _parse_nearby(response)
+    pano = parse_nearby(response)
     if neighbors:
         pano.neighbors = await get_neighbors_async(pano.id, session)
     if historical:
@@ -129,7 +128,7 @@ def get_historical(panoid: str, session: Session = None) -> List[NaverPanorama]:
     if "errors" in response:
         return []
 
-    return _parse_historical(response, panoid)
+    return parse_historical(response, panoid)
 
 
 async def get_historical_async(panoid: str, session: ClientSession) -> List[NaverPanorama]:
@@ -138,7 +137,7 @@ async def get_historical_async(panoid: str, session: ClientSession) -> List[Nave
     if "errors" in response:
         return []
 
-    return _parse_historical(response, panoid)
+    return parse_historical(response, panoid)
 
 
 def get_neighbors(panoid: str, session: Session = None) -> Neighbors:
@@ -154,7 +153,7 @@ def get_neighbors(panoid: str, session: Session = None) -> Neighbors:
     if "errors" in response:
         return Neighbors([], [])
 
-    return _parse_neighbors(response, panoid)
+    return parse_neighbors(response, panoid)
 
 
 async def get_neighbors_async(panoid: str, session: ClientSession) -> Neighbors:
@@ -163,7 +162,7 @@ async def get_neighbors_async(panoid: str, session: ClientSession) -> Neighbors:
     if "errors" in response:
         return Neighbors([], [])
 
-    return _parse_neighbors(response, panoid)
+    return parse_neighbors(response, panoid)
 
 
 def get_panorama(pano: NaverPanorama, zoom: int = 2,
@@ -323,102 +322,3 @@ def _stitch_panorama(tile_images: List[dict], cols: int, rows: int,
         stitched_face = stitch_cubemap_face(tiles, 512, cols, rows)
         stitched_faces.append(stitched_face)
     return stitch_cubemap_faces(stitched_faces, stitched_faces[0].size[0], stitching_method)
-
-
-def _parse_neighbors(response: dict, parent_id: str) -> Neighbors:
-    street = _parse_neighbor_section(response, "street", parent_id)
-    other = _parse_neighbor_section(response, "air", parent_id)
-    return Neighbors(street, other)
-
-
-def _parse_neighbor_section(response: dict, section: str, parent_id: str) -> List[NaverPanorama]:
-    panos = []
-    if section in response["around"]["panoramas"]:
-        for raw_pano in response["around"]["panoramas"][section][1:]:
-            if raw_pano[0] == parent_id:
-                continue
-            elevation = raw_pano[4] * 0.01
-            pano = NaverPanorama(
-                id=raw_pano[0],
-                lat=raw_pano[2],
-                lon=raw_pano[1],
-                elevation=elevation,
-                camera_height=(raw_pano[3] * 0.01) - elevation)
-            panos.append(pano)
-    return panos
-
-
-def _parse_historical(response: dict, parent_id: str) -> List[NaverPanorama]:
-    panos = response["timeline"]["panoramas"][1:]
-    return [NaverPanorama(
-        id=pano[0],
-        lat=pano[2],
-        lon=pano[1],
-        date=datetime.strptime(pano[3], "%Y-%m-%d %H:%M:%S.0")
-    ) for pano in panos if pano[0] != parent_id]
-
-
-def _parse_nearby(response: dict) -> NaverPanorama:
-    feature = response["features"][0]
-    elevation = feature["properties"]["land_altitude"] * 0.01
-    return NaverPanorama(
-        id=feature["properties"]["id"],
-        lat=feature["geometry"]["coordinates"][1],
-        lon=feature["geometry"]["coordinates"][0],
-        heading=math.radians(feature["properties"]["camera_angle"][1]),
-        date=_parse_date(feature["properties"]["photodate"]),
-        description=feature["properties"]["description"],
-        title=feature["properties"]["title"],
-        elevation=elevation,
-        camera_height=(feature["properties"]["camera_altitude"] * 0.01) - elevation
-    )
-
-
-def _parse_date(date_str: str) -> datetime:
-    return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-
-
-def _parse_panorama(response: dict) -> NaverPanorama:
-    basic = response["basic"]
-    elevation = basic["land_altitude"] * 0.01
-    pano = NaverPanorama(
-        id=basic["id"],
-        lat=basic["latitude"],
-        lon=basic["longitude"],
-        heading=math.radians(basic["camera_angle"][1]),
-        max_zoom=int(basic["image"]["segment"]) // 2,
-        timeline_id=basic["timeline_id"],
-        date=_parse_date(basic["photodate"]),
-        is_latest=basic["latest"],
-        description=basic["description"],
-        title=basic["title"],
-        panorama_type=PanoramaType(int(basic["dtl_type"])),
-        elevation=elevation,
-        camera_height=(basic["camera_altitude"] * 0.01) - elevation
-    )
-
-    if len(basic["image"]["overlays"]) > 1:
-        pano.overlay = Overlay(
-            "https://panorama.map.naver.com" + basic["image"]["overlays"][1][0],
-            "https://panorama.map.naver.com" + basic["image"]["overlays"][1][1])
-
-    pano.links = _parse_links(basic["links"])
-
-    return pano
-
-
-def _parse_links(links_json: List) -> Optional[List[Link]]:
-    if len(links_json) < 2:
-        return None
-
-    links = []
-    for linked_json in links_json[1:]:
-        linked = NaverPanorama(
-            id=linked_json[0],
-            title=linked_json[1],
-            lat=linked_json[5],
-            lon=linked_json[4],
-        )
-        angle = math.radians(float(linked_json[2]))
-        links.append(Link(linked, angle))
-    return links

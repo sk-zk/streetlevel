@@ -1,5 +1,4 @@
 import asyncio
-from datetime import datetime
 from io import BytesIO
 from typing import List, Union, Optional
 
@@ -7,9 +6,10 @@ from PIL import Image
 from aiohttp import ClientSession
 from requests import Session
 
-from .panorama import StreetsidePanorama
 from streetlevel.geo import *
 from . import api
+from .panorama import StreetsidePanorama
+from .parse import parse_panoramas, parse_panorama, parse_panoramas_id_response
 from .util import to_base4
 from ..util import download_files_async, stitch_cubemap_faces, CubemapStitchingMethod, save_cubemap_panorama
 
@@ -25,18 +25,12 @@ def find_panorama_by_id(panoid: int, session: Session = None) -> Optional[Street
     :return: A StreetsidePanorama object if a panorama was found, or None.
     """
     response = api.find_panorama_by_id(panoid, session)
-    if len(response) < 2:
-        return None
-    pano = _parse_pano(response[1])
-    return pano
+    return parse_panoramas_id_response(response)
 
 
 async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Optional[StreetsidePanorama]:
     response = await api.find_panorama_by_id_async(panoid, session)
-    if len(response) < 2:
-        return None
-    pano = _parse_pano(response[1])
-    return pano
+    return parse_panoramas_id_response(response)
 
 
 def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
@@ -53,15 +47,13 @@ def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
     :return: A list of StreetsidePanorama objects.
     """
     response = api.find_panoramas(north, west, south, east, limit, session)
-    panos = _parse_panos(response)
-    return panos
+    return parse_panoramas(response)
 
 
 async def find_panoramas_in_bbox_async(north: float, west: float, south: float, east: float,
                                        session: ClientSession, limit: int = 50) -> List[StreetsidePanorama]:
     response = await api.find_panoramas_async(north, west, south, east, session, limit)
-    panos = _parse_panos(response)
-    return panos
+    return parse_panoramas(response)
 
 
 def find_panoramas(lat: float, lon: float, radius: float = 25,
@@ -155,41 +147,6 @@ async def get_panorama_async(pano: StreetsidePanorama, session: ClientSession, z
     faces = _generate_tile_list(pano.id, zoom)
     await _download_tiles_async(faces, session)
     return _stitch_panorama(faces, stitching_method=stitching_method)
-
-
-def _parse_panos(response):
-    panos = []
-    for pano in response[1:]:  # first object is elapsed time
-        pano_obj = _parse_pano(pano)
-        panos.append(pano_obj)
-    return panos
-
-
-def _parse_pano(pano):
-    # TODO: parse bl, nbn, pbn, ad fields
-    # as it turns out, months/days without leading zeros
-    # don't have a cross-platform format code in strptime.
-    # wanna guess what kind of dates bing returns?
-    datestr = pano["cd"]
-    datestr = datestr.split("/")
-    datestr[0] = datestr[0].rjust(2, "0")
-    datestr[1] = datestr[1].rjust(2, "0")
-    datestr = "/".join(datestr)
-    date = datetime.strptime(datestr, "%m/%d/%Y %I:%M:%S %p")
-    pano_obj = StreetsidePanorama(
-        id=pano["id"],
-        lat=pano["la"],
-        lon=pano["lo"],
-        date=date,
-        next=pano["ne"] if "ne" in pano else None,
-        previous=pano["pr"] if "pr" in pano else None,
-        elevation=pano["al"] if "al" in pano else None,
-        heading=math.radians(pano["he"]) if "he" in pano else None,
-        pitch=math.radians(pano["pi"]) if "pi" in pano else None,
-        roll=math.radians(pano["ro"]) if "ro" in pano else None,
-        max_zoom=int(pano["ml"])
-    )
-    return pano_obj
 
 
 def _generate_tile_list(panoid, zoom):

@@ -1,4 +1,3 @@
-from datetime import datetime
 from enum import IntEnum
 from typing import List, Union, Tuple
 
@@ -8,9 +7,8 @@ from requests import Session
 
 from . import api
 from .auth import Authenticator
-from .panorama import LookaroundPanorama, CoverageType, CameraMetadata, LensProjection, OrientedPosition
-from .proto import GroundMetadataTile_pb2
-from .geo import protobuf_tile_offset_to_wgs84
+from .panorama import LookaroundPanorama
+from .parse import parse_coverage_tile
 from .. import geo
 
 
@@ -40,12 +38,12 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
     """
     tile = api.get_coverage_tile(tile_x, tile_y, session=session)
-    return _parse_panos(tile, tile_x, tile_y)
+    return parse_coverage_tile(tile)
 
 
 async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> List[LookaroundPanorama]:
     tile = await api.get_coverage_tile_async(tile_x, tile_y, session)
-    return _parse_panos(tile, tile_x, tile_y)
+    return parse_coverage_tile(tile)
 
 
 def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> List[LookaroundPanorama]:
@@ -147,58 +145,6 @@ def _panoid_to_string(pano: Union[LookaroundPanorama, Tuple[int, int]]) -> Tuple
         raise ValueError("build_id must not be longer than 10 digits.")
 
     return panoid, build_id
-
-
-def _parse_panos(tile: GroundMetadataTile_pb2.GroundMetadataTile, tile_x: int, tile_y: int) -> List[LookaroundPanorama]:
-    panos = []
-    camera_metadatas = [_camera_metadata_to_dataclass(c) for c in tile.camera_metadata]
-    for pano_pb in tile.pano:
-        lat, lon = protobuf_tile_offset_to_wgs84(
-            pano_pb.tile_position.x,
-            pano_pb.tile_position.y,
-            tile_x,
-            tile_y)
-        pano = LookaroundPanorama(
-            id=pano_pb.panoid,
-            build_id=tile.build_table[pano_pb.build_table_idx].build_id,
-            lat=lat,
-            lon=lon,
-            coverage_type=CoverageType(tile.build_table[pano_pb.build_table_idx].coverage_type),
-            date=datetime.utcfromtimestamp(pano_pb.timestamp / 1000.0),
-            has_blurs=tile.build_table[pano_pb.build_table_idx].index != 0,
-            raw_orientation=(pano_pb.tile_position.yaw, pano_pb.tile_position.pitch, pano_pb.tile_position.roll),
-            raw_altitude=pano_pb.tile_position.altitude,
-            tile=(tile_x, tile_y, 17),
-            camera_metadata=[camera_metadatas[i] for i in pano_pb.camera_metadata_idx]
-        )
-        panos.append(pano)
-    return panos
-
-
-def _camera_metadata_to_dataclass(camera_metadata_pb: GroundMetadataTile_pb2.CameraMetadata):
-    lens_projection_pb = camera_metadata_pb.lens_projection
-    position_pb =  camera_metadata_pb.position
-    return CameraMetadata(
-        lens_projection=LensProjection(
-            fov_s=lens_projection_pb.fov_s,
-            fov_h=lens_projection_pb.fov_h,
-            k2=lens_projection_pb.k2,
-            k3=lens_projection_pb.k3,
-            k4=lens_projection_pb.k4,
-            cx=lens_projection_pb.cx,
-            cy=lens_projection_pb.cy,
-            lx=lens_projection_pb.lx,
-            ly=lens_projection_pb.ly,
-        ),
-        position=OrientedPosition(
-            x=position_pb.x,
-            y=position_pb.y,
-            z=position_pb.z,
-            yaw=position_pb.yaw,
-            pitch=position_pb.pitch,
-            roll=position_pb.roll,
-        )
-    )
 
 
 def _build_panorama_face_url(panoid: str, build_id: str, face: int, zoom: int, auth: Authenticator) -> str:

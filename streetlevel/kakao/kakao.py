@@ -1,7 +1,5 @@
 import itertools
-import math
 from typing import List, Optional
-from datetime import datetime
 
 import requests
 from PIL import Image
@@ -9,9 +7,10 @@ from aiohttp import ClientSession
 from requests import Session
 
 from . import api
-from .panorama import KakaoPanorama, PanoramaType
-from ..dataclasses import Tile, Size, Link
-from ..util import try_get, get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
+from .panorama import KakaoPanorama
+from .parse import parse_panoramas, parse_panorama
+from ..dataclasses import Tile, Size
+from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
     get_image_async, download_file, download_file_async
 
 PANO_COLS = [1, 8, 16]
@@ -43,7 +42,7 @@ def find_panoramas(lat: float, lon: float, radius: int = 35,
     if response["street_view"]["cnt"] == 0:
         return []
 
-    return _parse_panoramas(response)
+    return parse_panoramas(response)
 
 
 async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
@@ -53,7 +52,7 @@ async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
     if response["street_view"]["cnt"] == 0:
         return []
 
-    return _parse_panoramas(response)
+    return parse_panoramas(response)
 
 
 def find_panorama_by_id(panoid: int, neighbors: bool = True, session: Session = None) -> Optional[KakaoPanorama]:
@@ -74,7 +73,7 @@ def find_panorama_by_id(panoid: int, neighbors: bool = True, session: Session = 
     if response["street_view"]["cnt"] == 0:
         return None
 
-    pano = _parse_panorama(response["street_view"]["street"])
+    pano = parse_panorama(response["street_view"]["street"])
     if neighbors:
         pano.neighbors = find_panoramas(pano.lat, pano.lon, session=session)
     return pano
@@ -87,7 +86,7 @@ async def find_panorama_by_id_async(panoid: int, session: ClientSession,
     if response["street_view"]["cnt"] == 0:
         return None
 
-    pano = _parse_panorama(response["street_view"]["street"])
+    pano = parse_panorama(response["street_view"]["street"])
     if neighbors:
         pano.neighbors = await find_panoramas_async(pano.lat, pano.lon, session)
     return pano
@@ -185,50 +184,6 @@ async def download_depthmap_async(pano: KakaoPanorama, path: str, session: Clien
 def _build_depthmap_url(pano):
     return f"https://map.daumcdn.net/map_roadview/depthmap_meerkat" \
            f"{pano.image_path}_W.png"
-
-
-def _parse_panoramas(response):
-    return [_parse_panorama(pano) for pano in response["street_view"]["streetList"]]
-
-
-def _parse_panorama(pano_json: dict) -> KakaoPanorama:
-    pano = KakaoPanorama(
-        id=pano_json["id"],
-        lat=pano_json["wgsy"],
-        lon=pano_json["wgsx"],
-        wcongx=pano_json["wcongx"],
-        wcongy=pano_json["wcongy"],
-        heading=math.radians(float(pano_json["angle"])),
-        image_path=pano_json["img_path"],
-        # shot_date sometimes returns the time as 00:00:00, but the image url is always correct
-        date=datetime.strptime(pano_json["img_path"].split("_")[-1], "%Y%m%d%H%M%S"),
-        street_name=try_get(lambda: pano_json["st_name"]),
-        address=try_get(lambda: pano_json["addr"]),
-        street_type=try_get(lambda: pano_json["st_type"]),
-        panorama_type=PanoramaType(int(pano_json["shot_tool"]))
-    )
-
-    if "past" in pano_json and pano_json["past"] is not None:
-        pano.historical = [_parse_panorama(past) for past in pano_json["past"]]
-
-    if "spot" in pano_json and pano_json["past"] is not None:
-        pano.links = _parse_links(pano_json["spot"])
-
-    return pano
-
-
-def _parse_links(links_json: List[dict]) -> List[Link]:
-    links = []
-    for linked_json in links_json:
-        linked = KakaoPanorama(
-            id=linked_json["id"],
-            lat=linked_json["wgsy"],
-            lon=linked_json["wgsx"],
-            street_name=try_get(lambda: linked_json["st_name"]),
-        )
-        angle = math.radians(float(linked_json["pan"]))
-        links.append(Link(linked, angle))
-    return links
 
 
 def _generate_tile_list(pano: KakaoPanorama, zoom: int) -> List[Tile]:

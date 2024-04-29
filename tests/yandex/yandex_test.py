@@ -1,23 +1,17 @@
 from datetime import datetime
-
-from pytest import approx
 import json
 
-from requests import Session
+from pytest import approx
 
 from streetlevel import yandex
+import streetlevel.yandex.parse
 
 
-def mocked_api_find_panorama(lat: float, lon: float, session: Session = None) -> dict:
+def test_parse_panorama_response():
     with open("yandex/data/find.json", "r") as f:
-        return json.load(f)
+        response = json.load(f)
 
-
-yandex.api.find_panorama = mocked_api_find_panorama
-
-
-def test_find_panorama():
-    pano = yandex.find_panorama(53.917633, 27.548128)
+    pano = yandex.parse.parse_panorama_response(response)
     assert pano.id == "1238072810_692204477_23_1688105969"
     assert pano.lat == approx(53.917633, 0.001)
     assert pano.lon == approx(27.548128, 0.001)

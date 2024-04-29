@@ -1,20 +1,17 @@
 import pytest
 from pytest import approx
 import pickle
+
 from streetlevel import mapy
+import streetlevel.mapy.parse
 from streetlevel.dataclasses import Size
 
 
-def mocked_getbest(lat, lon, radius, options=None):
+def test_parse_getbest_response():
     with open("mapy/data/getbest.pkl", "rb") as f:
-        return pickle.load(f)
+        response = pickle.load(f)
 
-
-mapy.api.getbest = mocked_getbest
-
-
-def test_find_panorama():
-    pano = mapy.find_panorama(50.1265193, 17.3762701, 100.0, historical=False, links=False)
+    pano = mapy.parse.parse_getbest_response(response)
     assert pano.id == 59418543
     assert pano.lat == approx(50.1265193, 0.001)
     assert pano.lon == approx(17.3762701, 0.001)
