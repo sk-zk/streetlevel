@@ -1,6 +1,7 @@
 from pyfrpc import FrpcClient
 from pyfrpc.asyncclient import AsyncFrpcClient
 import asyncio
+import atexit
 
 
 class MapyApi:
@@ -11,6 +12,7 @@ class MapyApi:
             # Cyclomedia panos (2020+) are only returned if this header is set
             "Referer": "https://en.mapy.cz/",
         }
+        atexit.register(self.cleanup)
 
     def make_client(self):
         if self.client is None:
@@ -20,9 +22,18 @@ class MapyApi:
         if self.async_client is None:
             self.async_client = AsyncFrpcClient("https://pro.mapy.cz/panorpc")
 
-    def __del__(self):
-        if async_client is not None:
-            asyncio.run(async_client.close())
+    def cleanup(self):
+        try:
+            loop = asyncio.get_event_loop()
+            asyncio.create_task(self._cleanup())
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(self._cleanup())
+
+    async def _cleanup(self):
+        if self.async_client is not None:
+            await self.async_client.close()
+            self.async_client = None
 
     def getbest(self, lat, lon, radius, options=None):
         self.make_client()
