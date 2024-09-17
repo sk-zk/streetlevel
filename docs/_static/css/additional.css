@@ -70,6 +70,9 @@
 #streetlevel\.lookaround\.panorama\.OrientedPosition + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+#streetlevel\.lookaround\.panorama\.CoverageTile + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
 
 
 #streetlevel\.yandex\.panorama\.YandexPanorama + dd > dl:first-of-type.field-list {

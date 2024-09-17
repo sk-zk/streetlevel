@@ -22,12 +22,13 @@ Finding panoramas
     
       from streetlevel import lookaround
       
-      panos = lookaround.get_coverage_tile(109775, 56716)
+      tile = lookaround.get_coverage_tile(109775, 56716)
+      first = tile.panos[0]
       print(f"""
-      Got {len(panos)} panoramas. Here's one of them:
-      ID: {panos[0].id}\t\tBuild ID: {panos[0].build_id}
-      Latitude: {panos[0].lat}\tLongitude: {panos[0].lon}
-      Capture date: {panos[0].date}
+      Got {len(tile.panos)} panoramas. Here's one of them:
+      ID: {first.id}\t\tBuild ID: {first.build_id}
+      Latitude: {first.lat}\tLongitude: {first.lon}
+      Capture date: {first.date}
       """)
     
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_async
@@ -37,12 +38,13 @@ Finding panoramas
     
       from streetlevel import lookaround
       
-      panos = lookaround.get_coverage_tile_by_latlon(23.53239040648735, 121.5068719584602)
+      tile = lookaround.get_coverage_tile_by_latlon(23.53239040648735, 121.5068719584602)
+      first = tile.panos[0]
       print(f"""
-      Got {len(panos)} panoramas. Here's one of them:
-      ID: {panos[0].id}\t\tBuild ID: {panos[0].build_id}
-      Latitude: {panos[0].lat}\tLongitude: {panos[0].lon}
-      Capture date: {panos[0].date}
+      Got {len(tile.panos)} panoramas. Here's one of them:
+      ID: {first.id}\t\tBuild ID: {first.build_id}
+      Latitude: {first.lat}\tLongitude: {first.lon}
+      Capture date: {first.date}
       """)
     
     .. autofunction:: streetlevel.lookaround.get_coverage_tile_by_latlon_async
@@ -55,13 +57,13 @@ Downloading panoramas
     
       from streetlevel import lookaround
       
-      panos = lookaround.get_coverage_tile_by_latlon(46.52943, 10.45544)
+      tile = lookaround.get_coverage_tile_by_latlon(46.52943, 10.45544)
       
       auth = lookaround.Authenticator()
       faces = []
       zoom = 0
       for face_idx in range(0, 6):
-          face = lookaround.get_panorama_face(panos[0], face_idx, zoom, auth)
+          face = lookaround.get_panorama_face(tile.panos[0], face_idx, zoom, auth)
           faces.append(face)
  
     .. autofunction:: streetlevel.lookaround.download_panorama_face
@@ -70,17 +72,21 @@ Downloading panoramas
     
       from streetlevel import lookaround
       
-      panos = lookaround.get_coverage_tile_by_latlon(46.52943, 10.45544)
+      tile = lookaround.get_coverage_tile_by_latlon(46.52943, 10.45544)
       
       auth = lookaround.Authenticator()
       zoom = 0
       for face_idx in range(0, 6):
-          lookaround.download_panorama_face(panos[0], f"{panos[0].id}_{face_idx}_{zoom}.heic",
-            face_idx, zoom, auth)
+          lookaround.download_panorama_face(tile.panos[0],
+              f"{tile.panos[0].id}_{face_idx}_{zoom}.heic", 
+              face_idx, zoom, auth)
 
 Data classes and Enums
 ----------------------
     .. autoclass:: streetlevel.lookaround.panorama.CameraMetadata
+      :members:
+      :member-order: bysource
+    .. autoclass:: streetlevel.lookaround.panorama.CoverageTile
       :members:
       :member-order: bysource
     .. autoclass:: streetlevel.lookaround.panorama.CoverageType

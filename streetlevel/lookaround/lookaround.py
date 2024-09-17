@@ -1,5 +1,6 @@
+from datetime import datetime
 from enum import IntEnum
-from typing import List, Union, Tuple
+from typing import Union, Tuple
 
 import requests
 from aiohttp import ClientSession
@@ -7,7 +8,7 @@ from requests import Session
 
 from . import api
 from .auth import Authenticator
-from .panorama import LookaroundPanorama
+from .panorama import LookaroundPanorama, CoverageTile
 from .parse import parse_coverage_tile
 from .. import geo
 
@@ -27,7 +28,7 @@ class Face(IntEnum):
     BOTTOM = 5  #:
 
 
-def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List[LookaroundPanorama]:
+def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> CoverageTile:
     """
     Fetches Look Around panoramas on a specific map tile. Coordinates are in Slippy Map aka XYZ format
     at zoom level 17.
@@ -35,32 +36,34 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> List
     :param tile_x: X coordinate of the tile.
     :param tile_y: Y coordinate of the tile.
     :param session: *(optional)* A requests session.
-    :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
+    :return: A CoverageTile object holding a list of panoramas and the last modification date of the tile.
     """
-    tile = api.get_coverage_tile(tile_x, tile_y, session=session)
-    return parse_coverage_tile(tile)
+    tile, etag = api.get_coverage_tile(tile_x, tile_y, session=session)
+    panos = parse_coverage_tile(tile)
+    return CoverageTile(tile_x, tile_y, panos, datetime.fromtimestamp(int(etag)))
 
 
-async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> List[LookaroundPanorama]:
-    tile = await api.get_coverage_tile_async(tile_x, tile_y, session)
-    return parse_coverage_tile(tile)
+async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> CoverageTile:
+    tile, etag = await api.get_coverage_tile_async(tile_x, tile_y, session)
+    panos = parse_coverage_tile(tile)
+    return CoverageTile(tile_x, tile_y, panos, datetime.fromtimestamp(int(etag)))
 
 
-def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> List[LookaroundPanorama]:
+def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> CoverageTile:
     """
     Same as :func:`get_coverage_tile <get_coverage_tile>`, but for fetching the tile on which a point is located.
 
     :param lat: Latitude of the point.
     :param lon: Longitude of the point.
     :param session: *(optional)* A requests session.
-    :return: A list of LookaroundPanoramas. If no coverage was returned by the API, the list is empty.
+    :return: A CoverageTile object holding a list of panoramas and the last modification date of the tile.
              Note that the list is not sorted - the panoramas are in the order in which they were returned by the API.
     """
     x, y = geo.wgs84_to_tile_coord(lat, lon, 17)
     return get_coverage_tile(x, y, session=session)
 
 
-async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: ClientSession) -> List[LookaroundPanorama]:
+async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: ClientSession) -> CoverageTile:
     x, y = geo.wgs84_to_tile_coord(lat, lon, 17)
     return await get_coverage_tile_async(x, y, session)
 

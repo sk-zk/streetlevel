@@ -33,7 +33,7 @@ class LookaroundPanorama:
     """The pano ID."""
     build_id: int
     """
-    An additional parameter required for requesting the imagery. Every time Apple publishes or updates 
+    An additional parameter required for requesting the imagery. Each time Apple publishes or updates 
     a set of panoramas, they are assigned a build ID to act as a revision number.
     """
 
@@ -157,3 +157,19 @@ class OrientedPosition:
     yaw: float  #:
     pitch: float  #:
     roll: float  #:
+
+
+@dataclass
+class CoverageTile:
+    """Represents a coverage tile."""
+    x: int
+    """The X coordinate of the tile at z=17."""
+    y: int
+    """The Y coordinate of the tile at z=17."""
+    panos: List[LookaroundPanorama]
+    """Panoramas on this tile."""
+    last_modified: datetime
+    """
+    The time the tile was last changed. This happens whenever footage is published or removed, 
+    new blurs are applied, or (I assume) PoIs are updated.
+    """

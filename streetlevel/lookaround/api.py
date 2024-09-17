@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import requests
 from aiohttp import ClientSession
 from requests import Session
@@ -9,25 +11,32 @@ COVERAGE_TILE_ENDPOINT = "https://gspe76-ssl.ls.apple.com/api/tile?"
 
 
 def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) \
-        -> GroundMetadataTile_pb2.GroundMetadataTile():
+        -> Tuple[GroundMetadataTile_pb2.GroundMetadataTile, int]:
     headers = _build_coverage_tile_request_headers(tile_x, tile_y)
     requester = session if session else requests
     response = requester.get(COVERAGE_TILE_ENDPOINT, headers=headers)
+
+    etag = response.headers["ETag"]
+    etag = int(etag[1:-1])
+
     tile = GroundMetadataTile_pb2.GroundMetadataTile()
     tile.ParseFromString(response.content)
-    return tile
+    return tile, etag
 
 
 async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) \
-        -> GroundMetadataTile_pb2.GroundMetadataTile():
+        -> Tuple[GroundMetadataTile_pb2.GroundMetadataTile, int]:
     headers = _build_coverage_tile_request_headers(tile_x, tile_y)
 
     async with session.get(COVERAGE_TILE_ENDPOINT, headers=headers) as response:
         content = await response.read()
 
+    etag = response.headers["ETag"]
+    etag = int(etag[1:-1])
+
     tile = GroundMetadataTile_pb2.GroundMetadataTile()
     tile.ParseFromString(content)
-    return tile
+    return tile, etag
 
 
 def _build_coverage_tile_request_headers(tile_x: int, tile_y: int) -> dict:
