@@ -1,65 +1,71 @@
 from pyfrpc import FrpcClient
 from pyfrpc.asyncclient import AsyncFrpcClient
-import atexit
 import asyncio
 
-client = FrpcClient("https://pro.mapy.cz/panorpc")
-async_client = AsyncFrpcClient("https://pro.mapy.cz/panorpc")
 
+class MapyApi:
+    def __init__(self):
+        self.client = None
+        self.async_client = None
+        self.headers = {
+            # Cyclomedia panos (2020+) are only returned if this header is set
+            "Referer": "https://en.mapy.cz/",
+        }
 
-def exit_handler():
-    asyncio.run(async_client.close())
+    def make_client(self):
+        if self.client is None:
+            self.client = FrpcClient("https://pro.mapy.cz/panorpc")
 
+    def make_async_client(self):
+        if self.async_client is None:
+            self.async_client = AsyncFrpcClient("https://pro.mapy.cz/panorpc")
 
-atexit.register(exit_handler)
+    def __del__(self):
+        if async_client is not None:
+            asyncio.run(async_client.close())
 
-headers = {
-    # Cyclomedia panos (2020+) are only returned if this header is set
-    "Referer": "https://en.mapy.cz/",
-}
+    def getbest(self, lat, lon, radius, options=None):
+        self.make_client()
+        if options is None:
+            options = {}
+        response = self.client.call("getbest",
+                                    args=(lon, lat, radius, options),
+                                    headers=self.headers)
+        return response
 
+    async def getbest_async(self, lat, lon, radius, options=None):
+        self.make_async_client()
+        if options is None:
+            options = {}
+        response = await self.async_client.call("getbest",
+                                                args=(lon, lat, radius, options),
+                                                headers=self.headers)
+        return response
 
-def getbest(lat, lon, radius, options=None):
-    if options is None:
-        options = {}
-    response = client.call("getbest",
-                           args=(lon, lat, radius, options),
-                           headers=headers)
-    return response
+    def detail(self, panoid: int):
+        self.make_client()
+        response = self.client.call("detail", args=[panoid], headers=self.headers)
+        return response
 
+    async def detail_async(self, panoid: int):
+        self.make_async_client()
+        response = await self.async_client.call("detail", args=[panoid], headers=self.headers)
+        return response
 
-async def getbest_async(lat, lon, radius, options=None):
-    if options is None:
-        options = {}
-    response = await async_client.call("getbest",
-                                       args=(lon, lat, radius, options),
-                                       headers=headers)
-    return response
+    def getneighbours(self, panoid: int, options=None):
+        self.make_client()
+        if options is None:
+            options = {}
+        response = self.client.call("getneighbours",
+                                    args=(panoid, options),
+                                    headers=self.headers)
+        return response
 
-
-def detail(panoid: int):
-    response = client.call("detail", args=[panoid], headers=headers)
-    return response
-
-
-async def detail_async(panoid: int):
-    response = await async_client.call("detail", args=[panoid], headers=headers)
-    return response
-
-
-def getneighbours(panoid, options=None):
-    if options is None:
-        options = {}
-    response = client.call("getneighbours",
-                           args=(panoid, options),
-                           headers=headers)
-    return response
-
-
-async def getneighbours_async(panoid, options):
-    if options is None:
-        options = {}
-    response = await async_client.call("getneighbours",
-                                       args=(panoid, options),
-                                       headers=headers)
-    return response
+    async def getneighbours_async(self, panoid: int, options):
+        self.make_async_client()
+        if options is None:
+            options = {}
+        response = await self.async_client.call("getneighbours",
+                                                args=(panoid, options),
+                                                headers=self.headers)
+        return response

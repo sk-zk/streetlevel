@@ -5,11 +5,13 @@ from aiohttp import ClientSession
 from PIL import Image
 from requests import Session
 
-from . import api
+from .api import MapyApi
 from .panorama import MapyPanorama
 from .parse import parse_pan_info_dict, parse_neighbors_response, parse_getbest_response
 from ..dataclasses import Tile, Link
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
+
+api = MapyApi()
 
 
 def find_panorama(lat: float, lon: float,
@@ -236,9 +238,9 @@ def _generate_tile_list(pano: MapyPanorama, zoom: int) -> List[Tile]:
     file_mask = pano.file_mask.replace("xx", "{0:02x}") \
         .replace("yy", "{1:02x}") \
         .replace("zz", "{2:02x}")
-    URL = f"https://panorama-mapserver.mapy.cz/panorama/" \
+    url = f"https://panorama-mapserver.mapy.cz/panorama/" \
           f"{pano.domain_prefix}/{pano.uri_path}/{file_mask}"
 
     coords = list(itertools.product(range(pano.num_tiles[zoom].x), range(pano.num_tiles[zoom].y)))
-    tiles = [Tile(x, y, URL.format(x, y, zoom)) for x, y in coords]
+    tiles = [Tile(x, y, url.format(x, y, zoom)) for x, y in coords]
     return tiles
