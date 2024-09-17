@@ -38,3 +38,6 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://github.com/sk-zk/streetlevel"
 "Bug Tracker" = "https://github.com/sk-zk/streetlevel/issues"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
