@@ -34,4 +34,5 @@ def build_permalink(id: int = None, lat: float = None, lon: float = None,
         pitch = math.radians(pitch)
         fov = math.radians(fov)
     return f"https://en.mapy.cz/zakladni?pano=1&pid={id}" \
-           f"&newest={newest}&yaw={heading}&fov={fov}&pitch={pitch}&x={lon}&y={lat}&z={map_zoom}"
+           f"&newest={newest}&yaw={heading}&fov={fov}&pitch={pitch}&x={lon}&y={lat}" \
+           f"&z={map_zoom}&ovl=8"
