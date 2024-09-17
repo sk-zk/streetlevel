@@ -22,7 +22,7 @@ Finding panoramas
       from aiohttp import ClientSession
       
       async with ClientSession() as session:
-          pano = await streetview.find_panorama_async(45.59395, 24.631609)
+          pano = await streetview.find_panorama_async(45.59395, 24.631609, session)
           print(pano.id)
           print(pano.lat, pano.lon)
           print(pano.date)
@@ -46,7 +46,7 @@ Finding panoramas
       from aiohttp import ClientSession
       
       async with ClientSession() as session:
-          pano = await streetview.find_panorama_by_id_async("Py5vaKsLWJG16XyZosdYBQ")
+          pano = await streetview.find_panorama_by_id_async("Py5vaKsLWJG16XyZosdYBQ", session)
           print(pano.id)
           print(pano.lat, pano.lon)
           print(pano.date)
