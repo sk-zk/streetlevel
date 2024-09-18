@@ -3,6 +3,8 @@ from aiohttp import ClientSession
 
 from ..util import get_json, get_json_async
 
+headers = {"Referer": "https://map.naver.com"}
+
 
 def build_find_panorama_request_url(lat: float, lon: float) -> str:
     return f"https://map.naver.com/p/api/panorama/nearby/{lon}/{lat}"
@@ -25,40 +27,50 @@ def build_depth_request_url(panoid: str) -> str:
 
 
 def find_panorama(lat: float, lon: float, session: Session = None) -> dict:
-    return get_json(build_find_panorama_request_url(lat, lon), session=session)
+    return get_json(build_find_panorama_request_url(lat, lon), session=session,
+                    headers={"Referer": "https://map.naver.com"})
 
 
 async def find_panorama_async(lat: float, lon: float, session: ClientSession) -> dict:
-    return await get_json_async(build_find_panorama_request_url(lat, lon), session)
+    return await get_json_async(build_find_panorama_request_url(lat, lon), session,
+                                headers={"Referer": "https://map.naver.com"})
 
 
 def find_panorama_by_id(panoid: str, language: str, session: Session = None) -> dict:
-    return get_json(build_find_panorama_by_id_request_url(panoid, language), session=session)
+    return get_json(build_find_panorama_by_id_request_url(panoid, language), session=session,
+                    headers={"Referer": "https://map.naver.com"})
 
 
 async def find_panorama_by_id_async(panoid: str, language: str, session: ClientSession) -> dict:
-    return await get_json_async(build_find_panorama_by_id_request_url(panoid, language), session)
+    return await get_json_async(build_find_panorama_by_id_request_url(panoid, language), session,
+                                headers={"Referer": "https://map.naver.com"})
 
 
 def get_historical(panoid: str, session: Session = None) -> dict:
-    return get_json(build_timeline_request_url(panoid), session=session)
+    return get_json(build_timeline_request_url(panoid), session=session,
+                    headers={"Referer": "https://map.naver.com"})
 
 
 async def get_historical_async(panoid: str, session: ClientSession) -> dict:
-    return await get_json_async(build_timeline_request_url(panoid), session)
+    return await get_json_async(build_timeline_request_url(panoid), session,
+                                headers={"Referer": "https://map.naver.com"})
 
 
 def get_neighbors(panoid: str, session: Session = None) -> dict:
-    return get_json(build_around_request_url(panoid), session=session)
+    return get_json(build_around_request_url(panoid), session=session,
+                    headers={"Referer": "https://map.naver.com"})
 
 
 async def get_neighbors_async(panoid: str, session: ClientSession) -> dict:
-    return await get_json_async(build_around_request_url(panoid), session)
+    return await get_json_async(build_around_request_url(panoid), session,
+                                headers={"Referer": "https://map.naver.com"})
 
 
 def get_depth(panoid: str, session: Session = None) -> dict:
-    return get_json(build_depth_request_url(panoid), session=session)
+    return get_json(build_depth_request_url(panoid), session=session,
+                    headers={"Referer": "https://map.naver.com"})
 
 
 async def get_depth_async(panoid: str, session: ClientSession) -> dict:
-    return await get_json_async(build_depth_request_url(panoid), session)
+    return await get_json_async(build_depth_request_url(panoid), session,
+                                headers=headers)

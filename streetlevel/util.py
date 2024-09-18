@@ -65,17 +65,19 @@ async def get_image_async(url: str, session: ClientSession) -> Image.Image:
         return Image.open(BytesIO(await response.read()))
 
 
-def get_json(url: str, session: Session = None, preprocess_function: Callable = None) -> dict:
+def get_json(url: str, session: Session = None, preprocess_function: Callable = None,
+             headers: dict = None) -> dict:
     """
     Fetches JSON from a URL using requests.
 
     :param url: The URL.
     :param session: *(optional)* A requests session.
     :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
+    :param headers: *(optional)* Request headers.
     :return: The requested document as dictionary.
     """
     requester = session if session else requests
-    response = requester.get(url)
+    response = requester.get(url, headers=headers)
     if preprocess_function:
         processed = preprocess_function(response.text)
         return json.loads(processed)
@@ -84,7 +86,7 @@ def get_json(url: str, session: Session = None, preprocess_function: Callable = 
 
 
 async def get_json_async(url: str, session: ClientSession, json_function_parameters: dict = None,
-                         preprocess_function: Callable = None) -> dict:
+                         preprocess_function: Callable = None, headers: dict = None) -> dict:
     """
     Fetches JSON from a URL using aiohttp.
 
@@ -92,9 +94,12 @@ async def get_json_async(url: str, session: ClientSession, json_function_paramet
     :param session: A ``ClientSession``.
     :param json_function_parameters: *(optional)* Parameters to pass to the ``ClientResponse.json`` function.
     :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
+    :param headers: *(optional)* Request headers.
     :return: The requested document as dictionary.
     """
-    async with session.get(url) as response:
+    if headers is None:
+        headers = {}
+    async with session.get(url, headers=headers) as response:
         if preprocess_function:
             text = await response.text()
             processed = preprocess_function(text)
