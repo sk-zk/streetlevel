@@ -47,7 +47,7 @@ message GroundMetadataTile {
     // that the panos in this build have blurs added to them
     int32 index = 1;
     
-    int32 build_id = 3;
+    uint64 build_id = 3;
     int32 data_format_version = 5;
     
     // whether the coverage was taken by car or backpack
