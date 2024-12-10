@@ -73,8 +73,10 @@ class CaptureDate:
     """
     Capture date of a Já 360 panorama.
     """
-    year: int  #:
+    year: int
+    """The year the panorama was taken."""
     month: int  #:
+    """The month the panorama was taken."""
 
     def __str__(self):
         return f"{self.year}-{self.month:02d}"
