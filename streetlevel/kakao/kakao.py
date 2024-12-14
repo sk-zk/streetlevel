@@ -1,4 +1,5 @@
 import itertools
+import math
 from typing import List, Optional
 
 import requests
@@ -10,6 +11,7 @@ from . import api
 from .panorama import KakaoPanorama
 from .parse import parse_panoramas, parse_panorama
 from ..dataclasses import Tile, Size
+from ..exif import save_with_metadata
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
     get_image_async, download_file, download_file_async
 
@@ -140,7 +142,9 @@ def download_panorama(pano: KakaoPanorama, path: str, zoom: int = 2, pil_args: d
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, str(pano.id),
+                       pano.lat, pano.lon, None, str(pano.date),
+                       -pano.heading + math.pi, None, None, "Kakao")
 
 
 async def download_panorama_async(pano: KakaoPanorama, path: str, session: ClientSession,
@@ -148,7 +152,9 @@ async def download_panorama_async(pano: KakaoPanorama, path: str, session: Clien
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, str(pano.id),
+                       pano.lat, pano.lon, None, str(pano.date),
+                       -pano.heading + math.pi, None, None, "Kakao")
 
 
 def get_depthmap(pano: KakaoPanorama, session: Session = None) -> Image.Image:
