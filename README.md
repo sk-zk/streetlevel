@@ -248,7 +248,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td></td>
     <td align="center">⚫</td>
     <td align="center">❌</td>
-    <td align="center">⚫</td>
+    <td align="center">❌</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
   </tr>
