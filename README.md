@@ -124,7 +124,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td></td>
-    <td align="center">❌?<sup>5</sup></td>
+    <td align="center">❌?<sup>10</sup></td>
     <td align="center">✔</td>
     <td align="center">✔<sup>5</sup></td>
     <td align="center">⚫<br></td>
