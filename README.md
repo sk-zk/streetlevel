@@ -74,7 +74,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔<sup>1</sup></td>
   </tr>
   <tr>
-    <td align="right">Find panoramas by slippy map tile or bounding box</td>
+    <td align="right">Find panoramas by map tile or bbox</td>
     <td align="center">✔<sup>2</sup></td>
     <td align="center">✔<sup>2</sup></td>
     <td align="center">⚫</td>
