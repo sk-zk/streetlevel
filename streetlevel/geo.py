@@ -4,6 +4,9 @@ from typing import Tuple
 import pyproj
 from pyproj import Transformer
 from scipy.spatial.transform import Rotation
+import bd09convertor
+import CoordinatesConverter
+
 
 pyproj.network.set_network_enabled(active=True)
 _geod = pyproj.Geod(ellps="WGS84")
@@ -52,6 +55,42 @@ def wgs84_to_isn93(lat: float, lon: float) -> Tuple[float, float]:
     :return: ISN93 coordinates.
     """
     return _tf_wgs84_to_isn93.transform(lat, lon)
+
+
+def wgs84_to_bd09mc(lat: float, lon: float) -> Tuple[float, float]:
+    """
+    Converts WGS84 coordinates to BD09 Mercator coordinates.
+
+    :param lat: Latitude.
+    :param lon: Longitude.
+    :return: BD09 Mercator coordinates.
+    """
+    bd09 = CoordinatesConverter.wgs84tobd09(lon, lat)
+    return bd09convertor.convertLL2MC(bd09[0], bd09[1])
+
+
+def bd09_to_bd09mc(lat: float, lon: float) -> Tuple[float, float]:
+    """
+    Converts BD09 coordinates to BD09 Mercator coordinates.
+
+    :param lat: Latitude.
+    :param lon: Longitude.
+    :return: BD09 Mercator coordinates.
+    """
+    return bd09convertor.convertLL2MC(lon, lat)
+
+
+def bd09mc_to_wgs84(x: float, y: float) -> Tuple[float, float]:
+    """
+    Converts BD09 Mercator coordinates to WGS84 coordinates.
+
+    :param x: X coordinate.
+    :param y: Y coordinate.
+    :return: WGS84 coordinates.
+    """
+    bd09 = bd09convertor.convertMC2LL(x, y)
+    wgs = CoordinatesConverter.bd09towgs84(bd09[0], bd09[1])
+    return wgs[1], wgs[0]
 
 
 def create_bounding_box_around_point(lat: float, lon: float, radius: float) \

@@ -49,6 +49,7 @@ Services covering multiple countries are on the left; services covering one spec
     <th align="center">Yandex<br>Panorama</th>
     <th align="center">Bing<br>Streetside</th>
     <th></th>
+    <th align="center">🇨🇳 Baidu<br>Panorama</th>
     <th align="center">🇰🇷 Kakao<br>Road&nbsp;View</th>
     <th align="center">🇰🇷 Naver<br>Street&nbsp;View</th>
     <th align="center">🇨🇿 Mapy.cz<br>Panorama</th>
@@ -66,6 +67,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔<sup>1</sup></td>
     <td align="center">✔</td>
     <td></td>
+    <td align="center">✔<sup>1</sup></td>
     <td align="center">✔</td>
     <td align="center">✔<sup>1</sup></td>
     <td align="center">✔<sup>1</sup></td>
@@ -82,6 +84,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
+    <td align="center">⚫</td>
   </tr>
   <tr>
     <td align="right">Get specific panorama by ID</td>
@@ -90,6 +93,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td></td>
+    <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
@@ -111,6 +115,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
+    <td align="center">✔</td>
   </tr>
   <tr>
     <td align="right">Download depth information</td>
@@ -119,6 +124,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td></td>
+    <td align="center">❌?<sup>5</sup></td>
     <td align="center">✔</td>
     <td align="center">✔<sup>5</sup></td>
     <td align="center">⚫<br></td>
@@ -132,6 +138,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">Cubemap</td>
     <td></td>
     <td align="center">Equirectangular</td>
+    <td align="center">Equirectangular</td>
     <td align="center">Cubemap</td>
     <td align="center">Equirectangular</td>
     <td align="center">Cubemap</td>
@@ -143,6 +150,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">JPEG</td>
     <td align="center">JPEG</td>
     <td></td>
+    <td align="center">JPEG</td>
     <td align="center">JPEG</td>
     <td align="center">JPEG</td>
     <td align="center">JPEG</td>
@@ -163,6 +171,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
+    <td align="center">✔</td>
     <td align="center">✔<sup>9</sup></td>
   </tr>
   <tr>
@@ -172,6 +181,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔<sup>7</sup></td>
     <td align="center">✔</td>
     <td></td>
+    <td align="center">✔</td>
     <td align="center">✔<sup>7</sup></td>
     <td align="center">✔<sup>7</sup></td>
     <td align="center">✔<br></td>
@@ -184,6 +194,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">⚫</td>
     <td align="center">✔</td>
     <td></td>
+    <td align="center">✔</td>
     <td align="center">⚫</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
@@ -200,6 +211,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
+    <td align="center">✔</td>
   </tr>
   <tr>
     <td align="right">Historical panoramas</td>
@@ -208,6 +220,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td></td>
+    <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
@@ -220,6 +233,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td></td>
+    <td align="center">⚫</td>
     <td align="center">✔</td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
@@ -232,6 +246,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td></td>
+    <td align="center">⚫</td>
     <td align="center">❌</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
@@ -244,6 +259,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
     <td align="center">⚫</td>
     <td></td>
+    <td align="center">✔</td>
     <td align="center">⚫</td>
     <td align="center">⚫</td>
     <td align="center">✔</td>
@@ -260,3 +276,4 @@ Services covering multiple countries are on the left; services covering one spec
 7: Only heading; pitch/roll do not appear to be available  
 8: Previous and next image in sequence  
 9: Month and year only  
+10: There is a `has_depth` field in the raw metadata, but I've yet to find a panorama that actually has depth.

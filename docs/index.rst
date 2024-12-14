@@ -10,6 +10,7 @@ The library uses latitude/longitude order. All coordinates are WGS84 unless spec
    :maxdepth: 1
    :caption: Contents
    
+   streetlevel.baidu
    streetlevel.ja
    streetlevel.kakao
    streetlevel.lookaround

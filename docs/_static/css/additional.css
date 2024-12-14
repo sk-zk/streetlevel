@@ -114,3 +114,25 @@
 #streetlevel\.ja\.panorama\.CaptureDate + dd > dl:first-of-type.field-list {
   display:none !important;
 }
+
+#streetlevel\.baidu\.panorama\.BaiduPanorama + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.baidu\.panorama\.PanoInteriorMetadata + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.baidu\.panorama\.PanoInteriorPoint + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.baidu\.panorama\.InteriorMetadata + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.baidu\.panorama\.InteriorPoint + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.baidu\.panorama\.Floor + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
+#streetlevel\.baidu\.panorama\.User + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
