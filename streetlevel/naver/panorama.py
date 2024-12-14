@@ -15,15 +15,19 @@ class PanoramaType(IntEnum):
     """
     The panorama type. Most identifiers are taken directly from the source.
     """
+    ALL = 0  #:
     AIR = 1  #:
+    DRONE = 2  #:
     CAR = 3  #:
     BICYCLE = 4  #:
-    INSIDE = 5  #:
-    INTERIOR = 7  #:
-    JIMMY_JIB = 8  #:
+    MUSEUM = 5  #:
+    PENSION = 7  #:
+    PENSION_FRONT = 8  #:
     INDOOR = 10  #:
-    TREKKER = 13  #:
+    INDOOR_HIGH = 11  #:
     UNDERWATER = 12  #:
+    TREKKER = 13  #:
+    MESH_EQUIRECT = 15  #:
     INDOOR_3D = 100  #:
 
 
