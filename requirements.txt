@@ -11,3 +11,6 @@ aiohttp
 pycryptodome
 pyequilib
 cython
+bd09convertor
+CoordinatesConverter
+pyexiv2

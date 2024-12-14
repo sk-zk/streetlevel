@@ -9,7 +9,7 @@ license = "MIT"
 authors = [
   { name="sk-zk", email="sk-zk@users.noreply.github.com" },
 ]
-description = "Download panoramas and metadata from Street View and others"
+description = "Download panoramas and metadata from Street View, Look Around, and more"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -20,13 +20,16 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
 ]
 dependencies = [
-    "Pillow",
     "aiohttp",
+    "bd09convertor",
+    "CoordinatesConverter",
     "cython",
     "numpy",
+    "Pillow",
     "protobuf > 4",
     "pycryptodome",
     "pyequilib",
+    "pyexiv2",
     "pyfrpc",
     "pyproj",
     "pytest",

@@ -11,6 +11,7 @@ from .parse import parse_coverage_tile_response, parse_panorama_id_response, \
     parse_panorama_radius_response
 from .util import is_third_party_panoid
 from ..dataclasses import Tile
+from ..exif import save_with_metadata
 from ..geo import wgs84_to_tile_coord
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async
 
@@ -139,7 +140,10 @@ def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_ar
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, pano.id,
+                       pano.lat, pano.lon, pano.elevation, str(pano.date),
+                       -pano.heading, pano.pitch, pano.roll,
+                       pano.uploader if pano.uploader is not None else "Google")
 
 
 async def download_panorama_async(pano: StreetViewPanorama, path: str, session: ClientSession,
@@ -147,7 +151,10 @@ async def download_panorama_async(pano: StreetViewPanorama, path: str, session: 
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, pano.id,
+                       pano.lat, pano.lon, pano.elevation, str(pano.date),
+                       -pano.heading, pano.pitch, pano.roll,
+                       pano.uploader if pano.uploader is not None else "Google")
 
 
 def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
