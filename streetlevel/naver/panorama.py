@@ -86,11 +86,11 @@ class NaverPanorama:
     """The panorama type. Most identifiers are taken directly from the source."""
     overlay: Overlay = None
     """
-    Curiously, Naver masks their car twice: once with an image of a car baked into the panorama, and additionally
-    with an image of the road beneath it (like Google and Apple), which is served as a separate file and overlaid
-    on the panorama in the client. This is the URL to that secondary overlay.
+    Curiously, in pre-3D imagery, Naver masks their car twice: once with an image of a car baked into the panorama, 
+    and additionally with an image of the road beneath it (like Google and Apple), which is served as a separate file 
+    and overlaid on the panorama in the client. This is the URL to that secondary overlay.
     
-    (Only available for car footage.)
+    (Only available for pre-3D car footage.)
     """
 
     def permalink(self: NaverPanorama, heading: float = 0.0, pitch: float = 10.0, fov: float = 80.0,
