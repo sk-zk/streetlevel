@@ -10,6 +10,7 @@ from . import api
 from .panorama import YandexPanorama
 from .parse import parse_panorama_response
 from ..dataclasses import Tile
+from ..exif import save_with_metadata
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async
 
 
@@ -95,7 +96,10 @@ def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0, pil_args: 
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, pano.id,
+                       pano.lat, pano.lon, None, pano.date,
+                       math.pi/2 - pano.heading + math.pi/2, None, None,
+                       pano.author if pano.author else "Yandex")
 
 
 async def download_panorama_async(pano: YandexPanorama, path: str, session: ClientSession,
@@ -103,7 +107,10 @@ async def download_panorama_async(pano: YandexPanorama, path: str, session: Clie
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, str(pano.id),
+                       pano.lat, pano.lon, None, pano.date,
+                       math.pi/2 - pano.heading + math.pi/2, None, None,
+                       pano.author if pano.author else "Yandex")
 
 
 def _generate_tile_list(pano: YandexPanorama, zoom: int) -> List[Tile]:
