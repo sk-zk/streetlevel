@@ -139,7 +139,7 @@ def download_panorama(pano: BaiduPanorama, path: str, zoom: int = 3, pil_args: d
     image = get_panorama(pano, zoom=zoom)
     save_with_metadata(image, path, pil_args, str(pano.id),
                        pano.lat, pano.lon, pano.elevation, pano.date,
-                       math.pi/2 - pano.heading, None, None,
+                       math.pi/2 - pano.heading, None, None,  # TODO figure out pitch/roll conversion
                        pano.creator if pano.creator else "Baidu")
 
 
@@ -150,7 +150,7 @@ async def download_panorama_async(pano: BaiduPanorama, path: str, session: Clien
     image = await get_panorama_async(pano, session, zoom=zoom)
     save_with_metadata(image, path, pil_args, str(pano.id),
                        pano.lat, pano.lon, pano.elevation, pano.date,
-                       math.pi/2 - pano.heading, None, None,
+                       math.pi/2 - pano.heading, None, None,  # TODO figure out pitch/roll conversion
                        pano.creator if pano.creator else "Baidu")
 
 
