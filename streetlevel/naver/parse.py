@@ -3,58 +3,74 @@ from datetime import datetime
 from typing import List, Optional
 
 from streetlevel.dataclasses import Link
+from streetlevel.geo import get_bearing
 from streetlevel.naver.panorama import Neighbors, NaverPanorama, PanoramaType, Overlay
 
 
 def parse_panorama(response: dict) -> NaverPanorama:
-    basic = response["basic"]
-    elevation = basic["land_altitude"] * 0.01
+    altitude = response["altitude"]
+    if response["camera_angle"][0] != 0:
+        pitch = math.radians(90 - response["camera_angle"][0])
+        roll = math.radians(90 - response["camera_angle"][2])
+    else:
+        pitch = 0
+        roll = 0
     pano = NaverPanorama(
-        id=basic["id"],
-        lat=basic["latitude"],
-        lon=basic["longitude"],
-        heading=math.radians(basic["camera_angle"][1]),
-        max_zoom=int(basic["image"]["segment"]) // 2,
-        timeline_id=basic["timeline_id"],
-        date=_parse_date(basic["photodate"]),
-        is_latest=basic["latest"],
-        description=basic["description"],
-        title=basic["title"],
-        panorama_type=PanoramaType(int(basic["dtl_type"])),
-        elevation=elevation,
-        camera_height=(basic["camera_altitude"] * 0.01) - elevation
+        id=response["id"],
+        lat=response["latitude"],
+        lon=response["longitude"],
+        heading=math.radians(response["camera_angle"][1]),
+        pitch=pitch,
+        roll=roll,
+        max_zoom=int(response["segment"]) // 2,
+        timeline_id=response["info"]["timeline_id"],
+        date=_parse_date(response["info"]["photodate"]),
+        is_latest=response["info"]["latest"],
+        description=response["info"]["description"],
+        title=response["info"]["title"],
+        panorama_type=PanoramaType(int(response["dtl_type"])),
+        altitude=altitude,
+        has_equirect=response["proj_type"] == "equirect"
     )
 
-    if len(basic["image"]["overlays"]) > 1:
+    if response["overlay_type"] == "car":
         pano.overlay = Overlay(
-            "https://panorama.map.naver.com" + basic["image"]["overlays"][1][0],
-            "https://panorama.map.naver.com" + basic["image"]["overlays"][1][1])
+            f"https://panorama.map.naver.com/api/v2/overlays/floor/{pano.id}",
+            f"https://panorama.map.naver.com/resources/style/mask.png"
+        )
 
-    pano.links = _parse_links(basic["links"])
+    pano.links = _parse_links(response["links"], pano.lat, pano.lon)
 
     return pano
 
 
 def parse_neighbors(response: dict, parent_id: str) -> Neighbors:
-    street = _parse_neighbor_section(response, "street", parent_id)
-    other = _parse_neighbor_section(response, "air", parent_id)
+    if "street" in response["panoramas"]:
+        street = _parse_neighbor_section(response["panoramas"]["street"], parent_id)
+    else:
+        street = None
+
+    if "air" in response["panoramas"]:
+        other = _parse_neighbor_section(response["panoramas"]["air"], parent_id)
+    else:
+        other = None
+
     return Neighbors(street, other)
 
 
-def _parse_neighbor_section(response: dict, section: str, parent_id: str) -> List[NaverPanorama]:
+def _parse_neighbor_section(section: dict, parent_id: str) -> List[NaverPanorama]:
     panos = []
-    if section in response["around"]["panoramas"]:
-        for raw_pano in response["around"]["panoramas"][section][1:]:
-            if raw_pano[0] == parent_id:
-                continue
-            elevation = raw_pano[4] * 0.01
-            pano = NaverPanorama(
-                id=raw_pano[0],
-                lat=raw_pano[2],
-                lon=raw_pano[1],
-                elevation=elevation,
-                camera_height=(raw_pano[3] * 0.01) - elevation)
-            panos.append(pano)
+    for raw_pano in section:
+        if raw_pano["id"] == parent_id:
+            continue
+        pano = NaverPanorama(
+            id=raw_pano["id"],
+            lat=raw_pano["latitude"],
+            lon=raw_pano["longitude"],
+            altitude=raw_pano["altitude"],
+            panorama_type=PanoramaType(int(raw_pano["dtl_type"])),
+        )
+        panos.append(pano)
     return panos
 
 
@@ -80,7 +96,7 @@ def parse_nearby(response: dict) -> NaverPanorama:
         date=_parse_date(feature["properties"]["photodate"]),
         description=feature["properties"]["description"],
         title=feature["properties"]["title"],
-        elevation=elevation,
+        altitude=elevation,
         camera_height=(feature["properties"]["camera_altitude"] * 0.01) - elevation,
         panorama_type=PanoramaType(int(feature["properties"]["type"])),
     )
@@ -90,18 +106,19 @@ def _parse_date(date_str: str) -> datetime:
     return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
 
 
-def _parse_links(links_json: List) -> Optional[List[Link]]:
+def _parse_links(links_json: List, pano_lat: float, pano_lon: float) -> Optional[List[Link]]:
     if len(links_json) < 2:
         return None
 
     links = []
-    for linked_json in links_json[1:]:
-        linked = NaverPanorama(
-            id=linked_json[0],
-            title=linked_json[1],
-            lat=linked_json[5],
-            lon=linked_json[4],
+    for link_json in links_json:
+        link = NaverPanorama(
+            id=link_json["id"],
+            lat=link_json["latitude"],
+            lon=link_json["longitude"],
+            panorama_type=PanoramaType(int(link_json["dtl_type"])),
+            altitude=link_json["altitude"]
         )
-        angle = math.radians(float(linked_json[2]))
-        links.append(Link(linked, angle))
+        angle = get_bearing(pano_lat, pano_lon, link.lat, link.lon)
+        links.append(Link(link, angle))
     return links

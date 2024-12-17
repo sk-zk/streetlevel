@@ -11,15 +11,15 @@ def build_find_panorama_request_url(lat: float, lon: float) -> str:
 
 
 def build_find_panorama_by_id_request_url(panoid: str, language: str) -> str:
-    return f"https://panorama.map.naver.com/metadata/basic/{panoid}?lang={language}&version=2.1.0"
+    return f"https://panorama.map.naver.com/metadataV3/basic/{panoid}?lang={language}"
 
 
-def build_timeline_request_url(panoid: str) -> str:
-    return f"https://panorama.map.naver.com/metadata/timeline/{panoid}"
+def build_timeline_request_url(timeline_id: str) -> str:
+    return f"https://panorama.map.naver.com/metadata/timeline/{timeline_id}"
 
 
 def build_around_request_url(panoid: str) -> str:
-    return f"https://panorama.map.naver.com/metadata/around/{panoid}?lang=ko"
+    return f"https://panorama.map.naver.com/metadataV3/around/{panoid}?lang=ko"
 
 
 def build_depth_request_url(panoid: str) -> str:

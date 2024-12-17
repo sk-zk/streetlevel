@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 
@@ -27,7 +27,11 @@ class PanoramaType(IntEnum):
     INDOOR_HIGH = 11  #:
     UNDERWATER = 12  #:
     TREKKER = 13  #:
-    MESH_EQUIRECT = 15  #:
+    MESH_EQUIRECT = 15
+    """
+    An Apple-like panorama which can be fetched in equirectangular projection
+    and for which a 3D mesh is available.
+    """
     INDOOR_3D = 100  #:
 
 
@@ -49,10 +53,18 @@ class NaverPanorama:
 
     heading: float = None
     """Heading in radians, where 0° is north, 90° is east, 180° is south and 270° is west."""
-    elevation: float = None
-    """Elevation at the capture location in meters."""
-    camera_height: float = None
-    """Height of the camera in meters above ground."""
+    altitude: float = None
+    """Altitude of the camera above sea level, in meters."""
+    pitch: float = None
+    """
+    Pitch offset for upright correction of the panorama, in radians. 
+    Only available if ``has_equirect`` is True; the field is set to 0 otherwise.
+    """
+    roll: float = None
+    """
+    Roll offset for upright correction of the panorama, in radians. 
+    Only available if ``has_equirect`` is True; the field is set to 0 otherwise.
+    """
 
     max_zoom: int = None
     """Highest zoom level available for this panorama."""
@@ -60,7 +72,10 @@ class NaverPanorama:
     neighbors: Neighbors = None
     """A list of nearby panoramas."""
     links: List[Link] = None
-    """The panoramas which the white dots in the client link to."""
+    """
+    The panoramas which the white dots in the pre-3D client link to.
+    This appears to be unused in the new client.
+    """
     historical: List[NaverPanorama] = None
     """A list of panoramas with a different date at the same location. 
     Only available if the panorama was retrieved by ``find_panorama_by_id``."""
@@ -80,11 +95,16 @@ class NaverPanorama:
     """The title field, which typically contains the street name."""
 
     depth: np.ndarray = None
-    """The depth maps of the faces."""
+    """The legacy depth maps of the cubemap faces."""
 
+    has_equirect: bool = None
+    """
+    If True, this panorama can be fetched as either in equirectangular projection or as a cubemap.
+    If False, only a cubemap is available.
+    """
     panorama_type: PanoramaType = None
     """The panorama type. Most identifiers are taken directly from the source."""
-    overlay: Overlay = None
+    overlay: Optional[Overlay] = None
     """
     Curiously, in pre-3D imagery, Naver masks their car twice: once with an image of a car baked into the panorama, 
     and additionally with an image of the road beneath it (like Google and Apple), which is served as a separate file 
@@ -121,7 +141,6 @@ class NaverPanorama:
 @dataclass
 class Overlay:
     """URLs to the images from which the overlay hiding the mapping car is created."""
-
     source: str
     """URL to the texture."""
     mask: str
@@ -131,7 +150,6 @@ class Overlay:
 @dataclass
 class Neighbors:
     """Nearby panoramas."""
-
     street: List[NaverPanorama]
     """Nearby panoramas taken at street level."""
     other: List[NaverPanorama]

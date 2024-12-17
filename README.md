@@ -183,8 +183,8 @@ Services covering multiple countries are on the left; services covering one spec
     <td></td>
     <td align="center">✔</td>
     <td align="center">✔<sup>7</sup></td>
-    <td align="center">✔<sup>7</sup></td>
-    <td align="center">✔<br></td>
+    <td align="center">✔<sup>11</sup></td>
+    <td align="center">✔</td>
     <td align="center">✔<sup>7</sup></td>
   </tr>
   <tr>
@@ -196,7 +196,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td></td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
-    <td align="center">✔</td>
+    <td align="center">⚫<sup>12</sup></td>
     <td align="center">✔</td>
     <td align="center">⚫</td>
   </tr>
@@ -276,4 +276,6 @@ Services covering multiple countries are on the left; services covering one spec
 7: Only heading; pitch/roll do not appear to be available  
 8: Previous and next image in sequence  
 9: Month and year only  
-10: There is a `has_depth` field in the raw metadata, but I've yet to find a panorama that actually has depth.
+10: There is a `has_depth` field in the raw metadata, but I've yet to find a panorama that actually has depth  
+11: Pitch/roll are only available for the new 3D imagery  
+12: Camera altitude is available, however
