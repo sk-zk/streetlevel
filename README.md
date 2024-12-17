@@ -139,7 +139,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td></td>
     <td align="center">Equirectangular</td>
     <td align="center">Equirectangular</td>
-    <td align="center">Cubemap</td>
+    <td align="center">Equirectangular/Cubemap<sup>13</sup></td>
     <td align="center">Equirectangular</td>
     <td align="center">Cubemap</td>
   </tr>
@@ -279,3 +279,4 @@ Services covering multiple countries are on the left; services covering one spec
 10: There is a `has_depth` field in the raw metadata, but I've yet to find a panorama that actually has depth  
 11: Pitch/roll are only available for the new 3D imagery  
 12: Camera altitude is available, however
+13: 3D imagery panos have both an equirectangular and a cubemap version; everything else is only available as cubemap

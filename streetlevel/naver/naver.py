@@ -1,3 +1,5 @@
+import itertools
+import math
 from typing import Optional, List, Union, Tuple
 
 import numpy as np
@@ -8,9 +10,11 @@ from requests import Session
 from . import api
 from .panorama import NaverPanorama, Neighbors
 from .parse import parse_panorama, parse_nearby, parse_historical, parse_neighbors
-from ..dataclasses import Tile
+from ..dataclasses import Tile, Size
+from ..exif import save_with_metadata
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
-    save_cubemap_panorama, get_image, get_image_async, stitch_cubemap_face
+    save_cubemap_panorama, get_image, get_image_async, stitch_cubemap_face, get_equirectangular_panorama, \
+    get_equirectangular_panorama_async
 
 
 def find_panorama_by_id(panoid: str, language: str = "en",
@@ -165,7 +169,7 @@ async def get_neighbors_async(panoid: str, session: ClientSession) -> Neighbors:
     return parse_neighbors(response, panoid)
 
 
-def get_panorama(pano: NaverPanorama, zoom: int = 2,
+def get_panorama(pano: NaverPanorama, zoom: int = 2, equirect=False,
                  stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW) \
         -> Union[List[Image.Image], Image.Image]:
     """
@@ -174,30 +178,50 @@ def get_panorama(pano: NaverPanorama, zoom: int = 2,
     :param pano: The panorama.
     :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. Defaults to 2. If 2 is unavailable, 1 will be
         downloaded instead.
+    :param equirect: *(optional)* Whether the panorama should be downloaded in equirectangular projection instead of
+        a cubemap. Only available for 3D imagery. Defaults to False.
     :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
-        image. Defaults to ``ROW``.
-    :return: A PIL image or a list of six PIL images depending on ``stitching_method``.
+        image if downloading as cubemap. Defaults to ``ROW``.
+    :return: A PIL image or a list of six PIL images depending on ``equirect`` and ``stitching_method``.
     """
     zoom = _validate_zoom(pano, zoom)
-    if zoom == 0:
-        return _get_zoom_0(pano, stitching_method)
-    face_tiles, cols, rows = _generate_tile_list(pano.id, zoom)
-    tile_images = _download_tiles(face_tiles)
-    return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
+    if equirect:
+        if not pano.has_equirect:
+            raise ValueError("This panorama cannot be downloaded in equirectangular projection.")
+        cols = 4 * int(math.pow(2, zoom))
+        rows = 2 * int(math.pow(2, zoom))
+        return get_equirectangular_panorama(
+            pano.tile_size.x * cols, pano.tile_size.y * rows,
+            pano.tile_size, _generate_tile_list_equirect(pano, zoom))
+    else:
+        if zoom == 0:
+            return _get_zoom_0_cubemap(pano, stitching_method)
+        face_tiles, cols, rows = _generate_tile_list_cubemap(pano.id, zoom)
+        tile_images = _download_tiles(face_tiles)
+        return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
 
 
-async def get_panorama_async(pano: NaverPanorama, session: ClientSession, zoom: int = 2,
+async def get_panorama_async(pano: NaverPanorama, session: ClientSession, zoom: int = 2, equirect=False,
                              stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW) \
         -> Union[List[Image.Image], Image.Image]:
     zoom = _validate_zoom(pano, zoom)
-    if zoom == 0:
-        return await _get_zoom_0_async(pano, session, stitching_method)
-    face_tiles, cols, rows = _generate_tile_list(pano.id, zoom)
-    tile_images = await _download_tiles_async(face_tiles, session)
-    return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
+    if equirect:
+        if not pano.has_equirect:
+            raise ValueError("This panorama cannot be downloaded in equirectangular projection.")
+        cols = 4 * int(math.pow(2, zoom))
+        rows = 2 * int(math.pow(2, zoom))
+        return await get_equirectangular_panorama_async(
+            512 * cols, 512 * rows, Size(512, 512),
+            _generate_tile_list_equirect(pano, zoom), session)
+    else:
+        if zoom == 0:
+            return await _get_zoom_0_cubemap_async(pano, session, stitching_method)
+        face_tiles, cols, rows = _generate_tile_list_cubemap(pano.id, zoom)
+        tile_images = await _download_tiles_async(face_tiles, session)
+        return _stitch_panorama(tile_images, cols, rows, stitching_method=stitching_method)
 
 
-def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2,
+def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2, equirect=False,
                       stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW,
                       pil_args: dict = None) -> None:
     """
@@ -207,8 +231,10 @@ def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2,
     :param path: Output path.
     :param zoom: *(optional)* Image size; 0 is lowest, 2 is highest. Defaults to 2. If 2 is unavailable, 1 will be
         downloaded instead.
+    :param equirect: *(optional)* Whether the panorama should be downloaded in equirectangular projection instead of
+        a cubemap. Only available for 3D imagery. Defaults to False.
     :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
-        image. Defaults to ``ROW``.
+        image if downloading as cubemap. Defaults to ``ROW``.
     :param pil_args: *(optional)* Additional arguments for PIL's
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
@@ -216,18 +242,32 @@ def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2,
     if pil_args is None:
         pil_args = {}
 
-    output = get_panorama(pano, zoom=zoom, stitching_method=stitching_method)
-    save_cubemap_panorama(output, path, pil_args)
+    image = get_panorama(pano, zoom=zoom, equirect=equirect,
+                         stitching_method=stitching_method)
+    if equirect:
+        save_with_metadata(image, path, pil_args, pano.id,
+                           pano.lat, pano.lon, pano.altitude, pano.date,
+                           pano.heading, pano.pitch, pano.roll,
+                           "Naver")
+    else:
+        save_cubemap_panorama(image, path, pil_args)
 
 
-async def download_panorama_async(pano: NaverPanorama, path: str, session: ClientSession, zoom: int = 2,
+async def download_panorama_async(pano: NaverPanorama, path: str, session: ClientSession, zoom: int = 2, equirect=False,
                                   stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW,
                                   pil_args: dict = None) -> None:
     if pil_args is None:
         pil_args = {}
 
-    output = await get_panorama_async(pano, session, zoom=zoom, stitching_method=stitching_method)
-    save_cubemap_panorama(output, path, pil_args)
+    image = await get_panorama_async(pano, session, zoom=zoom, equirect=equirect,
+                                     stitching_method=stitching_method)
+    if equirect:
+        save_with_metadata(image, path, pil_args, pano.id,
+                           pano.lat, pano.lon, pano.altitude, pano.date,
+                           pano.heading, pano.pitch, pano.roll,
+                           "Naver")
+    else:
+        save_cubemap_panorama(image, path, pil_args)
 
 
 def get_depth(panoid: str, session: Session = None) -> np.ndarray:
@@ -256,15 +296,16 @@ def _parse_depth(depth_json: dict) -> np.ndarray:
     return np.array(depth_faces)
 
 
-def _get_zoom_0(pano: NaverPanorama, stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
+def _get_zoom_0_cubemap(pano: NaverPanorama,
+                        stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
     FACE_SIZE = 256
     image = get_image(f"https://panorama.pstatic.net/image/{pano.id}/512/P")
     faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]
     return stitch_cubemap_faces(faces, FACE_SIZE, stitching_method)
 
 
-async def _get_zoom_0_async(pano: NaverPanorama, session: ClientSession,
-                            stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
+async def _get_zoom_0_cubemap_async(pano: NaverPanorama, session: ClientSession,
+                                    stitching_method: CubemapStitchingMethod) -> Union[List[Image.Image], Image.Image]:
     FACE_SIZE = 256
     image = await get_image_async(f"https://panorama.pstatic.net/image/{pano.id}/512/P", session)
     faces = [image.crop((i*FACE_SIZE, 0, (i+1)*FACE_SIZE, FACE_SIZE)) for i in [1, 2, 3, 0, 5, 4]]
@@ -281,7 +322,7 @@ def _validate_zoom(pano: NaverPanorama, zoom: int) -> int:
         return max(0, min(zoom, pano.max_zoom))
 
 
-def _generate_tile_list(panoid: str, zoom: int) -> Tuple[List[List[Tile]], int, int]:
+def _generate_tile_list_cubemap(panoid: str, zoom: int) -> Tuple[List[List[Tile]], int, int]:
     if not (zoom == 1 or zoom == 2):
         raise ValueError("Unsupported zoom level")
 
@@ -299,6 +340,20 @@ def _generate_tile_list(panoid: str, zoom: int) -> Tuple[List[List[Tile]], int, 
                                        f"{face_url_name}/{col_idx+1}/{row_idx+1}"))
         tiles.append(face_tiles)
     return tiles, cols, rows
+
+
+def _generate_tile_list_equirect(pano: NaverPanorama, zoom: int) -> List[Tile]:
+    """
+    Generates a list of a panorama's tiles and the URLs pointing to them.
+    """
+    cols = 4 * int(math.pow(2, zoom))
+    rows = 2 * int(math.pow(2, zoom))
+
+    IMAGE_URL = "https://panorama.pstatic.net/imageV3/{0:}/{3:}/{1:}/{2:}"
+
+    coords = list(itertools.product(range(cols), range(rows)))
+    tiles = [Tile(x, y, IMAGE_URL.format(pano.id, x+1, y+1, zoom)) for x, y in coords]
+    return tiles
 
 
 def _download_tiles(face_tiles: List[List[Tile]]) -> List[dict]:

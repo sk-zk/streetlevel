@@ -7,7 +7,7 @@ from typing import List, Optional
 
 import numpy as np
 
-from streetlevel.dataclasses import Link
+from streetlevel.dataclasses import Link, Size
 from .util import build_permalink
 
 
@@ -112,6 +112,14 @@ class NaverPanorama:
     
     (Only available for pre-3D car footage.)
     """
+
+    @property
+    def tile_size(self) -> Size:
+        """
+        Naver panoramas in equirectangular format are broken up into a grid of tiles.
+        This returns the size of one tile.
+        """
+        return Size(512, 512)
 
     def permalink(self: NaverPanorama, heading: float = 0.0, pitch: float = 10.0, fov: float = 80.0,
                   map_zoom: float = 17.0, radians: bool = False) -> str:
