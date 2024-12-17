@@ -1,6 +1,6 @@
 # streetlevel
 **streetlevel** is a library for downloading panoramas and metadata from street-level imagery services
-such as Google Street View, Apple Look Around, and several others. It provides a high-level abstraction
+such as Google Street View, Apple Look Around, and several others. It provides a simple abstraction
 over the internal APIs of the supported services &ndash; this means that no API keys are required, but the
 library may break unexpectedly. 
 
@@ -105,7 +105,7 @@ Services covering multiple countries are on the left; services covering one spec
     </td>
   </thead>
   <tr>
-    <td align="right">Download panoramas</td>
+    <td align="right">Panoramas</td>
     <td align="center">✔</td>
     <td align="center">✔<sup>4</sup></td>
     <td align="center">✔</td>
@@ -118,7 +118,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
   </tr>
   <tr>
-    <td align="right">Download depth information</td>
+    <td align="right">Depth</td>
     <td align="center">✔<sup>5</sup></td>
     <td align="center">❌</td>
     <td align="center">⚫</td>
