@@ -23,6 +23,9 @@ def find_panorama_by_id(panoid: str, language: str = "en",
     """
     Fetches metadata of a specific panorama.
 
+    Note that ``panorama_type``, ``pitch`` and ``roll`` will be wrong if this is a 3D panorama because
+    Naver has yet to update this endpoint.
+
     :param panoid: The pano ID.
     :param language: *(optional)* Language of ``description`` and ``title`` fields; accepted values are
         ``ko`` (Korean),``en`` (English), ``ja`` (Japanese) and ``zh`` (Simplified Chinese).

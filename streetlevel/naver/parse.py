@@ -100,17 +100,18 @@ def parse_historical(response: dict, parent_id: str) -> List[NaverPanorama]:
 
 def parse_nearby(response: dict) -> NaverPanorama:
     feature = response["features"][0]
-    elevation = feature["properties"]["land_altitude"] * 0.01
+    heading, pitch, roll = _convert_pano_rotation(feature["properties"]["camera_angle"])
     return NaverPanorama(
         id=feature["properties"]["id"],
         lat=feature["geometry"]["coordinates"][1],
         lon=feature["geometry"]["coordinates"][0],
-        heading=math.radians(feature["properties"]["camera_angle"][1]),
+        heading=heading,
+        pitch=pitch,
+        roll=roll,
         date=_parse_date(feature["properties"]["photodate"]),
         description=feature["properties"]["description"],
         title=feature["properties"]["title"],
-        altitude=elevation,
-        camera_height=(feature["properties"]["camera_altitude"] * 0.01) - elevation,
+        altitude=feature["properties"]["camera_altitude"] * 0.01,
         panorama_type=PanoramaType(int(feature["properties"]["type"])),
     )
 
