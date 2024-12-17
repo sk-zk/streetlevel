@@ -1,6 +1,8 @@
 import math
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
+
+from scipy.spatial.transform import Rotation
 
 from streetlevel.dataclasses import Link
 from streetlevel.geo import get_bearing
@@ -9,17 +11,12 @@ from streetlevel.naver.panorama import Neighbors, NaverPanorama, PanoramaType, O
 
 def parse_panorama(response: dict) -> NaverPanorama:
     altitude = response["altitude"]
-    if response["camera_angle"][0] != 0:
-        pitch = math.radians(90 - response["camera_angle"][0])
-        roll = math.radians(90 - response["camera_angle"][2])
-    else:
-        pitch = 0
-        roll = 0
+    heading, pitch, roll = _convert_pano_rotation(response["camera_angle"])
     pano = NaverPanorama(
         id=response["id"],
         lat=response["latitude"],
         lon=response["longitude"],
-        heading=math.radians(response["camera_angle"][1]),
+        heading=heading,
         pitch=pitch,
         roll=roll,
         max_zoom=int(response["segment"]) // 2,
@@ -42,6 +39,22 @@ def parse_panorama(response: dict) -> NaverPanorama:
     pano.links = _parse_links(response["links"], pano.lat, pano.lon)
 
     return pano
+
+
+def _convert_pano_rotation(angle: List[float]) -> Tuple[float, float, float]:
+    if angle[0] != 0:
+        heading, pitch, roll = \
+            Rotation.from_euler("zyx", (
+                angle[2],
+                angle[1],
+                angle[0],
+            ), True).as_euler("yxz")
+        heading += math.pi
+    else:
+        heading = math.radians(angle[0])
+        pitch = 0
+        roll = 0
+    return heading, pitch, roll
 
 
 def parse_neighbors(response: dict, parent_id: str) -> Neighbors:
