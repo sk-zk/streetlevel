@@ -278,6 +278,6 @@ Services covering multiple countries are on the left; services covering one spec
 9: Month and year only  
 10: There is a `has_depth` field in the raw metadata, but I've yet to find a panorama that actually has depth  
 11: Pitch/roll are only available for the new 3D imagery  
-12: Camera altitude is available, however
-13: 3D imagery panos have both an equirectangular and a cubemap version; everything else is only available as cubemap
+12: Camera altitude is available, however  
+13: 3D imagery panos have both an equirectangular and a cubemap version; everything else is only available as cubemap  
 14: Non-3D imagery appears to use a synthetic depthmap created from elevation data and building footprints
