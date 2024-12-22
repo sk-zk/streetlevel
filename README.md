@@ -126,7 +126,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td></td>
     <td align="center">❌?<sup>10</sup></td>
     <td align="center">✔</td>
-    <td align="center">✔<sup>5</sup></td>
+    <td align="center">✔<sup>14</sup></td>
     <td align="center">⚫<br></td>
     <td align="center">⚫<br></td>
   </tr>
@@ -280,3 +280,4 @@ Services covering multiple countries are on the left; services covering one spec
 11: Pitch/roll are only available for the new 3D imagery  
 12: Camera altitude is available, however
 13: 3D imagery panos have both an equirectangular and a cubemap version; everything else is only available as cubemap
+14: Non-3D imagery appears to use a synthetic depthmap created from elevation data and building footprints
