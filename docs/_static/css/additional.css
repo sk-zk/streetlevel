@@ -94,6 +94,9 @@
 }
 
 
+#streetlevel\.naver\.model\.Model + dd > dl:first-of-type.field-list {
+  display:none !important;
+}
 #streetlevel\.naver\.panorama\.NaverPanorama + dd > dl:first-of-type.field-list {
   display:none !important;
 }

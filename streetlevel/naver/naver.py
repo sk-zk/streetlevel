@@ -5,9 +5,11 @@ from typing import Optional, List, Union, Tuple
 import numpy as np
 from aiohttp import ClientSession
 from PIL import Image
+from google.protobuf.message import DecodeError
 from requests import Session
 
 from . import api
+from .model import Model
 from .panorama import NaverPanorama, Neighbors
 from .parse import parse_panorama, parse_nearby, parse_historical, parse_neighbors
 from ..dataclasses import Tile, Size
@@ -275,7 +277,7 @@ async def download_panorama_async(pano: NaverPanorama, path: str, session: Clien
 
 def get_depth(panoid: str, session: Session = None) -> np.ndarray:
     """
-    Fetches the depth map of a panorama.
+    Fetches the legacy depth map of a panorama.
 
     :param panoid: The pano ID.
     :param session: *(optional)* A requests session.
@@ -289,6 +291,34 @@ async def get_depth_async(panoid: str, session: ClientSession) -> np.ndarray:
     depth_json = await api.get_depth_async(panoid, session)
     return _parse_depth(depth_json)
 
+
+def get_model(panoid: str, session: Session = None) -> Optional[Model]:
+    """
+    Fetches the 3D model of the panorama. Only available if the panorama type is ``MESH_EQUIRECT``.
+
+    :param panoid: The pano ID.
+    :param session: *(optional)* A requests session.
+    :return: The vertices and faces of the model, or None if this panorama does not have a 3D model.
+    """
+    try:
+        pb_mesh = api.get_mesh(panoid, session)
+    except DecodeError:
+        return None
+    return Model(
+        np.reshape(pb_mesh.vertices, (len(pb_mesh.vertices)//3,3)),
+        np.reshape(pb_mesh.faces, (len(pb_mesh.faces)//3,3))
+    )
+
+
+async def get_model_async(panoid: str, session: ClientSession):
+    try:
+        pb_mesh = await api.get_mesh_async(panoid, session)
+    except DecodeError:
+        return None
+    return Model(
+        np.reshape(pb_mesh.vertices, (len(pb_mesh.vertices)//3,3)),
+        np.reshape(pb_mesh.faces, (len(pb_mesh.faces)//3,3))
+    )
 
 def _parse_depth(depth_json: dict) -> np.ndarray:
     depth = [float(n) for n in depth_json["depthmap"].split(",")]

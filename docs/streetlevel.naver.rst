@@ -82,9 +82,14 @@ Downloading panoramas
       async with ClientSession() as session:
           pano = await naver.find_panorama_by_id_async("hQ46n55JstD9C-tGdzZz2g", session)
           await naver.download_panorama_async(pano, f"{pano.id}.jpg", session)
+          
+    .. autofunction:: streetlevel.naver.get_model
+    .. autofunction:: streetlevel.naver.get_model_async
 
 Data classes and Enums
 ----------------------
+    .. autoclass:: streetlevel.naver.model.Model
+      :members:
     .. autoclass:: streetlevel.naver.panorama.NaverPanorama
       :members:
     .. autoclass:: streetlevel.naver.panorama.Neighbors

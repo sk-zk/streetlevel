@@ -1,7 +1,9 @@
+import requests
 from requests import Session
 from aiohttp import ClientSession
 
 from ..util import get_json, get_json_async
+from streetlevel.naver.proto import Model_pb2
 
 headers = {"Referer": "https://map.naver.com"}
 
@@ -24,6 +26,10 @@ def build_around_request_url(panoid: str) -> str:
 
 def build_depth_request_url(panoid: str) -> str:
     return f"https://panorama.map.naver.com/depthmap/{panoid}"
+
+
+def build_model_request_url(panoid: str) -> str:
+    return f"https://panorama.map.naver.com/metadataV3/model/{panoid}?modelType=v3_mesh"
 
 
 def find_panorama(lat: float, lon: float, session: Session = None) -> dict:
@@ -74,3 +80,21 @@ def get_depth(panoid: str, session: Session = None) -> dict:
 async def get_depth_async(panoid: str, session: ClientSession) -> dict:
     return await get_json_async(build_depth_request_url(panoid), session,
                                 headers=headers)
+
+
+def get_mesh(panoid: str, session: Session = None) -> Model_pb2:
+    requester = session if session else requests
+    response = requester.get(build_model_request_url(panoid), headers=headers)
+
+    model = Model_pb2.Model()
+    model.ParseFromString(response.content)
+    return model
+
+
+async def get_mesh_async(panoid: str, session: ClientSession) -> Model_pb2:
+    async with session.get(build_model_request_url(panoid), headers=headers) as response:
+        content = await response.read()
+
+    model = Model_pb2.Model()
+    model.ParseFromString(content)
+    return model

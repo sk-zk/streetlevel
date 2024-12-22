@@ -106,11 +106,11 @@ class NaverPanorama:
     """The panorama type. Most identifiers are taken directly from the source."""
     overlay: Optional[Overlay] = None
     """
-    Curiously, in pre-3D imagery, Naver masks their car twice: once with an image of a car baked into the panorama, 
+    Curiously, in non-3D imagery, Naver masks their car twice: once with an image of a car baked into the panorama, 
     and additionally with an image of the road beneath it (like Google and Apple), which is served as a separate file 
     and overlaid on the panorama in the client. This is the URL to that secondary overlay.
     
-    (Only available for pre-3D car footage.)
+    (Only available for non-3D car footage.)
     """
 
     @property
