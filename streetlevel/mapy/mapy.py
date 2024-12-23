@@ -188,7 +188,7 @@ def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: di
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
     save_with_metadata(image, path, pil_args, str(pano.id),
-                       pano.lat, pano.lon, None, str(pano.date),
+                       pano.lat, pano.lon, pano.elevation, str(pano.date),
                        0, pano.pitch, pano.roll, pano.provider)
 
 
@@ -198,7 +198,7 @@ async def download_panorama_async(pano: MapyPanorama, path: str, session: Client
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
     save_with_metadata(image, path, pil_args, str(pano.id),
-                       pano.lat, pano.lon, None, str(pano.date),
+                       pano.lat, pano.lon, pano.elevation, str(pano.date),
                        0, pano.pitch, pano.roll, pano.provider)
 
 
