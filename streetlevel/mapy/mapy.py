@@ -1,4 +1,5 @@
 import itertools
+import math
 from typing import List, Optional
 
 from aiohttp import ClientSession
@@ -9,6 +10,7 @@ from .api import MapyApi
 from .panorama import MapyPanorama
 from .parse import parse_pan_info_dict, parse_neighbors_response, parse_getbest_response
 from ..dataclasses import Tile, Link
+from ..exif import save_with_metadata
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async
 
 api = MapyApi()
@@ -172,7 +174,7 @@ async def get_panorama_async(pano: MapyPanorama, session: ClientSession, zoom: i
 
 def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
     """
-    Downloads a panorama to a file.
+    Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
 
     :param pano: The panorama.
     :param path: Output path.
@@ -185,7 +187,9 @@ def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: di
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, str(pano.id),
+                       pano.lat, pano.lon, None, str(pano.date),
+                       0, pano.pitch, pano.roll, pano.provider)
 
 
 async def download_panorama_async(pano: MapyPanorama, path: str, session: ClientSession,
@@ -193,7 +197,9 @@ async def download_panorama_async(pano: MapyPanorama, path: str, session: Client
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    image.save(path, **pil_args)
+    save_with_metadata(image, path, pil_args, str(pano.id),
+                       pano.lat, pano.lon, None, str(pano.date),
+                       0, pano.pitch, pano.roll, pano.provider)
 
 
 def _validate_find_panorama_params(radius, year):
