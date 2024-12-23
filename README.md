@@ -56,7 +56,7 @@ Services covering multiple countries are on the left; services covering one spec
     <th align="center">🇮🇸 Já<br>360</th>
   </thead>
   <thead>
-    <td colspan="10" style="padding-top:20px"><br><b>Finding panoramas</b><br>
+    <td colspan="11" style="padding-top:20px"><br><b>Finding panoramas</b><br>
       How panoramas can be retrieved through the API.
     </td>
   </thead>
@@ -100,7 +100,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">✔</td>
   </tr>
   <thead>
-    <td colspan="10" style="padding-top:20px"><br><b>Imagery</b><br>
+    <td colspan="11" style="padding-top:20px"><br><b>Imagery</b><br>
       The type of imagery returned by the service.
     </td>
   </thead>
@@ -157,7 +157,7 @@ Services covering multiple countries are on the left; services covering one spec
     <td align="center">JPEG</td>
   </tr>
   <thead>
-    <td colspan="10" style="padding-top:20px"><br><b>Available metadata</b><br>
+    <td colspan="11" style="padding-top:20px"><br><b>Available metadata</b><br>
       Metadata returned by the API of the service alongside ID and location.
     </td>
   </thead>
