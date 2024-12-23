@@ -51,7 +51,7 @@ def _convert_pano_rotation(angle: List[float]) -> Tuple[float, float, float]:
             ), True).as_euler("yxz")
         heading += math.pi
     else:
-        heading = math.radians(angle[0])
+        heading = math.radians(angle[1])
         pitch = 0
         roll = 0
     return heading, pitch, roll
