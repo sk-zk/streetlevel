@@ -39,7 +39,7 @@ def save_with_metadata(image: Image.Image, path: str, pil_args: dict,
         xmp = {
             "Xmp.GPano.UsePanoramaViewer": True,
             "Xmp.GPano.ProjectionType": "equirectangular",
-            "Xmp.GPano.PoseHeadingDegrees": math.degrees(heading),
+            "Xmp.GPano.PoseHeadingDegrees": math.degrees(heading) % 360,
             "Xmp.GPano.CroppedAreaImageWidthPixels": image.width,
             "Xmp.GPano.CroppedAreaImageHeightPixels": image.height,
             "Xmp.GPano.FullPanoWidthPixels": image.width,
