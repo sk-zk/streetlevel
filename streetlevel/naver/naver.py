@@ -30,7 +30,7 @@ def find_panorama_by_id(panoid: str, language: str = "en",
 
     :param panoid: The pano ID.
     :param language: *(optional)* Language of ``description`` and ``title`` fields; accepted values are
-        ``ko`` (Korean),``en`` (English), ``ja`` (Japanese) and ``zh`` (Simplified Chinese).
+        ``ko`` (Korean), ``en`` (English), ``ja`` (Japanese) and ``zh`` (Simplified Chinese).
     :param neighbors: *(optional)* Whether an additional network request is made to fetch nearby panoramas.
         Defaults to True.
     :param historical: *(optional)* Whether an additional network request is made to fetch metadata of
