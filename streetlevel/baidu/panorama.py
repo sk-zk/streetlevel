@@ -51,7 +51,8 @@ class BaiduPanorama:
     """The street name."""
 
     provider: Union[Provider, int] = None
-    """The company or organisation which captured the panorama."""
+    """The company or organisation which captured the panorama. If the enum value returned by the API is known,
+    this field is of type ``Provider``. Otherwise, it contains the raw integer."""
     creator: Optional[User] = None
     """Name and ID of the uploader if this is a user-provided panorama."""
 
