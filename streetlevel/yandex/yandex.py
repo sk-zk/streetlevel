@@ -80,7 +80,7 @@ async def get_panorama_async(pano: YandexPanorama, session: ClientSession, zoom:
 
 def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0, pil_args: dict = None) -> None:
     """
-    Downloads a panorama to a file.
+    Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
 
     Note that most official car coverage has its bottom part cropped out.
 

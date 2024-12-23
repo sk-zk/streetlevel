@@ -31,7 +31,7 @@ class BaiduPanorama:
     """WGS84 longitude of the panorama's location."""
 
     heading: float = None
-    """Heading in radians, where 0° is north, 90° is east, 180° is south, and 270° is west."""
+    """Heading of the car in radians, where 0° is north, 90° is east, 180° is south, and 270° is west."""
     pitch: float = None
     """Pitch offset for upright correction of the panorama, in radians."""
     roll: float = None

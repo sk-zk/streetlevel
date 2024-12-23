@@ -230,7 +230,7 @@ def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2, equirect=Fa
                       stitching_method: CubemapStitchingMethod = CubemapStitchingMethod.ROW,
                       pil_args: dict = None) -> None:
     """
-    Downloads a panorama to a file.
+    Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
 
     :param pano: The panorama.
     :param path: Output path.

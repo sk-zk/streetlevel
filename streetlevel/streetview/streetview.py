@@ -126,7 +126,7 @@ async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: Cli
 
 def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_args: dict = None) -> None:
     """
-    Downloads a panorama to a file.
+    Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
 
     :param pano: The panorama to download.
     :param path: Output path.

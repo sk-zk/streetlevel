@@ -129,7 +129,7 @@ async def get_panorama_async(pano: KakaoPanorama, session: ClientSession, zoom: 
 
 def download_panorama(pano: KakaoPanorama, path: str, zoom: int = 2, pil_args: dict = None) -> None:
     """
-    Downloads a panorama to a file.
+    Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
 
     :param pano: The panorama to download.
     :param path: Output path.

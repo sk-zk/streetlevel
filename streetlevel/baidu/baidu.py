@@ -123,7 +123,11 @@ async def get_panorama_async(pano: BaiduPanorama, session: ClientSession, zoom: 
 
 def download_panorama(pano: BaiduPanorama, path: str, zoom: int = 3, pil_args: dict = None) -> None:
     """
-    Downloads a panorama to a file.
+    Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
+
+    (``PosePitchDegrees`` and ``PoseRollDegrees`` are not set because I've been unable to work out
+    the order of operations. Rotations are my arch nemesis and there is only so much time I'm
+    willing to waste on this.)
 
     :param pano: The panorama to download.
     :param path: Output path.

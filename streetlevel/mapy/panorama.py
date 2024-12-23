@@ -43,14 +43,13 @@ class MapyPanorama:
     num_tiles: List[Size] = None
 
     heading: float = None
-    """Heading offset in radians, where 0° is north, 90° is east, -180°/180° is south, and -90° is west."""
+    """Heading offset in radians, where 0° is north, 90° is east, -180°/180° is south, and -90° is west.
+    Note that Mapy, unlike other providers, shifts their panoramas such that north is always in the center
+    of the image."""
 
-    omega: float = None
-    """ """
-    phi: float = None
-    """ """
-    kappa: float = None
-    """ """
+    omega: float = None  #:
+    phi: float = None  #:
+    kappa: float = None  #:
 
     pitch: float = None
     """Pitch offset for upright correction of the panorama, in radians."""
