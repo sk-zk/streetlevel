@@ -186,7 +186,7 @@ def get_panorama(pano: NaverPanorama, zoom: int = 2, equirect=False,
     :param equirect: *(optional)* Whether the panorama should be downloaded in equirectangular projection instead of
         a cubemap. Only available for 3D imagery. Defaults to False.
     :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
-        image if downloading as cubemap. Defaults to ``ROW``.
+        image when downloading as cubemap. Defaults to ``ROW``.
     :return: A PIL image or a list of six PIL images depending on ``equirect`` and ``stitching_method``.
     """
     zoom = _validate_zoom(pano, zoom)
@@ -239,7 +239,7 @@ def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2, equirect=Fa
     :param equirect: *(optional)* Whether the panorama should be downloaded in equirectangular projection instead of
         a cubemap. Only available for 3D imagery. Defaults to False.
     :param stitching_method: *(optional)* Whether and how the faces of the cubemap are stitched into one
-        image if downloading as cubemap. Defaults to ``ROW``.
+        image when downloading as cubemap. Defaults to ``ROW``.
     :param pil_args: *(optional)* Additional arguments for PIL's
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
