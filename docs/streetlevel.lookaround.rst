@@ -112,8 +112,8 @@ Reprojection
       
       from streetlevel import lookaround
 
-      panos = lookaround.get_coverage_tile_by_latlon(54.583244, 9.820249)
-      pano = next(p for p in panos if p.id == 6651337760361848285)
+      tile = lookaround.get_coverage_tile_by_latlon(54.583244, 9.820249)
+      pano = next(p for p in tile.panos if p.id == 6651337760361848285)
 
       auth = lookaround.Authenticator()
       faces = []
