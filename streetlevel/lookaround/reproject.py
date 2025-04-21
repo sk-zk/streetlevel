@@ -9,12 +9,14 @@ from torchvision import transforms
 from streetlevel.lookaround.panorama import CameraMetadata
 
 _equi2equi = Equi2Equi(mode="bilinear", z_down=True)
-_device = torch.device("cuda")
+_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 _to_tensor = transforms.Compose([transforms.ToTensor()])
 _to_pil = transforms.Compose([transforms.ToPILImage()])
 
 
-def to_equirectangular(faces: List[Image.Image], camera_metadata: List[CameraMetadata]) -> Image.Image:
+def to_equirectangular(
+    faces: List[Image.Image], camera_metadata: List[CameraMetadata]
+) -> Image.Image:
     """
     Reprojects the faces of a Look Around panorama to a single equirectangular image. The center of the
     returned image is the inverse direction of travel (meaning you're looking backwards).
@@ -37,15 +39,26 @@ def to_equirectangular(faces: List[Image.Image], camera_metadata: List[CameraMet
     for faceIndex in range(5, -1, -1):
         if faceIndex > 3:
             projected = _project_top_or_bottom_face(
-                faces[faceIndex], camera_metadata[faceIndex], full_width, full_height)
+                faces[faceIndex], camera_metadata[faceIndex], full_width, full_height
+            )
             stitched.paste(projected, (0, 0), projected)
         else:
-            _paste_side_face(faces[faceIndex], camera_metadata[faceIndex], full_width, full_height, stitched)
+            _paste_side_face(
+                faces[faceIndex],
+                camera_metadata[faceIndex],
+                full_width,
+                full_height,
+                stitched,
+            )
     return stitched
 
 
-def _project_top_or_bottom_face(face: Image.Image, camera_metadata: CameraMetadata,
-                                full_width: int, full_height: int) -> Image.Image:
+def _project_top_or_bottom_face(
+    face: Image.Image,
+    camera_metadata: CameraMetadata,
+    full_width: int,
+    full_height: int,
+) -> Image.Image:
     input_img = Image.new("RGBA", (full_width, full_height), (0, 0, 0, 0))
 
     phi_length = camera_metadata.lens_projection.fov_s
@@ -59,22 +72,38 @@ def _project_top_or_bottom_face(face: Image.Image, camera_metadata: CameraMetada
     input_img.paste(scaled_img, box=(math.ceil(x), math.ceil(y)))
 
     input_tensor = _to_tensor(input_img).to(_device)
-    reprojected_tensor = _equi2equi(input_tensor, {
-        "yaw": -camera_metadata.position.yaw,
-        "pitch": camera_metadata.position.pitch,
-        "roll": camera_metadata.position.roll,
-    })
+    reprojected_tensor = _equi2equi(
+        input_tensor,
+        {
+            "yaw": -camera_metadata.position.yaw,
+            "pitch": camera_metadata.position.pitch,
+            "roll": camera_metadata.position.roll,
+        },
+    )
     reprojected_tensor = reprojected_tensor.to("cpu")
     reprojected_img = _to_pil(reprojected_tensor)
     return reprojected_img
 
 
-def _paste_side_face(face: Image.Image, camera_metadata: CameraMetadata,
-                     full_width: int, full_height: int, stitched: Image.Image) -> None:
-    phi_start = math.pi + camera_metadata.position.yaw - (camera_metadata.lens_projection.fov_s / 2)
+def _paste_side_face(
+    face: Image.Image,
+    camera_metadata: CameraMetadata,
+    full_width: int,
+    full_height: int,
+    stitched: Image.Image,
+) -> None:
+    phi_start = (
+        math.pi
+        + camera_metadata.position.yaw
+        - (camera_metadata.lens_projection.fov_s / 2)
+    )
     if phi_start < 0:
         phi_start += 2 * math.pi
-    theta_start = (math.pi / 2) - (camera_metadata.lens_projection.fov_h / 2) - camera_metadata.lens_projection.cy
+    theta_start = (
+        (math.pi / 2)
+        - (camera_metadata.lens_projection.fov_h / 2)
+        - camera_metadata.lens_projection.cy
+    )
     phi_length = camera_metadata.lens_projection.fov_s
     theta_length = camera_metadata.lens_projection.fov_h
     face_width = phi_length * (full_height / math.pi)
