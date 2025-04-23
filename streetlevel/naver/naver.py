@@ -13,7 +13,7 @@ from .model import Model
 from .panorama import NaverPanorama, Neighbors
 from .parse import parse_panorama, parse_nearby, parse_historical, parse_neighbors
 from ..dataclasses import Tile, Size
-from ..exif import save_with_metadata
+from ..exif import save_with_metadata, OutputMetadata
 from ..util import download_tiles, CubemapStitchingMethod, stitch_cubemap_faces, download_tiles_async, \
     save_cubemap_panorama, get_image, get_image_async, stitch_cubemap_face, get_equirectangular_panorama, \
     get_equirectangular_panorama_async
@@ -250,10 +250,7 @@ def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2, equirect=Fa
     image = get_panorama(pano, zoom=zoom, equirect=equirect,
                          stitching_method=stitching_method)
     if equirect:
-        save_with_metadata(image, path, pil_args, pano.id,
-                           pano.lat, pano.lon, pano.altitude, pano.date,
-                           pano.heading, pano.pitch, pano.roll,
-                           "Naver")
+        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
     else:
         save_cubemap_panorama(image, path, pil_args)
 
@@ -267,12 +264,24 @@ async def download_panorama_async(pano: NaverPanorama, path: str, session: Clien
     image = await get_panorama_async(pano, session, zoom=zoom, equirect=equirect,
                                      stitching_method=stitching_method)
     if equirect:
-        save_with_metadata(image, path, pil_args, pano.id,
-                           pano.lat, pano.lon, pano.altitude, pano.date,
-                           pano.heading, pano.pitch, pano.roll,
-                           "Naver")
+        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
     else:
         save_cubemap_panorama(image, path, pil_args)
+
+
+def _build_output_metadata_object(pano: NaverPanorama) -> OutputMetadata:
+    return OutputMetadata(
+        panoid=pano.id,
+        lat=pano.lat,
+        lon=pano.lon,
+        creator="Naver",
+        is_equirectangular=True,
+        altitude=pano.altitude,
+        date=pano.date,
+        heading=math.pi - pano.heading,
+        pitch=pano.pitch,
+        roll=pano.roll,
+    )
 
 
 def get_depth(panoid: str, session: Session = None) -> np.ndarray:

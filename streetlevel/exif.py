@@ -1,4 +1,5 @@
 import math
+from dataclasses import dataclass
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -8,9 +9,22 @@ import pyexiv2
 from PIL import Image
 
 
+@dataclass
+class OutputMetadata:
+    panoid: str
+    lat: float
+    lon: float
+    creator: str
+    is_equirectangular: bool
+    altitude: Optional[float] = None
+    date: Union[datetime, str, None] = None
+    heading: Optional[float] = None
+    pitch: Optional[float] = None
+    roll: Optional[float] = None
+
+
 def save_with_metadata(image: Image.Image, path: str, pil_args: dict,
-                       panoid: str, lat: float, lon: float, altitude: Optional[float], date: Union[datetime, str],
-                       heading: float, pitch: Optional[float], roll: Optional[float], creator: str) -> None:
+                       metadata: OutputMetadata) -> None:
     suffix = Path(path).suffix.lower()
     # only write exif/xmp to JPG files
     if not (suffix == ".jpg" or suffix == ".jpeg"):
@@ -20,40 +34,56 @@ def save_with_metadata(image: Image.Image, path: str, pil_args: dict,
     buffer = BytesIO()
     image.save(buffer, format="jpeg", **pil_args)
     buffer.seek(0)
+
+    m = metadata
     with pyexiv2.ImageData(buffer.read()) as ximg:
-        exif = {
-            "Exif.Image.DateTime": date.strftime("%Y:%m:%d %H:%M:%S") if isinstance(date, datetime) else date,
-            "Exif.Image.ImageID": panoid,
-            "Exif.Image.Artist": creator,
-            "Exif.Image.Copyright": creator,
-            "Exif.GPSInfo.GPSVersionID": 2,
-            "Exif.GPSInfo.GPSLatitude": decimal_to_exif(lat),
-            "Exif.GPSInfo.GPSLatitudeRef": "N" if lat >= 0 else "S",
-            "Exif.GPSInfo.GPSLongitude": decimal_to_exif(lon),
-            "Exif.GPSInfo.GPSLongitudeRef": "E" if lon >= 0 else "W",
-        }
-        if altitude:
-            exif["Exif.GPSInfo.GPSAltitude"] = altitude_to_exif(altitude)
-            exif["Exif.GPSInfo.GPSAltitudeRef"] = 0 if altitude >= 0 else 1
+        exif = _build_exif_object(m)
         ximg.modify_exif(exif)
-        xmp = {
-            "Xmp.GPano.UsePanoramaViewer": True,
-            "Xmp.GPano.ProjectionType": "equirectangular",
-            "Xmp.GPano.PoseHeadingDegrees": math.degrees(heading) % 360,
-            "Xmp.GPano.CroppedAreaImageWidthPixels": image.width,
-            "Xmp.GPano.CroppedAreaImageHeightPixels": image.height,
-            "Xmp.GPano.FullPanoWidthPixels": image.width,
-            "Xmp.GPano.FullPanoHeightPixels": image.height,
-            "Xmp.GPano.CroppedAreaLeftPixels": 0,
-            "Xmp.GPano.CroppedAreaTopPixels": 0,
-        }
-        if pitch:
-            xmp["Xmp.GPano.PosePitchDegrees"] = math.degrees(pitch)
-        if roll:
-            xmp["Xmp.GPano.PoseRollDegrees"] = math.degrees(roll)
-        ximg.modify_xmp(xmp)
+
+        if m.is_equirectangular:
+            xmp = _build_xmp_object(image, m)
+            ximg.modify_xmp(xmp)
+
         with open(path, "wb") as f:
             f.write(ximg.get_bytes())
+
+
+def _build_xmp_object(image, m: OutputMetadata):
+    xmp = {
+        "Xmp.GPano.UsePanoramaViewer": True,
+        "Xmp.GPano.ProjectionType": "equirectangular",
+        "Xmp.GPano.CroppedAreaImageWidthPixels": image.width,
+        "Xmp.GPano.CroppedAreaImageHeightPixels": image.height,
+        "Xmp.GPano.FullPanoWidthPixels": image.width,
+        "Xmp.GPano.FullPanoHeightPixels": image.height,
+        "Xmp.GPano.CroppedAreaLeftPixels": 0,
+        "Xmp.GPano.CroppedAreaTopPixels": 0,
+    }
+    if m.heading:
+        xmp["Xmp.GPano.PoseHeadingDegrees"] = math.degrees(m.heading) % 360
+    if m.pitch:
+        xmp["Xmp.GPano.PosePitchDegrees"] = math.degrees(m.pitch)
+    if m.roll:
+        xmp["Xmp.GPano.PoseRollDegrees"] = math.degrees(m.roll)
+    return xmp
+
+
+def _build_exif_object(m: OutputMetadata) -> dict:
+    exif = {
+        "Exif.Image.DateTime": m.date.strftime("%Y:%m:%d %H:%M:%S") if isinstance(m.date, datetime) else m.date,
+        "Exif.Image.ImageID": m.panoid,
+        "Exif.Image.Artist": m.creator,
+        "Exif.Image.Copyright": m.creator,
+        "Exif.GPSInfo.GPSVersionID": 2,
+        "Exif.GPSInfo.GPSLatitude": decimal_to_exif(m.lat),
+        "Exif.GPSInfo.GPSLatitudeRef": "N" if m.lat >= 0 else "S",
+        "Exif.GPSInfo.GPSLongitude": decimal_to_exif(m.lon),
+        "Exif.GPSInfo.GPSLongitudeRef": "E" if m.lon >= 0 else "W",
+    }
+    if m.altitude:
+        exif["Exif.GPSInfo.GPSAltitude"] = altitude_to_exif(m.altitude)
+        exif["Exif.GPSInfo.GPSAltitudeRef"] = 0 if m.altitude >= 0 else 1
+    return exif
 
 
 def decimal_to_dms(coord: float) -> Tuple[int, int, float]:

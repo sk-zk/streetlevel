@@ -11,7 +11,7 @@ from . import api
 from .panorama import KakaoPanorama
 from .parse import parse_panoramas, parse_panorama
 from ..dataclasses import Tile, Size
-from ..exif import save_with_metadata
+from ..exif import save_with_metadata, OutputMetadata
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, \
     get_image_async, download_file, download_file_async
 
@@ -142,9 +142,7 @@ def download_panorama(pano: KakaoPanorama, path: str, zoom: int = 2, pil_args: d
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    save_with_metadata(image, path, pil_args, str(pano.id),
-                       pano.lat, pano.lon, None, str(pano.date),
-                       -pano.heading + math.pi, None, None, "Kakao")
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
 
 
 async def download_panorama_async(pano: KakaoPanorama, path: str, session: ClientSession,
@@ -152,9 +150,19 @@ async def download_panorama_async(pano: KakaoPanorama, path: str, session: Clien
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    save_with_metadata(image, path, pil_args, str(pano.id),
-                       pano.lat, pano.lon, None, str(pano.date),
-                       -pano.heading + math.pi, None, None, "Kakao")
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+
+
+def _build_output_metadata_object(pano: KakaoPanorama) -> OutputMetadata:
+    return OutputMetadata(
+        panoid=str(pano.id),
+        lat=pano.lat,
+        lon=pano.lon,
+        creator="Kakao",
+        is_equirectangular=True,
+        date=str(pano.date),
+        heading=-pano.heading + math.pi,
+    )
 
 
 def get_depthmap(pano: KakaoPanorama, session: Session = None) -> Image.Image:

@@ -11,7 +11,7 @@ from . import api
 from .panorama import BaiduPanorama, InteriorMetadata
 from .parse import parse_panorama_response, parse_inter_response
 from ..dataclasses import Tile
-from ..exif import save_with_metadata
+from ..exif import save_with_metadata, OutputMetadata
 from ..geo import wgs84_to_bd09mc, bd09_to_bd09mc
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async
 
@@ -141,10 +141,7 @@ def download_panorama(pano: BaiduPanorama, path: str, zoom: int = 3, pil_args: d
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    save_with_metadata(image, path, pil_args, str(pano.id),
-                       pano.lat, pano.lon, pano.elevation, pano.date,
-                       -pano.heading - math.pi/2, None, None,  # TODO figure out pitch/roll conversion
-                       pano.creator if pano.creator else "Baidu")
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
 
 
 async def download_panorama_async(pano: BaiduPanorama, path: str, session: ClientSession,
@@ -152,10 +149,20 @@ async def download_panorama_async(pano: BaiduPanorama, path: str, session: Clien
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    save_with_metadata(image, path, pil_args, str(pano.id),
-                       pano.lat, pano.lon, pano.elevation, pano.date,
-                       -pano.heading - math.pi/2, None, None,  # TODO figure out pitch/roll conversion
-                       pano.creator if pano.creator else "Baidu")
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+
+
+def _build_output_metadata_object(pano: BaiduPanorama) -> OutputMetadata:
+    return OutputMetadata(
+        panoid=str(pano.id),
+        lat=pano.lat,
+        lon=pano.lon,
+        creator=pano.creator if pano.creator else "Baidu",
+        is_equirectangular=True,
+        altitude=pano.elevation,
+        date=pano.date,
+        heading=-(pano.heading - math.pi/2),
+    )
 
 
 def _validate_get_panorama_params(pano: BaiduPanorama, zoom: int) -> int:
@@ -180,3 +187,4 @@ def _generate_tile_list(pano: BaiduPanorama, zoom: int) -> List[Tile]:
     coords = list(itertools.product(range(cols), range(rows)))
     tiles = [Tile(x, y, IMAGE_URL.format(pano.id, y, x, zoom + 1)) for x, y in coords]
     return tiles
+
