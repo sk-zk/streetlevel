@@ -29,8 +29,8 @@ class StreetViewPanorama:
     Official panoramas have an ID which is 22 characters in length, representing a 16-byte number
     as URL-encoded Base64.
     
-    IDs for third-party panoramas used to have 44 characters starting with `AF1Q`, but Google is currently
-    transitioning to a different scheme which uses 22 to 28(?) characters staring with `CI`.
+    IDs for third-party panoramas used to have 44 characters starting with ``AF1Q``, but Google is currently
+    transitioning to a different scheme which uses 22 to 28(?) characters staring with ``CI``.
     """
     lat: float
     """Latitude of the panorama's location."""
