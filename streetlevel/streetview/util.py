@@ -8,7 +8,7 @@ def is_third_party_panoid(panoid: str) -> bool:
     :param panoid: The pano ID.
     :return: Whether the pano ID points to a third-party panorama.
     """
-    return len(panoid) > 22
+    return panoid.startswith("CIHM0og") or len(panoid) > 22
 
 
 def build_permalink(id: str = None, lat: float = None, lon: float = None,
@@ -29,7 +29,7 @@ def build_permalink(id: str = None, lat: float = None, lon: float = None,
     """
     # the reason I'm not creating a `map_action=pano` URL as described here
     # https://developers.google.com/maps/documentation/urls/get-started#street-view-action
-    # is because third-party panos IDs do not appear to be work.
+    # is because third-party pano IDs do not appear to be work.
     if id is None and (lat is None or lon is None):
         raise ValueError("You must pass a location, or pano ID, or both.")
     elif id is None:

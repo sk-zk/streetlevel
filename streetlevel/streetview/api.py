@@ -81,7 +81,8 @@ def build_find_panorama_request_url(lat, lon, radius, download_depth, locale, se
 
 
 def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
-    pano_type = 10 if is_third_party_panoid(panoid) else 2
+    is_ari = is_third_party_panoid(panoid)
+    pano_type = 10 if is_ari else 2
     toggles = []
     include_resolution_info = True
     include_street_name_and_date = True
@@ -105,9 +106,16 @@ def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
     if include_street_labels:
         toggles.append(ProtobufEnum(8))
 
+    # Ari timestamp (and two other unknown values)
+    toggles.append(ProtobufEnum(12))
+
+    # Imagery URL for the new ari panoids
+    # (as used on maps.google.com; the embeddable viewer uses a different endpoint)
+    # if is_ari:
+    #    toggles.append(ProtobufEnum(17))
+
     # these change stuff, but idk what exactly:
     # toggles.append(ProtobufEnum(11))
-    toggles.append(ProtobufEnum(12))
     # toggles.append(ProtobufEnum(13))
 
     if download_depth:
@@ -141,6 +149,9 @@ def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
                     {1: ProtobufEnum(10), 2: True, 3: ProtobufEnum(2)},
                     {1: ProtobufEnum(10), 2: False, 3: ProtobufEnum(3)}
                 ]
+            },
+            11: {
+                3: {4: True}
             }
         }
     }

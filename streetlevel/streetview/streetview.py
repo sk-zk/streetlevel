@@ -11,9 +11,10 @@ from .parse import parse_coverage_tile_response, parse_panorama_id_response, \
     parse_panorama_radius_response
 from .util import is_third_party_panoid
 from ..dataclasses import Tile
-from ..exif import save_with_metadata, OutputMetadata
+from ..exif import save_with_metadata, OutputMetadata, add_metadata
 from ..geo import wgs84_to_tile_coord
-from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async
+from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async, \
+    download_file, download_file_async
 
 
 def find_panorama(lat: float, lon: float, radius: int = 50, locale: str = "en",
@@ -137,22 +138,43 @@ def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_ar
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
     """
-    if pil_args is None:
-        pil_args = {}
-    image = get_panorama(pano, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    if pano.is_third_party:
+        zoom = _validate_get_panorama_params(pano, zoom)
+        url = _build_sized_third_party_image_url(pano, zoom)
+        download_file(url, path)
+        add_metadata(path, _build_output_metadata_object(pano, pano.image_sizes[zoom].x, pano.image_sizes[zoom].y))
+    else:
+        if pil_args is None:
+            pil_args = {}
+        image = get_panorama(pano, zoom=zoom)
+        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image.width, image.height))
 
 
 async def download_panorama_async(pano: StreetViewPanorama, path: str, session: ClientSession,
                                   zoom: int = 5, pil_args: dict = None) -> None:
-    if pil_args is None:
-        pil_args = {}
-    image = await get_panorama_async(pano, session, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    if pano.is_third_party:
+        zoom = _validate_get_panorama_params(pano, zoom)
+        url = _build_sized_third_party_image_url(pano, zoom)
+        await download_file_async(url, path, session)
+        add_metadata(path, _build_output_metadata_object(pano, pano.image_sizes[zoom].x, pano.image_sizes[zoom].y))
+    else:
+        if pil_args is None:
+            pil_args = {}
+        image = await get_panorama_async(pano, session, zoom=zoom)
+        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image.width, image.height))
 
 
-def _build_output_metadata_object(pano: StreetViewPanorama) -> OutputMetadata:
+def _build_sized_third_party_image_url(pano: StreetViewPanorama, zoom: int) -> str:
+    width = str(pano.image_sizes[zoom].x)
+    height = str(pano.image_sizes[zoom].y)
+    url = f"https://lh3.ggpht.com/jsapi2/a/b/c/w{width}-h{height}/{pano.id}"
+    return url
+
+
+def _build_output_metadata_object(pano: StreetViewPanorama, width: int, height: int) -> OutputMetadata:
     return OutputMetadata(
+        width=width,
+        height=height,
         panoid=pano.id,
         lat=pano.lat,
         lon=pano.lon,
@@ -177,6 +199,11 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
     :return: A PIL image containing the panorama.
     """
     zoom = _validate_get_panorama_params(pano, zoom)
+
+    if pano.is_third_party:
+        url = _build_sized_third_party_image_url(pano, zoom)
+        return get_image(url)
+
     return get_equirectangular_panorama(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
         pano.tile_size, _generate_tile_list(pano, zoom))
@@ -184,6 +211,11 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
 
 async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image.Image:
     zoom = _validate_get_panorama_params(pano, zoom)
+
+    if pano.is_third_party:
+        url = _build_sized_third_party_image_url(pano, zoom)
+        return await get_image_async(url, session)
+
     return await get_equirectangular_panorama_async(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
         pano.tile_size, _generate_tile_list(pano, zoom),
@@ -208,10 +240,7 @@ def _generate_tile_list(pano: StreetViewPanorama, zoom: int) -> List[Tile]:
     rows = math.ceil(img_size.y / tile_height)
 
     IMAGE_URL = "https://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
-    THIRD_PARTY_IMAGE_URL = "https://lh3.ggpht.com/p/{0:}=x{1:}-y{2:}-z{3:}"
-
-    url_to_use = THIRD_PARTY_IMAGE_URL if is_third_party_panoid(pano.id) else IMAGE_URL
 
     coords = list(itertools.product(range(cols), range(rows)))
-    tiles = [Tile(x, y, url_to_use.format(pano.id, x, y, zoom)) for x, y in coords]
+    tiles = [Tile(x, y, IMAGE_URL.format(pano.id, x, y, zoom)) for x, y in coords]
     return tiles
