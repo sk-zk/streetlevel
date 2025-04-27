@@ -53,6 +53,9 @@ def build_find_panorama_request_url(lat, lon, radius, download_depth, locale, se
         toggles.append(ProtobufEnum(6))
     toggles.append(ProtobufEnum(8))
 
+    # Ari timestamp (and two other unknown values)
+    toggles.append(ProtobufEnum(12))
+
     search_message = {
         1: {
             1: 'apiv3',
