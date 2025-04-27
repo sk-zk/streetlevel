@@ -1,7 +1,9 @@
 from __future__ import annotations
+
+from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 
 from numpy import ndarray
 
@@ -17,11 +19,19 @@ class StreetViewPanorama:
     ID, latitude and longitude are always present*. The availability of other metadata depends on which function
     was called and what was returned by the API.
 
-    \*) Except for rare edge cases where latitude and longitude of links are not returned by the API and therefore
+    *) Except for rare edge cases where latitude and longitude of links are not returned by the API and therefore
     set to None.
     """
     id: str
-    """The pano ID."""
+    """
+    The panorama ID.
+    
+    Official panoramas have an ID which is 22 characters in length, representing a 16-byte number
+    as URL-encoded Base64.
+    
+    IDs for third-party panoramas used to have 44 characters starting with `AF1Q`, but Google is currently
+    transitioning to a different scheme which uses 22 to 28(?) characters staring with `CI`.
+    """
     lat: float
     """Latitude of the panorama's location."""
     lon: float
@@ -62,13 +72,14 @@ class StreetViewPanorama:
     """One panorama per floor above or below this one (if the panorama is located inside a building which has been
     covered on multiple floors and this metadata is available)."""
 
-    date: Optional[CaptureDate] = None
+    date: Union[CaptureDate,datetime,None] = None
     """
-    The capture date. Note that, for official coverage, only month and year are available.
-    For third-party panoramas, the day is available also.
+    The capture date. 
+    For official coverage, only month and year are available.
+    Third-party panoramas can be either year/month/day or a full timestamp depending on what the API returns.
     This may be unavailable in some rare cases.
     """
-    upload_date: UploadDate = None
+    upload_date: Optional[UploadDate] = None
     """
     The upload date. Only available for third-party panoramas.
     """

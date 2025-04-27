@@ -1,11 +1,13 @@
 import math
 from typing import List, Tuple, Optional
+from datetime import datetime
 
 from streetlevel.dataclasses import Link, Size
 from streetlevel.geo import get_bearing
 from streetlevel.streetview.panorama import StreetViewPanorama, LocalizedString, UploadDate, \
     CaptureDate, Place, BusinessStatus, ArtworkLink, Artwork, BuildingLevel, StreetLabel
 from streetlevel.streetview.depth import parse as parse_depth
+from streetlevel.streetview.util import is_third_party_panoid
 from streetlevel.util import try_get
 
 
@@ -56,10 +58,20 @@ def parse_coverage_tile_response(tile: list) -> List[StreetViewPanorama]:
 
 
 def parse_panorama_message(msg: dict) -> StreetViewPanorama:
+    panoid = msg[1][1]
+
     img_sizes = msg[2][3][0]
     img_sizes = list(map(lambda x: Size(x[0][1], x[0][0]), img_sizes))
     others = try_get(lambda: msg[5][0][3][0])
-    date = try_get(lambda: msg[6][7])
+
+    if is_third_party_panoid(panoid) and msg[12] and msg[12][0] != "":
+        timestamp = int(msg[12][0].split("/")[1]) / 1000
+        date = datetime.fromtimestamp(timestamp)
+    else:
+        date = try_get(lambda: msg[6][7])
+        date = CaptureDate(date[0],
+                           date[1],
+                           date[2] if len(date) > 2 else None) if date else None
 
     links, other_bld_levels, other_dates = _parse_other_pano_indices(msg)
 
@@ -86,16 +98,14 @@ def parse_panorama_message(msg: dict) -> StreetViewPanorama:
         artworks, places = None, None
 
     pano = StreetViewPanorama(
-        id=msg[1][1],
+        id=panoid,
         lat=msg[5][0][1][0][2],
         lon=msg[5][0][1][0][3],
         heading=try_get(lambda: math.radians(msg[5][0][1][2][0])),
         pitch=try_get(lambda: math.radians(90 - msg[5][0][1][2][1])),
         roll=try_get(lambda: math.radians(msg[5][0][1][2][2])),
         depth=depth,
-        date=CaptureDate(date[0],
-                         date[1],
-                         date[2] if len(date) > 2 else None) if date else None,
+        date=date,
         upload_date=upload_date,
         elevation=try_get(lambda: msg[5][0][1][1][0]),
         tile_size=Size(msg[2][3][1][0], msg[2][3][1][1]),
