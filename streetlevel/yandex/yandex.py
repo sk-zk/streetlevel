@@ -96,7 +96,7 @@ def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0, pil_args: 
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
 async def download_panorama_async(pano: YandexPanorama, path: str, session: ClientSession,
@@ -104,11 +104,13 @@ async def download_panorama_async(pano: YandexPanorama, path: str, session: Clie
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
-def _build_output_metadata_object(pano: YandexPanorama) -> OutputMetadata:
+def _build_output_metadata_object(pano: YandexPanorama, image: Image.Image) -> OutputMetadata:
     return OutputMetadata(
+        width=image.width,
+        height=image.height,
         panoid=pano.id,
         lat=pano.lat,
         lon=pano.lon,

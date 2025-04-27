@@ -142,7 +142,7 @@ def download_panorama(pano: KakaoPanorama, path: str, zoom: int = 2, pil_args: d
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
 async def download_panorama_async(pano: KakaoPanorama, path: str, session: ClientSession,
@@ -150,11 +150,13 @@ async def download_panorama_async(pano: KakaoPanorama, path: str, session: Clien
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
-def _build_output_metadata_object(pano: KakaoPanorama) -> OutputMetadata:
+def _build_output_metadata_object(pano: KakaoPanorama, image: Image.Image) -> OutputMetadata:
     return OutputMetadata(
+        width=image.width,
+        height=image.height,
         panoid=str(pano.id),
         lat=pano.lat,
         lon=pano.lon,

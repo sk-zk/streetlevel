@@ -1,5 +1,4 @@
 import itertools
-import math
 from typing import List, Optional
 
 from aiohttp import ClientSession
@@ -187,7 +186,7 @@ def download_panorama(pano: MapyPanorama, path: str, zoom: int = 2, pil_args: di
     if pil_args is None:
         pil_args = {}
     image = get_panorama(pano, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
 async def download_panorama_async(pano: MapyPanorama, path: str, session: ClientSession,
@@ -195,11 +194,13 @@ async def download_panorama_async(pano: MapyPanorama, path: str, session: Client
     if pil_args is None:
         pil_args = {}
     image = await get_panorama_async(pano, session, zoom=zoom)
-    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+    save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
-def _build_output_metadata_object(pano: MapyPanorama) -> OutputMetadata:
+def _build_output_metadata_object(pano: MapyPanorama, image: Image.Image) -> OutputMetadata:
     return OutputMetadata(
+        width=image.width,
+        height=image.height,
         panoid=str(pano.id),
         lat=pano.lat,
         lon=pano.lon,

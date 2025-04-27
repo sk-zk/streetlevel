@@ -250,7 +250,7 @@ def download_panorama(pano: NaverPanorama, path: str, zoom: int = 2, equirect=Fa
     image = get_panorama(pano, zoom=zoom, equirect=equirect,
                          stitching_method=stitching_method)
     if equirect:
-        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
     else:
         save_cubemap_panorama(image, path, pil_args)
 
@@ -264,13 +264,15 @@ async def download_panorama_async(pano: NaverPanorama, path: str, session: Clien
     image = await get_panorama_async(pano, session, zoom=zoom, equirect=equirect,
                                      stitching_method=stitching_method)
     if equirect:
-        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano))
+        save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
     else:
         save_cubemap_panorama(image, path, pil_args)
 
 
-def _build_output_metadata_object(pano: NaverPanorama) -> OutputMetadata:
+def _build_output_metadata_object(pano: NaverPanorama, image: Image.Image) -> OutputMetadata:
     return OutputMetadata(
+        width=image.width,
+        height=image.height,
         panoid=pano.id,
         lat=pano.lat,
         lon=pano.lon,

@@ -11,6 +11,8 @@ from PIL import Image
 
 @dataclass
 class OutputMetadata:
+    width: int
+    height: int
     panoid: str
     lat: float
     lon: float
@@ -25,6 +27,16 @@ class OutputMetadata:
 
 def save_with_metadata(image: Image.Image, path: str, pil_args: dict,
                        metadata: OutputMetadata) -> None:
+    """
+    Saves a PIL image as JPEG with Exif and XMP GPano metadata.
+
+    :param image: The PIL image.
+    :param path: The output path.
+    :param pil_args: Additional arguments for PIL's
+        `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+        method.
+    :param metadata: The metadata of the panorama.
+    """
     suffix = Path(path).suffix.lower()
     # only write exif/xmp to JPG files
     if not (suffix == ".jpg" or suffix == ".jpeg"):
@@ -35,27 +47,45 @@ def save_with_metadata(image: Image.Image, path: str, pil_args: dict,
     image.save(buffer, format="jpeg", **pil_args)
     buffer.seek(0)
 
-    m = metadata
     with pyexiv2.ImageData(buffer.read()) as ximg:
-        exif = _build_exif_object(m)
-        ximg.modify_exif(exif)
-
-        if m.is_equirectangular:
-            xmp = _build_xmp_object(image, m)
-            ximg.modify_xmp(xmp)
-
+        _write_metadata_to_buffer(metadata, ximg)
         with open(path, "wb") as f:
             f.write(ximg.get_bytes())
 
 
-def _build_xmp_object(image, m: OutputMetadata):
+def add_metadata(path: str, metadata: OutputMetadata) -> None:
+    """
+    Adds Exif and XMP GPano metadata to an existing JPEG image.
+
+    :param path: The path of the JPEG image.
+    :param metadata: The metadata to write to the image.
+    """
+    with open(path, "rb") as f:
+        buffer = f.read()
+
+    with pyexiv2.ImageData(buffer) as ximg:
+        _write_metadata_to_buffer(metadata, ximg)
+        with open(path, "wb") as f:
+            f.write(ximg.get_bytes())
+
+
+def _write_metadata_to_buffer(metadata: OutputMetadata, ximg: pyexiv2.ImageData) -> None:
+    exif = _build_exif_object(metadata)
+    ximg.modify_exif(exif)
+
+    if metadata.is_equirectangular:
+        xmp = _build_xmp_object(metadata)
+        ximg.modify_xmp(xmp)
+
+
+def _build_xmp_object(m: OutputMetadata):
     xmp = {
         "Xmp.GPano.UsePanoramaViewer": True,
         "Xmp.GPano.ProjectionType": "equirectangular",
-        "Xmp.GPano.CroppedAreaImageWidthPixels": image.width,
-        "Xmp.GPano.CroppedAreaImageHeightPixels": image.height,
-        "Xmp.GPano.FullPanoWidthPixels": image.width,
-        "Xmp.GPano.FullPanoHeightPixels": image.height,
+        "Xmp.GPano.CroppedAreaImageWidthPixels": m.width,
+        "Xmp.GPano.CroppedAreaImageHeightPixels": m.height,
+        "Xmp.GPano.FullPanoWidthPixels": m.width,
+        "Xmp.GPano.FullPanoHeightPixels": m.height,
         "Xmp.GPano.CroppedAreaLeftPixels": 0,
         "Xmp.GPano.CroppedAreaTopPixels": 0,
     }
