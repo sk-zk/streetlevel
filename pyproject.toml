@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "streetlevel"
-version = "0.11.0"
+version = "0.12.0"
 license = "MIT"
 authors = [
   { name="sk-zk", email="sk-zk@users.noreply.github.com" },
@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 3 - Beta",
     "Topic :: Scientific/Engineering :: GIS",
 ]
 dependencies = [
