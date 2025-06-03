@@ -25,7 +25,7 @@ class MapyApi:
     def cleanup(self):
         try:
             loop = asyncio.get_event_loop()
-            asyncio.create_task(self._cleanup())
+            loop.create_task(self._cleanup())
         except RuntimeError:
             loop = asyncio.new_event_loop()
             loop.run_until_complete(self._cleanup())

@@ -37,10 +37,11 @@ def find_panorama(lat: float, lon: float,
     response = api.getbest(lat, lon, radius, options=options)
     pano = parse_getbest_response(response)
 
-    if links:
-        pano.links = get_links(pano.id, year=pano.date.year)
-    if historical:
-        _append_historical(pano, response["result"]["panInfo"], lat, lon)
+    if pano:
+        if links:
+            pano.links = get_links(pano.id, year=pano.date.year)
+        if historical:
+            _append_historical(pano, response["result"]["panInfo"], lat, lon)
 
     return pano
 
@@ -54,10 +55,11 @@ async def find_panorama_async(lat: float, lon: float,
     response = await api.getbest_async(lat, lon, radius, options=options)
     pano = parse_getbest_response(response)
 
-    if links:
-        pano.links = await get_links_async(pano.id, year=pano.date.year)
-    if historical:
-        await _append_historical_async(pano, response["result"]["panInfo"], lat, lon)
+    if pano:
+        if links:
+            pano.links = await get_links_async(pano.id, year=pano.date.year)
+        if historical:
+            await _append_historical_async(pano, response["result"]["panInfo"], lat, lon)
 
     return pano
 

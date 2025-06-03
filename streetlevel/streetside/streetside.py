@@ -34,9 +34,12 @@ async def find_panorama_by_id_async(panoid: int, session: ClientSession) -> Opti
 
 
 def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
-                           limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
+                           limit: int = 50, session: Session = None) -> Optional[List[StreetsidePanorama]]:
     """
     Retrieves panoramas within a bounding box.
+
+    The latitude parameters must be greater than -85.06° and less than 85.06°. If they are not, the function
+    returns None.
 
     :param north: lat1.
     :param west: lon1.
@@ -46,20 +49,29 @@ def find_panoramas_in_bbox(north: float, west: float, south: float, east: float,
     :param session: *(optional)* A requests session.
     :return: A list of StreetsidePanorama objects.
     """
+    if abs(north) >= 85.06 or abs(south) >= 85.06:
+        return None
+
     response = api.find_panoramas(north, west, south, east, limit, session)
     return parse_panoramas(response)
 
 
 async def find_panoramas_in_bbox_async(north: float, west: float, south: float, east: float,
-                                       session: ClientSession, limit: int = 50) -> List[StreetsidePanorama]:
+                                       session: ClientSession, limit: int = 50) -> Optional[List[StreetsidePanorama]]:
+    if abs(north) >= 85.06 or abs(south) >= 85.06:
+        return None
+
     response = await api.find_panoramas_async(north, west, south, east, session, limit)
     return parse_panoramas(response)
 
 
 def find_panoramas(lat: float, lon: float, radius: float = 25,
-                   limit: int = 50, session: Session = None) -> List[StreetsidePanorama]:
+                   limit: int = 50, session: Session = None) -> Optional[List[StreetsidePanorama]]:
     """
     Retrieves panoramas within a square around a point.
+
+    The latitudes of the resulting bounding box must be greater than -85.06° and less than 85.06°.
+    If they are not, the function returns None.
 
     :param lat: Latitude of the center point.
     :param lon: Longitude of the center point.
@@ -77,7 +89,7 @@ def find_panoramas(lat: float, lon: float, radius: float = 25,
 
 
 async def find_panoramas_async(lat: float, lon: float, session: ClientSession,
-                               radius: float = 25, limit: int = 50) -> List[StreetsidePanorama]:
+                               radius: float = 25, limit: int = 50) -> Optional[List[StreetsidePanorama]]:
 
     top_left, bottom_right = create_bounding_box_around_point(lat, lon, radius)
     return await find_panoramas_in_bbox_async(
