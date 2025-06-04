@@ -153,6 +153,10 @@ async def download_panorama_async(pano: BaiduPanorama, path: str, session: Clien
 
 
 def _build_output_metadata_object(pano: BaiduPanorama, image: Image.Image) -> OutputMetadata:
+    if pano.heading:
+        heading = -(pano.heading - math.pi / 2)
+    else:
+        heading = None
     return OutputMetadata(
         width=image.width,
         height=image.height,
@@ -163,7 +167,7 @@ def _build_output_metadata_object(pano: BaiduPanorama, image: Image.Image) -> Ou
         is_equirectangular=True,
         altitude=pano.elevation,
         date=pano.date,
-        heading=-(pano.heading - math.pi/2),
+        heading=heading,
     )
 
 

@@ -182,7 +182,7 @@ def _build_output_metadata_object(pano: StreetViewPanorama, width: int, height: 
         is_equirectangular=True,
         altitude=pano.elevation,
         date=str(pano.date),
-        heading=-pano.heading,
+        heading=-pano.heading if pano.heading else None,
         pitch=pano.pitch,
         roll=pano.roll,
     )

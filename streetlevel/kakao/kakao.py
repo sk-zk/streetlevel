@@ -154,6 +154,10 @@ async def download_panorama_async(pano: KakaoPanorama, path: str, session: Clien
 
 
 def _build_output_metadata_object(pano: KakaoPanorama, image: Image.Image) -> OutputMetadata:
+    if pano.heading:
+        heading = -pano.heading + math.pi
+    else:
+        heading = None
     return OutputMetadata(
         width=image.width,
         height=image.height,
@@ -163,7 +167,7 @@ def _build_output_metadata_object(pano: KakaoPanorama, image: Image.Image) -> Ou
         creator="Kakao",
         is_equirectangular=True,
         date=str(pano.date),
-        heading=-pano.heading + math.pi,
+        heading=heading,
     )
 
 

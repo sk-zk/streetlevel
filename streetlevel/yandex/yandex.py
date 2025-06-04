@@ -108,6 +108,10 @@ async def download_panorama_async(pano: YandexPanorama, path: str, session: Clie
 
 
 def _build_output_metadata_object(pano: YandexPanorama, image: Image.Image) -> OutputMetadata:
+    if pano.heading:
+        heading = math.pi / 2 - pano.heading + math.pi / 2
+    else:
+        heading = None
     return OutputMetadata(
         width=image.width,
         height=image.height,
@@ -117,7 +121,7 @@ def _build_output_metadata_object(pano: YandexPanorama, image: Image.Image) -> O
         creator=pano.author if pano.author else "Yandex",
         is_equirectangular=True,
         date=pano.date,
-        heading=math.pi / 2 - pano.heading + math.pi / 2,
+        heading=heading,
     )
 
 

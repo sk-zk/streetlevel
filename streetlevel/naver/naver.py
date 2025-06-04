@@ -280,7 +280,7 @@ def _build_output_metadata_object(pano: NaverPanorama, image: Image.Image) -> Ou
         is_equirectangular=True,
         altitude=pano.altitude,
         date=pano.date,
-        heading=math.pi - pano.heading,
+        heading=math.pi - pano.heading if pano.heading else None,
         pitch=pano.pitch,
         roll=pano.roll,
     )
