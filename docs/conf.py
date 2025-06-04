@@ -9,7 +9,7 @@
 project = 'streetlevel'
 copyright = '2025, skzk'
 author = 'skzk'
-release = '0.12.1'
+release = '0.12.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
