@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from streetlevel.lookaround.geo import protobuf_tile_offset_to_wgs84
@@ -23,7 +23,7 @@ def parse_coverage_tile(tile: GroundMetadataTile_pb2.GroundMetadataTile) \
             lat=lat,
             lon=lon,
             coverage_type=CoverageType(tile.build_table[pano_pb.build_table_idx].coverage_type),
-            date=datetime.utcfromtimestamp(pano_pb.timestamp / 1000.0),
+            date=datetime.fromtimestamp(pano_pb.timestamp / 1000.0, timezone.utc),
             has_blurs=tile.build_table[pano_pb.build_table_idx].index != 0,
             raw_orientation=(pano_pb.tile_position.yaw, pano_pb.tile_position.pitch, pano_pb.tile_position.roll),
             raw_altitude=pano_pb.tile_position.altitude,

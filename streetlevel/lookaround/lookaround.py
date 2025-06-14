@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import IntEnum
 from typing import Union, Tuple
 
@@ -40,13 +40,13 @@ def get_coverage_tile(tile_x: int, tile_y: int, session: Session = None) -> Cove
     """
     tile, etag = api.get_coverage_tile(tile_x, tile_y, session=session)
     panos = parse_coverage_tile(tile)
-    return CoverageTile(tile_x, tile_y, panos, datetime.fromtimestamp(int(etag)))
+    return CoverageTile(tile_x, tile_y, panos, datetime.fromtimestamp(int(etag), timezone.utc))
 
 
 async def get_coverage_tile_async(tile_x: int, tile_y: int, session: ClientSession) -> CoverageTile:
     tile, etag = await api.get_coverage_tile_async(tile_x, tile_y, session)
     panos = parse_coverage_tile(tile)
-    return CoverageTile(tile_x, tile_y, panos, datetime.fromtimestamp(int(etag)))
+    return CoverageTile(tile_x, tile_y, panos, datetime.fromtimestamp(int(etag), timezone.utc))
 
 
 def get_coverage_tile_by_latlon(lat: float, lon: float, session: Session = None) -> CoverageTile:

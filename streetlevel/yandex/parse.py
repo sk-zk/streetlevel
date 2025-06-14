@@ -1,6 +1,6 @@
 import math
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple, Optional
 
 from streetlevel.dataclasses import Size, Link
@@ -104,7 +104,7 @@ def _get_panoid_from_url(url: str) -> str:
 
 
 def _get_date_from_panoid(panoid: str) -> datetime:
-    return datetime.utcfromtimestamp(int(panoid.split("_")[-1]))
+    return datetime.fromtimestamp(int(panoid.split("_")[-1]), timezone.utc)
 
 
 def _parse_image_sizes(zooms: dict) -> List[Size]:

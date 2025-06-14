@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 
 from pytest import approx
@@ -15,7 +15,7 @@ def test_parse_panorama_response():
     assert pano.id == "1238072810_692204477_23_1688105969"
     assert pano.lat == approx(53.917633, 0.001)
     assert pano.lon == approx(27.548128, 0.001)
-    assert pano.date == datetime.utcfromtimestamp(1688105969)
+    assert pano.date == datetime.fromtimestamp(1688105969, timezone.utc)
     assert pano.image_id == "WhpeuZGm2FIL"
     assert pano.image_sizes[0].x == 17664
     assert pano.image_sizes[0].y == 6145
