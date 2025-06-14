@@ -97,11 +97,7 @@ def convert_pano_orientation(lat: float, lon: float, raw_yaw: int, raw_pitch: in
     rot *= Rotation.from_quat((0.5, 0.5, -0.5, -0.5))
     quat = rot.as_quat()
     quat2 = quat[3], -quat[2], -quat[0], quat[1]
-    conv_roll, conv_pitch, conv_yaw = \
-        Rotation.from_euler("xyz",
-                            _from_rigid_transform_ecef_no_offset(lat, lon, quat2))\
-                .as_euler("zyx")
-    return conv_yaw, conv_pitch, conv_roll
+    return _from_rigid_transform_ecef_no_offset(lat, lon, quat2)
 
 
 def _from_rigid_transform_ecef_no_offset(lat: float, lon: float, rotation: Tuple[float, float, float, float]) \

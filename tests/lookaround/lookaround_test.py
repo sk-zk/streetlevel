@@ -20,7 +20,7 @@ def test_parse_coverage_tile():
                                      22, 14, 21, 111000,
                                      timezone.utc)
     assert panos[0].coverage_type == CoverageType.CAR
-    assert panos[0].heading == approx(1.7832050655066374)
-    assert panos[0].pitch == approx(-0.016837476195331824)
-    assert panos[0].roll == approx(-0.030182552495642945)
+    assert panos[0].heading == approx(1.7832923433779566)
+    assert panos[0].pitch == approx(0.03305357743988524)
+    assert panos[0].roll == approx(-0.010094509175066158)
     assert panos[0].elevation == approx(80.48369275437446)

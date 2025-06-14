@@ -24,7 +24,7 @@ def test_convert_altitude():
 def test_convert_pano_orientation():
     lat, lon = 52.33704527861042, -6.457956875071801
     raw_yaw, raw_pitch, raw_roll = 1669, 1377, 9363
-    expected_yaw, expected_pitch, expected_roll = 0.6316049853589996, -0.021887603089695062, -0.006644714887693137
+    expected_yaw, expected_pitch, expected_roll = 0.6318033516997712, -0.013740416000112887, -0.018287546853410053
     actual_yaw, actual_pitch, actual_roll = convert_pano_orientation(lat, lon, raw_yaw, raw_pitch, raw_roll)
     assert actual_yaw == approx(expected_yaw)
     assert actual_pitch == approx(expected_pitch)
