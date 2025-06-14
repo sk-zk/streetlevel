@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 from pytest import approx, raises
 import json
@@ -160,4 +160,4 @@ def test_get_exact_datetime_if_available():
 
     assert pano.date == datetime(2024, 8, 5,
                                  5, 53, 6, 769000,
-                                 tzinfo=UTC)
+                                 tzinfo=timezone.utc)
