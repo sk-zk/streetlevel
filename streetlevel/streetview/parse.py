@@ -1,6 +1,6 @@
 import math
 from typing import List, Tuple, Optional
-from datetime import datetime
+from datetime import datetime, UTC
 
 from streetlevel.dataclasses import Link, Size
 from streetlevel.geo import get_bearing
@@ -69,7 +69,7 @@ def get_exact_datetime_if_available(msg: dict) -> Optional[datetime]:
         return None
 
     timestamp = int(parts[1]) / 1000
-    return datetime.fromtimestamp(timestamp)
+    return datetime.fromtimestamp(timestamp, UTC)
 
 
 def parse_panorama_message(msg: dict) -> StreetViewPanorama:
