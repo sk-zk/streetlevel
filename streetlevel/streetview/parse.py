@@ -56,6 +56,21 @@ def parse_coverage_tile_response(tile: list) -> List[StreetViewPanorama]:
                                 for link_idx in link_indices]
     return panos
 
+def get_exact_datetime_if_available(msg: dict) -> Optional[datetime]:
+    panoid = msg[1][1]
+    if not is_third_party_panoid(panoid):
+        return None
+
+    if not msg[12] or msg[12][0] == "":
+        return None
+
+    parts = msg[12][0].split("/")
+    if len(parts) < 2:
+        return None
+
+    timestamp = int(parts[1]) / 1000
+    return datetime.fromtimestamp(timestamp)
+
 
 def parse_panorama_message(msg: dict) -> StreetViewPanorama:
     panoid = msg[1][1]
@@ -64,9 +79,9 @@ def parse_panorama_message(msg: dict) -> StreetViewPanorama:
     img_sizes = list(map(lambda x: Size(x[0][1], x[0][0]), img_sizes))
     others = try_get(lambda: msg[5][0][3][0])
 
-    if is_third_party_panoid(panoid) and msg[12] and msg[12][0] != "":
-        timestamp = int(msg[12][0].split("/")[1]) / 1000
-        date = datetime.fromtimestamp(timestamp)
+    exact_datetime = get_exact_datetime_if_available(msg)
+    if exact_datetime:
+        date = exact_datetime
     else:
         date = try_get(lambda: msg[6][7])
         date = CaptureDate(date[0],

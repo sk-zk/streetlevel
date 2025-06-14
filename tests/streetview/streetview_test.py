@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pytest import approx, raises
 import json
 from streetlevel import streetview
@@ -137,3 +139,24 @@ def test_build_permalink_raises():
         streetview.build_permalink(lat=None, lon=42)
     with raises(ValueError):
         streetview.build_permalink()
+
+
+def test_get_exact_datetime_if_available():
+    # field 12 contains UUID - use regular date field instead
+    with open("streetview/data/ari_with_uuid_in_12.json", "r") as f:
+        response = json.load(f)
+
+    pano = streetview.parse.parse_panorama_id_response(response)
+
+    assert pano.date.year == 2022
+    assert pano.date.month == 10
+    assert pano.date.day == 9
+
+    # field 12 contains timestamp
+    with open("streetview/data/ari_with_timestamp_in_12.json", "r") as f:
+        response = json.load(f)
+
+    pano = streetview.parse.parse_panorama_id_response(response)
+
+    assert pano.date == datetime(2024, 8, 5,
+                                 7, 53, 6, 769000)
