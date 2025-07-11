@@ -5,7 +5,7 @@ from typing import Optional, List, Tuple, Union
 from .panorama import BaiduPanorama, PanoInteriorMetadata, PanoInteriorPoint, \
     User, Provider, InteriorMetadata, Floor, InteriorPoint
 from ..dataclasses import Size
-from ..geo import bd09mc_to_wgs84
+from ..geo import bd09mc_to_wgs84, bd09mc_to_gcj02
 
 
 _tz = timezone(timedelta(hours=8), "Asia/Shanghai")
@@ -19,14 +19,16 @@ def parse_panorama_response(response: dict) -> Optional[BaiduPanorama]:
         return None
 
     pano = response["content"][0]
-    x, y, lat, lon = _convert_position(pano["X"], pano["Y"])
+    mc, wgs, gcj = _convert_position(pano["X"], pano["Y"])
 
     return BaiduPanorama(
         id=pano["ID"],
-        x=x,
-        y=y,
-        lat=lat,
-        lon=lon,
+        x=mc[0],
+        y=mc[1],
+        lat=wgs[0],
+        lon=wgs[1],
+        gcj02_lat=gcj[0],
+        gcj02_lon=gcj[1],
         elevation=pano["Z"],
         heading=math.radians(pano["Heading"]),
         pitch=math.radians(pano["Pitch"]),
@@ -58,10 +60,12 @@ def _parse_provider_from_panoid(panoid: str) -> Union[int, Provider]:
     return _parse_provider(int(panoid[0:2]))
 
 
-def _convert_position(x: float, y: float) -> Tuple[float, float, float, float]:
+def _convert_position(x: float, y: float) \
+        -> Tuple[Tuple[float, float], Tuple[float, float], Tuple[float, float]]:
     x, y = x / 100.0, y / 100.0
     lat, lon = bd09mc_to_wgs84(x, y)
-    return x, y, lat, lon
+    gcj02_lat, gcj02_lon = bd09mc_to_gcj02(x, y)
+    return (x, y), (lat, lon), (gcj02_lat, gcj02_lon)
 
 
 def _parse_user(pano: dict) -> Optional[User]:

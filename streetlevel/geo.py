@@ -80,6 +80,18 @@ def bd09_to_bd09mc(lat: float, lon: float) -> Tuple[float, float]:
     return bd09convertor.convertLL2MC(lon, lat)
 
 
+def gcj02_to_bd09mc(lat: float, lon: float) -> Tuple[float, float]:
+    """
+    Converts GCJ-02 coordinates to BD09 Mercator coordinates.
+
+    :param lat: Latitude.
+    :param lon: Longitude.
+    :return: BD09 Mercator coordinates.
+    """
+    bd09 = CoordinatesConverter.gcj02tobd09(lon, lat)
+    return bd09convertor.convertLL2MC(bd09[0], bd09[1])
+
+
 def bd09mc_to_wgs84(x: float, y: float) -> Tuple[float, float]:
     """
     Converts BD09 Mercator coordinates to WGS84 coordinates.
@@ -91,6 +103,19 @@ def bd09mc_to_wgs84(x: float, y: float) -> Tuple[float, float]:
     bd09 = bd09convertor.convertMC2LL(x, y)
     wgs = CoordinatesConverter.bd09towgs84(bd09[0], bd09[1])
     return wgs[1], wgs[0]
+
+
+def bd09mc_to_gcj02(x: float, y: float) -> Tuple[float, float]:
+    """
+    Converts BD09 Mercator coordinates to GCJ-02 coordinates.
+
+    :param x: X coordinate.
+    :param y: Y coordinate.
+    :return: GCJ-02 coordinates.
+    """
+    bd09 = bd09convertor.convertMC2LL(x, y)
+    gcj = CoordinatesConverter.bd09togcj02(bd09[0], bd09[1])
+    return gcj[1], gcj[0]
 
 
 def create_bounding_box_around_point(lat: float, lon: float, radius: float) \

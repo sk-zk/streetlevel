@@ -12,7 +12,7 @@ from .panorama import BaiduPanorama, InteriorMetadata
 from .parse import parse_panorama_response, parse_inter_response
 from ..dataclasses import Tile
 from ..exif import save_with_metadata, OutputMetadata
-from ..geo import wgs84_to_bd09mc, bd09_to_bd09mc
+from ..geo import wgs84_to_bd09mc, bd09_to_bd09mc, gcj02_to_bd09mc
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async
 
 
@@ -23,6 +23,7 @@ class Crs(Enum):
     WGS84 = 0  #:
     BD09 = 1  #:
     BD09MC = 2  #:
+    GCJ02 = 3  #:
 
 
 def find_panorama(coord1: float, coord2: float, crs: Crs = Crs.WGS84, session: Session = None) \
@@ -52,6 +53,8 @@ async def find_panorama_async(coord1: float, coord2: float, session: ClientSessi
 def _convert_to_bd09mc(coord1: float, coord2: float, crs: Crs) -> Tuple[float, float]:
     if crs == Crs.WGS84:
         x, y = wgs84_to_bd09mc(coord1, coord2)
+    elif crs == Crs.GCJ02:
+        x, y = gcj02_to_bd09mc(coord1, coord2)
     elif crs == Crs.BD09:
         x, y = bd09_to_bd09mc(coord1, coord2)
     elif crs == Crs.BD09MC:

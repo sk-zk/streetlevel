@@ -29,6 +29,10 @@ class BaiduPanorama:
     """WGS84 latitude of the panorama's location."""
     lon: float = None
     """WGS84 longitude of the panorama's location."""
+    gcj02_lat: float = None
+    """GCJ-02 latitude of the panorama's location."""
+    gcj02_lon: float = None
+    """GCJ-02 longitude of the panorama's location."""
 
     heading: float = None
     """Heading of the car in radians, where 0° is north, 90° is east, 180° is south, and 270° is west."""
