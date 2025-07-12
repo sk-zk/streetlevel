@@ -3,8 +3,8 @@ streetlevel.baidu: Baidu Panorama
 
 Support for Baidu Panorama of Baidu Maps, covering many cities in the PRC. 
 
-``find_panorama`` accepts WGS84 in addition to BD09. The positions of retrieved panoramas
-are given as both WGS84 and BD09MC.
+``find_panorama`` accepts WGS84, GCJ-02, BD09, or BD09MC. The positions of retrieved panoramas
+are given as WGS84, GJC-02, and BD09MC.
 
 Finding panoramas
 -----------------
