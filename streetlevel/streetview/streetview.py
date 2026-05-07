@@ -239,7 +239,7 @@ def _generate_tile_list(pano: StreetViewPanorama, zoom: int) -> List[Tile]:
     cols = math.ceil(img_size.x / tile_width)
     rows = math.ceil(img_size.y / tile_height)
 
-    IMAGE_URL = "https://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom={3:}&x={1:}&y={2:}"
+    IMAGE_URL = "https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid={0:}&x={1:}&y={2:}&zoom={3:}"
 
     coords = list(itertools.product(range(cols), range(rows)))
     tiles = [Tile(x, y, IMAGE_URL.format(pano.id, x, y, zoom)) for x, y in coords]
