@@ -174,9 +174,13 @@ async def download_files_async(urls: List[str], session: ClientSession = None) -
     session = session if session else ClientSession()
 
     async def download_one(url: str) -> bytes:
-        async with session.get(url) as response:
-            response.raise_for_status()
-            return await response.read()
+        for _ in range(4):
+            async with session.get(url) as response:
+                if response.status == 200:
+                    return await response.read()
+                if 400 <= response.status < 500:
+                    response.raise_for_status()
+        response.raise_for_status()
 
     tasks = [download_one(url) for url in urls]
     data = await asyncio.gather(*tasks)
