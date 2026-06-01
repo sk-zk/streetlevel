@@ -15,8 +15,9 @@ def parse_panorama_id_response(response: dict) -> Optional[StreetViewPanorama]:
     response_code = response[1][0][0][0]
     # 1: OK
     # 2: Not found
+    # 3: Unknown purpose, but also works
     # don't know if there are others
-    if response_code != 1:
+    if not (response_code == 1 or response_code == 3):
         return None
     return parse_panorama_message(response[1][0])
 
