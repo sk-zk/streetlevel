@@ -191,6 +191,13 @@ def find_panorama_by_id(panoid, download_depth=False, locale="en", session=None)
     return get_json(
         build_find_panorama_by_id_request_url(panoid, download_depth, locale),
         session=session,
+        headers={
+            "Accept": "*/*",
+            "Host": "www.google.com",
+            "Referer": "https://www.google.com/",
+            "Alt-Used": "www.google.com",
+            "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+        },
         preprocess_function=lambda text: text[4:])
 
 
