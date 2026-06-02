@@ -205,6 +205,13 @@ async def find_panorama_by_id_async(panoid, session, download_depth=False, local
     return await get_json_async(
         build_find_panorama_by_id_request_url(panoid, download_depth, locale),
         session,
+        headers={
+            "Accept": "*/*",
+            "Host": "www.google.com",
+            "Referer": "https://www.google.com/",
+            "Alt-Used": "www.google.com",
+            "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+        },
         preprocess_function=lambda text: text[4:])
 
 
