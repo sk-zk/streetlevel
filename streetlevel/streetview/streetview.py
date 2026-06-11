@@ -204,9 +204,16 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
         url = _build_sized_third_party_image_url(pano, zoom)
         return get_image(url)
 
+    headers = {
+            "Host": "streetviewpixels-pa.googleapis.com",
+            "Origin": "https://www.google.com",
+            "Referer": "https://www.google.com/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0"
+        }
     return get_equirectangular_panorama(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
-        pano.tile_size, _generate_tile_list(pano, zoom))
+        pano.tile_size, _generate_tile_list(pano, zoom),
+        headers=headers)
 
 
 async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image.Image:
@@ -216,10 +223,16 @@ async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, z
         url = _build_sized_third_party_image_url(pano, zoom)
         return await get_image_async(url, session)
 
+    headers = {
+            "Host": "streetviewpixels-pa.googleapis.com",
+            "Origin": "https://www.google.com",
+            "Referer": "https://www.google.com/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0"
+        }
     return await get_equirectangular_panorama_async(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
         pano.tile_size, _generate_tile_list(pano, zoom),
-        session)
+        session, headers=headers)
 
 
 def _validate_get_panorama_params(pano: StreetViewPanorama, zoom: int) -> int:

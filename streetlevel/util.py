@@ -111,7 +111,8 @@ async def get_json_async(url: str, session: ClientSession, json_function_paramet
 
 
 def get_equirectangular_panorama(width: int, height: int, tile_size: Size,
-                                 tile_list: List[Tile]) -> Image.Image:
+                                 tile_list: List[Tile],
+                                 headers: dict = None) -> Image.Image:
     """
     Downloads and stitches a tiled equirectangular panorama.
 
@@ -119,16 +120,18 @@ def get_equirectangular_panorama(width: int, height: int, tile_size: Size,
     :param height: Height of the panorama in pixels.
     :param tile_size: Size of one tile.
     :param tile_list: The tiles this panorama is made of.
+    :param headers: *(optional)* Request headers to send.
     :return: The stitched panorama as PIL image.
     """
-    tile_images = download_tiles(tile_list)
+    tile_images = download_tiles(tile_list, headers)
     stitched = stitch_equirectangular_tiles(tile_images, width, height, tile_size.x, tile_size.y)
     return stitched
 
 
 async def get_equirectangular_panorama_async(width: int, height: int, tile_size: Size,
                                              tile_list: List[Tile],
-                                             session: ClientSession) -> Image.Image:
+                                             session: ClientSession,
+                                             headers: dict = None) -> Image.Image:
     """
     Downloads and stitches a tiled equirectangular panorama.
 
@@ -137,9 +140,10 @@ async def get_equirectangular_panorama_async(width: int, height: int, tile_size:
     :param tile_size: Size of one tile.
     :param tile_list: The tiles this panorama is made of.
     :param session: A ``ClientSession``.
+    :param headers: *(optional)* Request headers to send.
     :return: The stitched panorama as PIL image.
     """
-    tile_images = await download_tiles_async(tile_list, session)
+    tile_images = await download_tiles_async(tile_list, session, headers)
     stitched = stitch_equirectangular_tiles(tile_images, width, height, tile_size.x, tile_size.y)
     return stitched
 
@@ -162,27 +166,29 @@ def try_get(accessor):
         return None
 
 
-async def download_files_async(urls: List[str], session: ClientSession = None) -> List[bytes]:
+async def download_files_async(urls: List[str], session: ClientSession = None,
+                               headers: dict = None) -> List[bytes]:
     """
     Downloads multiple files to a list of ``bytes``.
 
     :param urls: The URLs of the files to download.
     :param session: *(optional)* A ``ClientSession``. If no session is passed, a new one will be created.
+    :param headers: *(optional)* Request headers to send.
     :return: The downloaded files as ``bytes``.
     """
     close_session = session is None
     session = session if session else ClientSession()
 
-    async def download_one(url: str) -> bytes:
+    async def download_one(url: str, headers: dict = None) -> bytes:
         for _ in range(4):
-            async with session.get(url) as response:
+            async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     return await response.read()
                 if 400 <= response.status < 500:
                     response.raise_for_status()
         response.raise_for_status()
 
-    tasks = [download_one(url) for url in urls]
+    tasks = [download_one(url, headers) for url in urls]
     data = await asyncio.gather(*tasks)
 
     if close_session:
@@ -191,14 +197,15 @@ async def download_files_async(urls: List[str], session: ClientSession = None) -
     return data
 
 
-def download_tiles(tile_list: List[Tile]) -> dict:
+def download_tiles(tile_list: List[Tile], headers: dict = None) -> dict:
     """
     Downloads tiles to ``bytes``.
 
     :param tile_list: The tiles to download.
+    :param headers: *(optional)* Request headers to send.
     :return: A dictionary containing the images as ``bytes`` with the key ``(x, y)``.
     """
-    images = asyncio.run(download_files_async([t.url for t in tile_list]))
+    images = asyncio.run(download_files_async([t.url for t in tile_list], headers=headers))
 
     images_dict = {}
     for i, tile in enumerate(tile_list):
@@ -207,16 +214,18 @@ def download_tiles(tile_list: List[Tile]) -> dict:
     return images_dict
 
 
-async def download_tiles_async(tile_list: List[Tile], session: ClientSession):
+async def download_tiles_async(tile_list: List[Tile], session: ClientSession,
+                               headers: dict = None):
     """
     Downloads tiles to ``bytes``.
 
     :param tile_list: The tiles to download.
     :param session: A ``ClientSession``.
+    :param headers: *(optional)* Request headers to send.
     :return: A dictionary containing the images as ``bytes`` with the key ``(x, y)``.
     """
 
-    images = await download_files_async([t.url for t in tile_list], session=session)
+    images = await download_files_async([t.url for t in tile_list], session=session, headers=headers)
 
     images_dict = {}
     for i, tile in enumerate(tile_list):
