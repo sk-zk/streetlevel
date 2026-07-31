@@ -161,3 +161,16 @@ def test_get_exact_datetime_if_available():
     assert pano.date == datetime(2024, 8, 5,
                                  5, 53, 6, 769000,
                                  tzinfo=timezone.utc)
+
+
+def test_mixed_historical_dates():
+    with open("streetview/data/mixed_historical_dates.json", "r") as f:
+        response = json.load(f)
+
+    pano = streetview.parse.parse_panorama_id_response(response)
+    assert len(pano.historical) == 2
+    assert pano.historical[0].id == "a9crTN6CU45XleT_iSH1Fw"
+    assert pano.historical[0].date.year == 2018
+    assert pano.historical[0].date.month == 5
+    assert pano.historical[1].id == "b-VGE5BhdMY3fE8skK_Tlw"
+    assert pano.historical[1].date is None
