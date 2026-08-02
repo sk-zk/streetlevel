@@ -176,7 +176,7 @@ def parse_panorama_message(msg: dict) -> StreetViewPanorama:
                 connected.address = [LocalizedString(x[0], x[1]) for x in other_address]
 
     pano.historical = sorted(pano.historical,
-                             key=lambda x: (x.date.year, x.date.month) if x.date else None,
+                             key=lambda x: (x.date.year, x.date.month) if x.date else (0, 0),
                              reverse=True)
 
     return pano
