@@ -30,7 +30,7 @@ dependencies = [
     "pycryptodome",
     "pyequilib",
     "pyexiv2",
-    "pyfrpc",
+    "pyfrpc == 0.2.13",
     "pyproj",
     "pytest",
     "pytest-asyncio",

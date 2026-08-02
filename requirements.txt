@@ -5,7 +5,7 @@ requests
 pytest
 pytest-asyncio
 protobuf~=4.21.9
-pyfrpc
+pyfrpc == 0.2.13
 scipy
 aiohttp
 pycryptodome
