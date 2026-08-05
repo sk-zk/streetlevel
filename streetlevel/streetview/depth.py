@@ -35,7 +35,9 @@ def parse_header(depth_map):
         "number_of_planes": get_uint16(depth_map, 1),
         "width": get_uint16(depth_map, 3),
         "height": get_uint16(depth_map, 5),
-        "offset": get_uint16(depth_map, 7),
+        # One byte, not two: the header is `header_size` (8) bytes long, so a uint16
+        # read here would extend to index 8, which is already the first plane index.
+        "offset": depth_map[7],
     }
 
 
