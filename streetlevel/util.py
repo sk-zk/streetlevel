@@ -68,7 +68,7 @@ async def get_image_async(url: str, session: ClientSession) -> Image.Image:
 def get_json(url: str, session: Session = None, preprocess_function: Callable = None,
              headers: dict = None) -> dict:
     """
-    Fetches JSON from a URL using requests.
+    Fetches JSON from a GET endpoint using requests.
 
     :param url: The URL.
     :param session: *(optional)* A requests session.
@@ -88,7 +88,7 @@ def get_json(url: str, session: Session = None, preprocess_function: Callable = 
 async def get_json_async(url: str, session: ClientSession, json_function_parameters: dict = None,
                          preprocess_function: Callable = None, headers: dict = None) -> dict:
     """
-    Fetches JSON from a URL using aiohttp.
+    Fetches JSON from a GET endpoint using aiohttp.
 
     :param url: The URL.
     :param session: A ``ClientSession``.
@@ -100,6 +100,53 @@ async def get_json_async(url: str, session: ClientSession, json_function_paramet
     if headers is None:
         headers = {}
     async with session.get(url, headers=headers) as response:
+        if preprocess_function:
+            text = await response.text()
+            processed = preprocess_function(text)
+            return json.loads(processed)
+        else:
+            if json_function_parameters:
+                return await response.json(**json_function_parameters)
+            return await response.json()
+
+
+def post_json(url: str, body: any, session: Session = None, preprocess_function: Callable = None,
+             headers: dict = None) -> dict:
+    """
+    Fetches JSON from a POST endpoint using requests.
+
+    :param url: The URL.
+    :param body: The post body.
+    :param session: *(optional)* A requests session.
+    :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
+    :param headers: *(optional)* Request headers.
+    :return: The requested document as dictionary.
+    """
+    requester = session if session else requests
+    response = requester.post(url, data=body, headers=headers)
+    if preprocess_function:
+        processed = preprocess_function(response.text)
+        return json.loads(processed)
+    else:
+        return response.json()
+
+
+async def post_json_async(url: str, body: any, session: ClientSession, json_function_parameters: dict = None,
+                         preprocess_function: Callable = None, headers: dict = None) -> dict:
+    """
+    Fetches JSON from a POST endpoint using aiohttp.
+
+    :param url: The URL.
+    :param body: The post body.
+    :param session: A ``ClientSession``.
+    :param json_function_parameters: *(optional)* Parameters to pass to the ``ClientResponse.json`` function.
+    :param preprocess_function: *(optional)* A function to run on the text before passing it to the JSON parser.
+    :param headers: *(optional)* Request headers.
+    :return: The requested document as dictionary.
+    """
+    if headers is None:
+        headers = {}
+    async with session.post(url, data=body, headers=headers) as response:
         if preprocess_function:
             text = await response.text()
             processed = preprocess_function(text)

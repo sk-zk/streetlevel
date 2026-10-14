@@ -23,13 +23,13 @@ def parse_panorama_id_response(response: dict) -> Optional[StreetViewPanorama]:
 
 
 def parse_panorama_radius_response(response: dict) -> Optional[StreetViewPanorama]:
-    response_code = response[0][0][0]
+    response_code = response[0][0]
     # 0: OK
     # 5: search returned no images
     # don't know if there are others
     if response_code != 0:
         return None
-    return parse_panorama_message(response[0][1])
+    return parse_panorama_message(response[1])
 
 
 def parse_coverage_tile_response(tile: list) -> List[StreetViewPanorama]:

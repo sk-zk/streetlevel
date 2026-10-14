@@ -1,8 +1,11 @@
 import aiohttp
+import json
 from typing import Tuple
 from .protobuf import *
 from .util import is_third_party_panoid
-from ..util import get_json, get_json_async
+from ..util import get_json, get_json_async, post_json, post_json_async
+
+_find_panorama_endpoint = "https://maps.googleapis.com/$rpc/google.internal.maps.mapsjs.v1.MapsJsInternalService/SingleImageSearch"
 
 
 def split_ietf(tag: str) -> Tuple[str, str]:
@@ -21,7 +24,7 @@ def build_coverage_tile_request_url(tile_x, tile_y):
     return url
 
 
-def build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party):
+def build_find_panorama_post_body(lat, lon, radius, download_depth, locale, search_third_party) -> str:
     radius = float(radius)
     toggles = []
     include_resolution_info = True
@@ -36,51 +39,53 @@ def build_find_panorama_request_url(lat, lon, radius, download_depth, locale, se
         image_type = 2
 
     if download_depth:
-        depth1 = {1: ProtobufEnum(0)}
-        depth2 = {1: ProtobufEnum(2)}
+        depth1 = [0]
+        depth2 = [2]
     else:
-        depth1 = {}
-        depth2 = {}
+        depth1 = []
+        depth2 = []
 
     if include_resolution_info:
-        toggles.append(ProtobufEnum(1))
+        toggles.append(1)
     if include_street_name_and_date:
-        toggles.append(ProtobufEnum(2))
+        toggles.append(2)
     if include_copyright_information:
-        toggles.append(ProtobufEnum(3))
-    toggles.append(ProtobufEnum(4))
+        toggles.append(3)
+    toggles.append(4)
     if include_neighbors_and_historical:
-        toggles.append(ProtobufEnum(6))
-    toggles.append(ProtobufEnum(8))
+        toggles.append(6)
+    toggles.append(8)
 
     # Ari timestamp (and two other unknown values)
-    toggles.append(ProtobufEnum(12))
+    toggles.append(12)
 
-    search_message = {
-        1: {
-            1: 'apiv3',
-            5: 'US',
-            11: {1: {1: False}}
-        },
-        2: {1: {3: lat, 4: lon}, 2: radius},
-        3: {
-            2: {1: ietf_lang, 2: ietf_country},
-            9: {1: ProtobufEnum(2)},
-            11: {
-                1: {1: ProtobufEnum(image_type), 2: True, 3: ProtobufEnum(2)}
-            },
-        },
-        4: {
-            1: toggles,
-            5: depth1,
-            6: depth2,
-        }
-    }
+    search_message = [
+        ["apiv3", None, None, None, "US"],
+        [[None, None, lat, lon], radius],
+        [
+         None,
+         [ietf_lang, ietf_country],
+         None,
+         None,
+         None,
+         None,
+         None,
+         None,
+         [2],
+         None,
+         [[[image_type, True, 2]]],
+        ],
+        [
+            toggles,
+            None,
+            None,
+            None,
+            depth1,
+            depth2,
+        ]
+    ]
 
-    url = "https://maps.googleapis.com/maps/api/js/GeoPhotoService.SingleImageSearch?pb=" \
-          + to_protobuf_url(search_message) + "&callback=_xdc_._v2mub5"
-          
-    return url
+    return json.dumps(search_message)
 
 
 def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
@@ -164,26 +169,26 @@ def build_find_panorama_by_id_request_url(panoid, download_depth, locale):
     return url
 
 
-def repair_find_panorama_response(text):
-    first_paren = text.index("(")
-    last_paren = text.rindex(")")
-    return "[" + text[first_paren + 1:last_paren] + "]"
-
-
 def find_panorama(lat, lon, radius=50, download_depth=False, locale="en", search_third_party=False, session=None):
-    return get_json(
-        build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party),
-        session=session,
-        preprocess_function=repair_find_panorama_response
+    return post_json(
+        _find_panorama_endpoint,
+        build_find_panorama_post_body(lat, lon, radius, download_depth, locale, search_third_party),
+        headers={
+            "content-type": "application/json+protobuf",
+        },
+        session=session
     )
 
 
 async def find_panorama_async(lat, lon, session: aiohttp.ClientSession, radius=50,
                               download_depth=False, locale="en", search_third_party=False):
-    return await get_json_async(
-        build_find_panorama_request_url(lat, lon, radius, download_depth, locale, search_third_party),
+    return await post_json_async(
+        _find_panorama_endpoint,
+        build_find_panorama_post_body(lat, lon, radius, download_depth, locale, search_third_party),
         session,
-        preprocess_function=repair_find_panorama_response
+        headers={
+            "content-type": "application/json+protobuf",
+        },
     )
 
 
