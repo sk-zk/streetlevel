@@ -24,12 +24,8 @@ def build_around_request_url(panoid: str) -> str:
     return f"https://panorama.map.naver.com/metadataV3/around/{panoid}?lang=ko"
 
 
-def build_depth_request_url(panoid: str) -> str:
-    return f"https://panorama.map.naver.com/depthmap/{panoid}"
-
-
-def build_model_request_url(panoid: str) -> str:
-    return f"https://panorama.map.naver.com/metadataV3/model/{panoid}?modelType=v3_mesh"
+def build_model_request_url(panoid: str, model_type: str = "v3_mesh") -> str:
+    return f"https://panorama.map.naver.com/metadataV3/model/{panoid}?modelType={model_type}"
 
 
 def find_panorama(lat: float, lon: float, session: Session = None) -> dict:
@@ -72,14 +68,24 @@ async def get_neighbors_async(panoid: str, session: ClientSession) -> dict:
                                 headers=headers)
 
 
-def get_depth(panoid: str, session: Session = None) -> dict:
-    return get_json(build_depth_request_url(panoid), session=session,
-                    headers=headers)
+def get_depth(panoid: str, v3: bool, session: Session = None):
+    type_str = "v3_depth" if v3 else "v2_depth"
+    requester = session if session else requests
+    response = requester.get(build_model_request_url(panoid, type_str), headers=headers)
+
+    model = Model_pb2.Model()
+    model.ParseFromString(response.content)
+    return model.depth_map
 
 
-async def get_depth_async(panoid: str, session: ClientSession) -> dict:
-    return await get_json_async(build_depth_request_url(panoid), session,
-                                headers=headers)
+async def get_depth_async(panoid: str, v3: bool, session: ClientSession):
+    type_str = "v3_depth" if v3 else "v2_depth"
+    async with session.get(build_model_request_url(panoid, type_str), headers=headers) as response:
+        content = await response.read()
+
+    model = Model_pb2.Model()
+    model.ParseFromString(content)
+    return model.depth_map
 
 
 def get_mesh(panoid: str, session: Session = None) -> Model_pb2:

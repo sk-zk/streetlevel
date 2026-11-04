@@ -286,21 +286,23 @@ def _build_output_metadata_object(pano: NaverPanorama, image: Image.Image) -> Ou
     )
 
 
-def get_depth(panoid: str, session: Session = None) -> np.ndarray:
+def get_depth(panoid: str, has_equirect: bool, session: Session = None) -> np.ndarray:
     """
     Fetches the legacy depth map of a panorama.
 
     :param panoid: The pano ID.
+    :param has_equirect: For 3D / equirectangular panoramas, set this to True to fetch the real depth map
+    instead of the synthetic one.
     :param session: *(optional)* A requests session.
     :return: The depth map of the faces in the order front, right, back, left, top, bottom.
     """
-    depth_json = api.get_depth(panoid, session=session)
-    return _parse_depth(depth_json)
+    depth_arr = api.get_depth(panoid, has_equirect, session=session)
+    return _parse_depth(depth_arr)
 
 
-async def get_depth_async(panoid: str, session: ClientSession) -> np.ndarray:
-    depth_json = await api.get_depth_async(panoid, session)
-    return _parse_depth(depth_json)
+async def get_depth_async(panoid: str, has_equirect: bool, session: ClientSession) -> np.ndarray:
+    depth_arr = await api.get_depth_async(panoid, has_equirect, session)
+    return _parse_depth(depth_arr)
 
 
 def get_model(panoid: str, session: Session = None) -> Optional[Model]:
@@ -331,13 +333,11 @@ async def get_model_async(panoid: str, session: ClientSession):
         np.reshape(pb_mesh.faces, (len(pb_mesh.faces)//3,3))
     )
 
-def _parse_depth(depth_json: dict) -> np.ndarray:
-    depth = [float(n) for n in depth_json["depthmap"].split(",")]
-    depth_faces = []
-    for i in [0, 1, 2, 3, 5, 4]:
-        # this order ^ is intentional, it reverses the top and bottom face for consistency with everything else
-        depth_faces.append(np.array(depth[i * 4225:(i + 1) * 4225]).reshape(65, 65))
-    return np.array(depth_faces)
+
+def _parse_depth(depth_arr) -> Optional[np.ndarray]:
+    if depth_arr is None or len(depth_arr) == 0:
+        return None
+    return np.reshape(depth_arr, (6, 65, 65))
 
 
 def _get_zoom_0_cubemap(pano: NaverPanorama,
