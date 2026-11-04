@@ -122,6 +122,8 @@ def _build_output_metadata_object(pano: YandexPanorama, image: Image.Image) -> O
         is_equirectangular=True,
         date=pano.date,
         heading=heading,
+        full_width=image.width,
+        full_height=image.width//2,
     )
 
 
