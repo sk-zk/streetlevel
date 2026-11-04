@@ -23,6 +23,10 @@ class OutputMetadata:
     heading: Optional[float] = None
     pitch: Optional[float] = None
     roll: Optional[float] = None
+    full_width: Optional[int] = None
+    full_height: Optional[int] = None
+    cropped_area_left: Optional[int] = None
+    cropped_area_top: Optional[int] = None
 
 
 def save_with_metadata(image: Image.Image, path: str, pil_args: dict,
@@ -84,10 +88,10 @@ def _build_xmp_object(m: OutputMetadata):
         "Xmp.GPano.ProjectionType": "equirectangular",
         "Xmp.GPano.CroppedAreaImageWidthPixels": m.width,
         "Xmp.GPano.CroppedAreaImageHeightPixels": m.height,
-        "Xmp.GPano.FullPanoWidthPixels": m.width,
-        "Xmp.GPano.FullPanoHeightPixels": m.height,
-        "Xmp.GPano.CroppedAreaLeftPixels": 0,
-        "Xmp.GPano.CroppedAreaTopPixels": 0,
+        "Xmp.GPano.FullPanoWidthPixels": m.full_width if m.full_width else m.width,
+        "Xmp.GPano.FullPanoHeightPixels": m.full_height if m.full_height else m.height,
+        "Xmp.GPano.CroppedAreaLeftPixels": m.cropped_area_left if m.cropped_area_left else 0,
+        "Xmp.GPano.CroppedAreaTopPixels": m.cropped_area_top if m.cropped_area_top else 0,
     }
     if m.heading:
         xmp["Xmp.GPano.PoseHeadingDegrees"] = math.degrees(m.heading) % 360
