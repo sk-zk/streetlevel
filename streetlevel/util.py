@@ -236,12 +236,12 @@ async def download_files_async(urls: List[str], session: ClientSession = None,
         response.raise_for_status()
 
     tasks = [download_one(url, headers) for url in urls]
-    data = await asyncio.gather(*tasks)
-
-    if close_session:
-        await session.close()
-
-    return data
+    try:
+        data = await asyncio.gather(*tasks)
+        return data
+    finally:
+        if close_session:
+            await session.close()
 
 
 def download_tiles(tile_list: List[Tile], headers: dict = None) -> dict:
