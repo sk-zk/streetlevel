@@ -27,6 +27,10 @@ class PanoramaType(IntEnum):
     INDOOR_HIGH = 11  #:
     UNDERWATER = 12  #:
     TREKKER = 13  #:
+    NO_MESH_EQUIRECT = 14
+    """
+    A panorama which can be fetched in equirectangular projection.
+    """
     MESH_EQUIRECT = 15
     """
     An Apple-like panorama which can be fetched in equirectangular projection
