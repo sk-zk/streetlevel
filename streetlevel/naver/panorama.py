@@ -36,6 +36,8 @@ class PanoramaType(IntEnum):
     An Apple-like panorama which can be fetched in equirectangular projection
     and for which a 3D mesh is available.
     """
+    SPACE = 20  #:
+    UNKNOWN = 99  #:
     INDOOR_3D = 100  #:
 
 
