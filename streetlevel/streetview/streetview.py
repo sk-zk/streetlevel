@@ -3,19 +3,19 @@ import itertools
 import math
 from PIL import Image
 from requests import Session
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from . import api
 from .panorama import StreetViewPanorama
 from .parse import parse_coverage_tile_response, parse_panorama_id_response, \
     parse_panorama_radius_response
-from .util import is_third_party_panoid
 from ..dataclasses import Tile
 from ..exif import save_with_metadata, OutputMetadata, add_metadata
 from ..geo import wgs84_to_tile_coord
 from ..util import get_equirectangular_panorama, get_equirectangular_panorama_async, get_image, get_image_async, \
     download_file, download_file_async
 
+_tile_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0"
 
 def find_panorama(lat: float, lon: float, radius: int = 50, locale: str = "en",
                   search_third_party: bool = False, session: Session = None) -> Optional[StreetViewPanorama]:
@@ -125,7 +125,8 @@ async def get_coverage_tile_by_latlon_async(lat: float, lon: float, session: Cli
     return await get_coverage_tile_async(tile_coord[0], tile_coord[1], session)
 
 
-def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_args: dict = None) -> None:
+def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5,
+                      pil_args: Optional[dict] = None, refetch: bool = False) -> None:
     """
     Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
 
@@ -137,9 +138,11 @@ def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_ar
     :param pil_args: *(optional)* Additional arguments for PIL's
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
+    :param refetch: *(optional)* If True, the metadata of the panorama will be refetched if ``pano.image_sizes``
+    is not set. This will make an additional network request. Defaults to False.
     """
+    pano, zoom = _validate_get_panorama_params(pano, zoom, refetch, None)
     if pano.is_third_party:
-        zoom = _validate_get_panorama_params(pano, zoom)
         url = _build_sized_third_party_image_url(pano, zoom)
         download_file(url, path)
         add_metadata(path, _build_output_metadata_object(pano, pano.image_sizes[zoom].x, pano.image_sizes[zoom].y))
@@ -151,9 +154,9 @@ def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5, pil_ar
 
 
 async def download_panorama_async(pano: StreetViewPanorama, path: str, session: ClientSession,
-                                  zoom: int = 5, pil_args: dict = None) -> None:
+                                  zoom: int = 5, pil_args: Optional[dict] = None, refetch: bool = False) -> None:
+    pano, zoom = await _validate_get_panorama_params_async(pano, zoom, refetch, session)
     if pano.is_third_party:
-        zoom = _validate_get_panorama_params(pano, zoom)
         url = _build_sized_third_party_image_url(pano, zoom)
         await download_file_async(url, path, session)
         add_metadata(path, _build_output_metadata_object(pano, pano.image_sizes[zoom].x, pano.image_sizes[zoom].y))
@@ -188,7 +191,7 @@ def _build_output_metadata_object(pano: StreetViewPanorama, width: int, height: 
     )
 
 
-def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
+def get_panorama(pano: StreetViewPanorama, zoom: int = 5, refetch: bool = False) -> Image.Image:
     """
     Downloads a panorama and returns it as PIL image.
 
@@ -196,9 +199,11 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
     :param zoom: *(optional)* Image size; 0 is lowest, 5 is highest. The dimensions of a zoom level of a
         specific panorama depend on the camera used. If the requested zoom level does not exist,
         the highest available level will be downloaded. Defaults to 5.
+    :param refetch: *(optional)* If True, the metadata of the panorama will be refetched if ``pano.image_sizes``
+    is not set. This will make an additional network request. Defaults to False.
     :return: A PIL image containing the panorama.
     """
-    zoom = _validate_get_panorama_params(pano, zoom)
+    pano, zoom = _validate_get_panorama_params(pano, zoom, refetch, None)
 
     if pano.is_third_party:
         url = _build_sized_third_party_image_url(pano, zoom)
@@ -208,7 +213,7 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
             "Host": "streetviewpixels-pa.googleapis.com",
             "Origin": "https://www.google.com",
             "Referer": "https://www.google.com/",
-            "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0"
+            "User-Agent": _tile_user_agent
         }
     return get_equirectangular_panorama(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
@@ -216,8 +221,9 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5) -> Image.Image:
         headers=headers)
 
 
-async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, zoom: int = 5) -> Image.Image:
-    zoom = _validate_get_panorama_params(pano, zoom)
+async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession,
+                             zoom: int = 5, refetch: bool = False) -> Image.Image:
+    pano, zoom = await _validate_get_panorama_params_async(pano, zoom, refetch, session)
 
     if pano.is_third_party:
         url = _build_sized_third_party_image_url(pano, zoom)
@@ -227,7 +233,7 @@ async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, z
             "Host": "streetviewpixels-pa.googleapis.com",
             "Origin": "https://www.google.com",
             "Referer": "https://www.google.com/",
-            "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0"
+            "User-Agent": _tile_user_agent
         }
     return await get_equirectangular_panorama_async(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
@@ -235,11 +241,30 @@ async def get_panorama_async(pano: StreetViewPanorama, session: ClientSession, z
         session, headers=headers)
 
 
-def _validate_get_panorama_params(pano: StreetViewPanorama, zoom: int) -> int:
+def _validate_get_panorama_params(pano: StreetViewPanorama, zoom: int,
+                                  refetch: bool, session: Session) -> Tuple[StreetViewPanorama, int]:
     if not pano.image_sizes:
-        raise ValueError("pano.image_sizes is None.")
+        if refetch:
+            pano = find_panorama_by_id(pano.id, session=session)
+            if pano is None:
+                raise ValueError("pano.image_sizes is None and refetch failed.")
+        else:
+            raise ValueError("pano.image_sizes is None.")
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
-    return zoom
+    return pano, zoom
+
+
+async def _validate_get_panorama_params_async(pano: StreetViewPanorama, zoom: int,
+                                        refetch: bool, session: ClientSession) -> Tuple[StreetViewPanorama, int]:
+    if not pano.image_sizes:
+        if refetch:
+            pano = await find_panorama_by_id_async(pano.id, session)
+            if pano is None:
+                raise ValueError("pano.image_sizes is None and refetch failed.")
+        else:
+            raise ValueError("pano.image_sizes is None.")
+    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
+    return pano, zoom
 
 
 def _generate_tile_list(pano: StreetViewPanorama, zoom: int) -> List[Tile]:
