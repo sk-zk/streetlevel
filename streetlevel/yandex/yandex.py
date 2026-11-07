@@ -1,6 +1,6 @@
 import itertools
 import math
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from PIL import Image
 from aiohttp import ClientSession
@@ -52,7 +52,7 @@ async def find_panorama_by_id_async(panoid: str, session: ClientSession) -> Opti
     return parse_panorama_response(response)
 
 
-def get_panorama(pano: YandexPanorama, zoom: int = 0) -> Image.Image:
+def get_panorama(pano: YandexPanorama, zoom: int = 0, refetch: bool = False) -> Image.Image:
     """
     Downloads a panorama and returns it as PIL image.
 
@@ -62,23 +62,27 @@ def get_panorama(pano: YandexPanorama, zoom: int = 0) -> Image.Image:
     :param zoom: *(optional)* Image size; 0 is highest, 4 is lowest. The dimensions of a zoom level of a
         specific panorama depend on the camera used. If the requested zoom level does not exist,
         the highest available level will be downloaded. Defaults to 0.
+    :param refetch: *(optional)* If True, the metadata of the panorama will be refetched if ``pano.image_sizes``
+        is not set. This will make an additional network request. Defaults to False.
     :return: A PIL image containing the panorama.
     """
-    zoom = _validate_get_panorama_params(pano, zoom)
+    pano, zoom = _validate_get_panorama_params(pano, zoom, refetch, None)
     return get_equirectangular_panorama(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
         pano.tile_size, _generate_tile_list(pano, zoom))
 
 
-async def get_panorama_async(pano: YandexPanorama, session: ClientSession, zoom: int = 0) -> Image.Image:
-    zoom = _validate_get_panorama_params(pano, zoom)
+async def get_panorama_async(pano: YandexPanorama, session: ClientSession, zoom: int = 0,
+                             refetch: bool = False) -> Image.Image:
+    pano, zoom = await _validate_get_panorama_params_async(pano, zoom, refetch, session)
     return await get_equirectangular_panorama_async(
         pano.image_sizes[zoom].x, pano.image_sizes[zoom].y,
         pano.tile_size, _generate_tile_list(pano, zoom),
         session)
 
 
-def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0, pil_args: dict = None) -> None:
+def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0,
+                      pil_args: Optional[dict] = None, refetch: bool = False) -> None:
     """
     Downloads a panorama to a file. If the chosen format is JPEG, Exif and XMP GPano metadata are included.
 
@@ -92,18 +96,20 @@ def download_panorama(pano: YandexPanorama, path: str, zoom: int = 0, pil_args: 
     :param pil_args: *(optional)* Additional arguments for PIL's
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
+    :param refetch: *(optional)* If True, the metadata of the panorama will be refetched if ``pano.image_sizes``
+        is not set. This will make an additional network request. Defaults to False.
     """
     if pil_args is None:
         pil_args = {}
-    image = get_panorama(pano, zoom=zoom)
+    image = get_panorama(pano, zoom=zoom, refetch=refetch)
     save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
 async def download_panorama_async(pano: YandexPanorama, path: str, session: ClientSession,
-                                  zoom: int = 0, pil_args: dict = None) -> None:
+                                  zoom: int = 0, pil_args: Optional[dict] = None, refetch: bool = False) -> None:
     if pil_args is None:
         pil_args = {}
-    image = await get_panorama_async(pano, session, zoom=zoom)
+    image = await get_panorama_async(pano, session, zoom=zoom, refetch=refetch)
     save_with_metadata(image, path, pil_args, _build_output_metadata_object(pano, image))
 
 
@@ -144,8 +150,27 @@ def _generate_tile_list(pano: YandexPanorama, zoom: int) -> List[Tile]:
     return tiles
 
 
-def _validate_get_panorama_params(pano: YandexPanorama, zoom: int) -> int:
+def _validate_get_panorama_params(pano: YandexPanorama, zoom: int,
+                                  refetch: bool, session: Session) -> Tuple[YandexPanorama, int]:
     if not pano.image_sizes:
-        raise ValueError("pano.image_sizes is None.")
+        if refetch:
+            pano = find_panorama_by_id(pano.id, session=session)
+            if pano is None:
+                raise ValueError("pano.image_sizes is None and refetch failed.")
+        else:
+            raise ValueError("pano.image_sizes is None.")
     zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
-    return zoom
+    return pano, zoom
+
+
+async def _validate_get_panorama_params_async(pano: YandexPanorama, zoom: int,
+                                  refetch: bool, session: ClientSession) -> Tuple[YandexPanorama, int]:
+    if not pano.image_sizes:
+        if refetch:
+            pano = await find_panorama_by_id_async(pano.id, session)
+            if pano is None:
+                raise ValueError("pano.image_sizes is None and refetch failed.")
+        else:
+            raise ValueError("pano.image_sizes is None.")
+    zoom = max(0, min(zoom, len(pano.image_sizes) - 1))
+    return pano, zoom
