@@ -292,7 +292,7 @@ def get_depth(panoid: str, has_equirect: bool, session: Session = None) -> np.nd
 
     :param panoid: The pano ID.
     :param has_equirect: For 3D / equirectangular panoramas, set this to True to fetch the real depth map
-    instead of the synthetic one.
+        instead of the synthetic one.
     :param session: *(optional)* A requests session.
     :return: The depth map of the faces in the order front, right, back, left, top, bottom.
     """
