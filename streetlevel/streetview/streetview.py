@@ -139,7 +139,7 @@ def download_panorama(pano: StreetViewPanorama, path: str, zoom: int = 5,
         `Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
         method, e.g. ``{"quality":100}``. Defaults to ``{}``.
     :param refetch: *(optional)* If True, the metadata of the panorama will be refetched if ``pano.image_sizes``
-    is not set. This will make an additional network request. Defaults to False.
+        is not set. This will make an additional network request. Defaults to False.
     """
     pano, zoom = _validate_get_panorama_params(pano, zoom, refetch, None)
     if pano.is_third_party:
@@ -200,7 +200,7 @@ def get_panorama(pano: StreetViewPanorama, zoom: int = 5, refetch: bool = False)
         specific panorama depend on the camera used. If the requested zoom level does not exist,
         the highest available level will be downloaded. Defaults to 5.
     :param refetch: *(optional)* If True, the metadata of the panorama will be refetched if ``pano.image_sizes``
-    is not set. This will make an additional network request. Defaults to False.
+        is not set. This will make an additional network request. Defaults to False.
     :return: A PIL image containing the panorama.
     """
     pano, zoom = _validate_get_panorama_params(pano, zoom, refetch, None)
