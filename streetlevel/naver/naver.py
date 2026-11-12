@@ -101,7 +101,7 @@ def find_panorama(lat: float, lon: float, neighbors: bool = True, historical: bo
     if historical:
         pano.historical = get_historical(pano.id, session=session)
     if depth:
-        pano.depth = get_depth(pano.id, session=session)
+        pano.depth = get_depth(pano.id, pano.has_equirect, session=session)
     return pano
 
 
@@ -118,7 +118,7 @@ async def find_panorama_async(lat: float, lon: float, session: ClientSession, ne
     if historical:
         pano.historical = await get_historical_async(pano.id, session)
     if depth:
-        pano.depth = await get_depth_async(pano.id, session)
+        pano.depth = await get_depth_async(pano.id, pano.has_equirect, session)
     return pano
 
 
